@@ -78,8 +78,11 @@
                            :value (:submit-label params "Submit")}]))]
     [form-attrs fields]))
 
-(defn render-form [params & names+fields]
-  (apply render-form* (prep-form params names+fields)))
+(defn render-form [& names+fields]
+  (let [[params names+fields] (if (map? (first names+fields))
+                                [(first names+fields) (rest names+fields)]
+                                [{} names+fields])]
+    (apply render-form* (prep-form params names+fields))))
 
 (defmacro with-form-style [style & body]
   `(binding [*form-style* ~style]

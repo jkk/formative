@@ -33,7 +33,7 @@
         submit-only? (and (= 1 (count fields))
                           (= :submit (:type (first fields))))]
     [:div {:class (str "form-shell" (when submit-only? " submit-only"))}
-     [:form (dissoc form-attrs :form-style)
+     [:form (dissoc form-attrs :type)
       (list
        (map render-field hidden-fields)
        [:table.form-table

@@ -5,7 +5,7 @@
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]))
 
-(def ^:dynamic *form-style* :table)
+(def ^:dynamic *form-type* :table)
 
 (defn normalize-field [field]
   (assoc field
@@ -60,7 +60,7 @@
                     params [:action :method :enctype :accept :name :id :class
                             :onsubmit :onreset :accept-charset :autofill])
         form-attrs (assoc form-attrs
-                     :form-style (:form-style params *form-style*))
+                     :type (:type params *form-type*))
         values (stringify-keys (:values params))
         fields (prep-fields names+fields values)
         fields (if (:cancel-href params)
@@ -84,6 +84,6 @@
                                 [{} names+fields])]
     (apply render-form* (prep-form params names+fields))))
 
-(defmacro with-form-style [style & body]
-  `(binding [*form-style* ~style]
+(defmacro with-form-type [type & body]
+  `(binding [*form-type* ~type]
      (do ~@body)))

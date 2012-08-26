@@ -10,11 +10,14 @@
                    (str *field-prefix* (:name field)))
         field (assoc field :id field-id)]
     [:tr {:id (str "row-" field-id)
-          :class (str (name (:type field :text)) "-row")}
+          :class (str (name (:type field :text)) "-row"
+                      (when (:problem field) " problem"))}
      (if (= :heading (:type field))
-       [:td.heading-cell {:colspan 2} (render-field field)]
+       [:th.heading-cell {:colspan 2} (render-field field)]
        (list
-        [:td.label-cell
+        [:th {:class (if (#{:checkbox :submit} (:type field))
+                       "empty-cell"
+                       "label-cell")}
          (when (and (not (#{:checkbox} (:type field))) (:label field))
            [:label {:for field-id}
             (:label field)])]

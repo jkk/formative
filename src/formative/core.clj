@@ -33,12 +33,12 @@
 (defmethod prep-field :checkbox [field values]
   (let [field (if (and (not (contains? field :value))
                         (not (contains? field :unchecked-value)))
-                 (assoc field :value 1 :unchecked-value 0)
+                 (assoc field :value "true" :unchecked-value "false")
                  field)
         val (get values (:name field))]
     (assoc field
-      :value (:value field 1)
-      :checked (= (str val) (str (:value field 1)))
+      :value (:value field "true")
+      :checked (= (str val) (str (:value field "true")))
       :label (:label field (field-name->label (:name field))))))
 
 (defmethod prep-field :submit [field values]

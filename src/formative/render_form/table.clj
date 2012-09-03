@@ -22,9 +22,13 @@
            [:label {:for field-id}
             (:label field)])]
         [:td.input-cell
+         (when (:prefix field)
+           [:span.prefix (:prefix field)])
          (render-field field)
          (when (= :checkbox (:type field))
            [:label {:for field-id} " " [:span.cb-label (:label field)]])
+         (when (:suffix field)
+           [:span.suffix (:suffix field)])
          (when (and (= :submit (:type field)) (:cancel-href field))
            [:span.cancel-link " " [:a {:href (:cancel-href field)} "Cancel"]])
          (when (:note field)

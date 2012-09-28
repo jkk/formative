@@ -56,14 +56,14 @@
         (normalize-field)
         (prep-field values))))
 
-(defn prep-form [params names+fields]
+(defn prep-form [params]
   (let [form-attrs (select-keys
                     params [:action :method :enctype :accept :name :id :class
                             :onsubmit :onreset :accept-charset :autofill])
         form-attrs (assoc form-attrs
                      :type (:type params *form-type*))
         values (stringify-keys (:values params))
-        fields (prep-fields names+fields values)
+        fields (prep-fields (:fields params) values)
         fields (if (:cancel-href params)
                  (for [field fields]
                    (if (= :submit (:type field))
@@ -79,11 +79,12 @@
                            :value (:submit-label params "Submit")}]))]
     [form-attrs fields]))
 
-(defn render-form [& names+fields]
-  (let [[params names+fields] (if (map? (first names+fields))
-                                [(first names+fields) (rest names+fields)]
-                                [{} names+fields])]
-    (apply render-form* (prep-form params names+fields))))
+(defn render-form [& params]
+  (let [[params kvs] (if (map? (first params))
+                       [(first params) (rest params)]
+                       [{} params])
+        params (merge params (apply hash-map kvs))]
+    (apply render-form* (prep-form params))))
 
 (defmacro with-form-type [type & body]
   `(binding [*form-type* ~type]

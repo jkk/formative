@@ -1,6 +1,7 @@
 (ns formative.core
   (:require [formative.render-form :refer [render-form*]]
-            [formative.render-form.table]
+            formative.render-form.table
+            formative.render-form.div
             [formative.render-field :refer [render-field]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]))

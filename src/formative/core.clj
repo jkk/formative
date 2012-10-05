@@ -20,7 +20,7 @@
   (str (Character/toUpperCase (.charAt s 0)) (subs s 1)))
 
 (defn field-name->label [fname]
-  (-> fname
+  (-> (name fname)
       (string/replace #"[_-]" " ")
       ucfirst))
 
@@ -93,7 +93,14 @@
                          [{:type :submit
                            :name "submit"
                            :cancel-href (:cancel-href params)
-                           :value (:submit-label params "Submit")}]))]
+                           :value (:submit-label params "Submit")}]))
+        problems (if-not (set? (:problems params))
+                   (set (map name (:problems params)))
+                   (map name (:problems params)))
+        fields (for [field fields]
+                 (if (problems (:name field))
+                   (assoc field :problem true)
+                   field))]
     [form-attrs fields]))
 
 (defn render-form [& params]

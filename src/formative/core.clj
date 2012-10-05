@@ -5,7 +5,9 @@
             [formative.render-field :refer [render-field]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
-            [ordered.map :refer [ordered-map]]))
+            [ordered.map :refer [ordered-map]]
+            [sundry.num :refer [parse-long]]
+            [ring.middleware.nested-params :as np]))
 
 (def ^:dynamic *form-type* :table)
 
@@ -113,3 +115,56 @@
 (defmacro with-form-type [type & body]
   `(binding [*form-type* ~type]
      (do ~@body)))
+
+
+;;;;
+
+(defmulti parse-input (fn [spec s]
+                        (:datatype spec (:type spec))))
+
+(defmethod parse-input :default [_ s]
+  s)
+
+(defmethod parse-input :int [_ s]
+  (parse-long s))
+
+(defmethod parse-input :ints [_ s]
+  (map parse-long s))
+
+(defmethod parse-input :long [_ s]
+  (parse-long s))
+
+(defmethod parse-input :longs [_ s]
+  (map parse-long s))
+
+(defmethod parse-input :boolean [_ s]
+  (Boolean/valueOf s))
+
+(defmethod parse-input :date [_ s]
+  (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") s))
+
+;; TODO: more types
+
+(defn- get-param [m kw]
+  (get m (name kw) (get m kw)))
+
+(defn- fix-input [input spec]
+  (if (and (= :checkboxes (:type spec))
+           (= "" (first input)))
+    (rest input)
+    input))
+
+(defn parse-params [fields params]
+  (let [;; FIXME: Should probably not rely on a private Ring fn (shhh)
+        input (#'np/nest-params params
+                                np/parse-nested-keys)]
+    (reduce
+      (fn [row [fname spec]]
+        (if (or (contains? input (name fname))
+                (contains? input fname))
+          (assoc row
+                 fname (parse-input spec (fix-input
+                                           (get-param input fname) spec)))
+          row))
+      {}
+      (partition 2 fields))))

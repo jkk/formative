@@ -6,11 +6,16 @@
 (defmulti render-field (fn [field]
                          (:type field)))
 
+(defn- get-input-attrs [field allowed-keys]
+  (let [data-keys (filter #(re-find #"^data-" (name %))
+                          (keys field))]
+    (select-keys field (concat allowed-keys data-keys))))
+
 (defn render-default-input [field]
-  (let [attrs (select-keys field [:type :name :id :class :value :autofocus
-                                  :checked :disabled :href :style :src :size
-                                  :readonly :tabindex :onchange :onclick
-                                  :onfocus :onblur :placeholder :autofill])
+  (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
+                                      :checked :disabled :href :style :src :size
+                                      :readonly :tabindex :onchange :onclick
+                                      :onfocus :onblur :placeholder :autofill])
         attrs (if (:type attrs)
                 attrs
                 (assoc attrs :type :text))
@@ -24,10 +29,10 @@
   (render-default-input field))
 
 (defmethod render-field :textarea [field]
-  (let [attrs (select-keys field [:name :id :class :autofocus
-                                  :disabled :style :size :rows :cols :wrap
-                                  :readonly :tabindex :onchange :onclick
-                                  :onfocus :onblur :placeholder])]
+  (let [attrs (get-input-attrs field [:name :id :class :autofocus
+                                      :disabled :style :size :rows :cols :wrap
+                                      :readonly :tabindex :onchange :onclick
+                                      :onfocus :onblur :placeholder])]
     [:textarea attrs (h (:value field))]))
 
 (defn normalize-options [opts]
@@ -38,10 +43,10 @@
     (map #(vector % %) opts)))
 
 (defmethod render-field :select [field]
-  (let [attrs (select-keys field [:name :id :class :autofocus
-                                  :disabled :multiple :size :readonly
-                                  :tabindex :onchange :onclick :onfocus
-                                  :onblur])
+  (let [attrs (get-input-attrs field [:name :id :class :autofocus
+                                      :disabled :multiple :size :readonly
+                                      :tabindex :onchange :onclick :onfocus
+                                      :onblur])
         val (str (:value field))
         opts (normalize-options (:options field))]
     [:select attrs

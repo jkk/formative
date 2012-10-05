@@ -4,7 +4,8 @@
             formative.render-form.div
             [formative.render-field :refer [render-field]]
             [clojure.walk :refer [stringify-keys]]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [ordered.map :refer [ordered-map]]))
 
 (def ^:dynamic *form-type* :table)
 
@@ -55,6 +56,22 @@
     (-> field
         (normalize-field)
         (prep-field values))))
+
+(defn merge-fields [fields1 fields2]
+  (let [fields2 (if (map? fields2)
+                  fields2
+                  (into (ordered-map) (map vec (partition 2 fields2))))
+        [ret leftovers] (reduce
+                          (fn [[ret fields2] [fname spec]]
+                            (let [[spec* fields2*]
+                                  (if (contains? fields2 fname)
+                                    [(merge spec (get fields2 fname))
+                                     (dissoc fields2 fname)]
+                                    [spec fields2])]
+                              [(conj ret fname spec*) fields2*]))
+                          [[] fields2]
+                          (partition 2 fields1))]
+    (apply concat ret leftovers)))
 
 (defn prep-form [params]
   (let [form-attrs (select-keys

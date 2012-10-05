@@ -57,13 +57,13 @@
                             :value (:unchecked-value field)}))
    (render-default-input field)))
 
-(defn- cb-slug [val]
+(defn- opt-slug [val]
   (-> (str val)
     (string/replace #"[^a-zA-Z0-9\-]" "-")
     (string/replace #"-{2,}" "-")))
 
 (defmethod render-field :checkboxes [field]
-  (let [vals (set (:value field))
+  (let [vals (set (map str (:value field)))
         opts (normalize-options (:options field))
         fname (str (name (:name field)) "[]")
         cols (:cols field 1)
@@ -81,14 +81,36 @@
                               (partition-all cb-per-col opts))]
        [:div {:class (str "cb-col cb-col-" col)}
         (for [[oval olabel] colopts]
-          (let [id (str (:id field) "__" (cb-slug oval))]
+          (let [id (str (:id field) "__" (opt-slug oval))]
             [:div.cb-shell
              [:span.cb-input-shell
-              (render-field {:name fname :id id :checked (contains? vals oval)
+              (render-field {:name fname :id id :checked (contains? vals (str oval))
                              :type :checkbox :value oval})]
              " "
              [:label {:for id}
               [:nobr olabel]]]))])]))
+
+(defn- render-radios [field]
+  (let [val (str (:value field))
+        opts (normalize-options (:options field))]
+    [:div.radios
+     (for [[oval olabel] opts]
+       (let [id (str (:id field) "__" (opt-slug oval))]
+         [:div.radio-shell
+          [:span.radio-input-shell
+           (render-default-input {:name (:name field) :id id
+                                  :type :radio
+                                  :checked (= val (str oval))
+                                  :value oval})]
+          " "
+          [:label {:for id}
+           [:nobr olabel]]]))]))
+
+(defmethod render-field :radio [field]
+  (render-radios field))
+
+(defmethod render-field :radios [field]
+  (render-radios field))
 
 (defmethod render-field :html [field]
   (:html field))

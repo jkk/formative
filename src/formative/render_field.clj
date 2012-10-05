@@ -1,5 +1,7 @@
 (ns formative.render-field
-  (:require [hiccup.core :refer [h]]))
+  (:require [hiccup.core :refer [h]]
+            [formative.data :as data]
+            [clojure.string :as string]))
 
 (defmulti render-field (fn [field]
                          (:type field)))
@@ -55,8 +57,57 @@
                             :value (:unchecked-value field)}))
    (render-default-input field)))
 
+(defn- cb-slug [val]
+  (-> (str val)
+    (string/replace #"[^a-zA-Z0-9\-]" "-")
+    (string/replace #"-{2,}" "-")))
+
+(defmethod render-field :checkboxes [field]
+  (let [vals (set (:value field))
+        opts (normalize-options (:options field))
+        fname (str (name (:name field)) "[]")
+        cols (:cols field 1)
+        cb-per-col (+ (quot (count opts) cols)
+                      (if (zero? (rem (count opts) cols))
+                        0 1))]
+    [:div.checkboxes
+     ;; FIXME: this prevents checkbox values from being absent in the submitted
+     ;; request, but at the cost of including an empty value which must be
+     ;; filtered out. We can't use an empty input without the "[]" suffix
+     ;; because nested-params Ring middleware won't allow it.
+     (render-field {:name fname :type :hidden})
+     (for [[col colopts] (map vector
+                              (range 1 (inc cols))
+                              (partition-all cb-per-col opts))]
+       [:div {:class (str "cb-col cb-col-" col)}
+        (for [[oval olabel] colopts]
+          (let [id (str (:id field) "__" (cb-slug oval))]
+            [:div.cb-shell
+             [:span.cb-input-shell
+              (render-field {:name fname :id id :checked (contains? vals oval)
+                             :type :checkbox :value oval})]
+             " "
+             [:label {:for id}
+              [:nobr olabel]]]))])]))
+
 (defmethod render-field :html [field]
   (:html field))
 
 (defmethod render-field :heading [field]
   [:h3 (:text field)])
+
+(defmethod render-field :us-state [field]
+  (render-field (assoc field
+                       :type :select
+                       :options data/us-states)))
+
+(defmethod render-field :ca-state [field]
+  (render-field (assoc field
+                       :type :select
+                       :options data/ca-states)))
+
+(defmethod render-field :country [field]
+  (render-field (assoc field
+                       :type :select
+                       :options (data/countries-by (or (:country-code field) :alpha2)))))
+

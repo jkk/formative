@@ -5,5 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [hiccup "1.0.0"]
-                 [ordered "1.3.2"]
+                 [com.jkkramer/ordered "1.3.3-SNAPSHOT"]
                  [ring/ring-core "1.1.1"]])

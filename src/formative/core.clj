@@ -150,6 +150,15 @@
 (defmethod parse-input :boolean [_ v]
   (Boolean/valueOf v))
 
+(defmethod parse-input :float [_ v]
+  (try (Double/valueOf v) (catch Exception _)))
+
+(defmethod parse-input :double [_ v]
+  (try (Double/valueOf v) (catch Exception _)))
+
+(defmethod parse-input :decimal [_ v]
+  (try (BigDecimal. v) (catch Exception _)))
+
 (defmethod parse-input :date [spec v]
   (when-not (string/blank? v)
     (try

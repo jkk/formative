@@ -5,7 +5,7 @@
             [formative.render-field :refer [render-field]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
-            [ordered.map :refer [ordered-map]]
+            [com.jkkramer.ordered.map :refer [ordered-map]]
             [sundry.num :refer [parse-long]]
             [ring.middleware.nested-params :as np]))
 

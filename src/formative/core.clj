@@ -2,6 +2,7 @@
   (:require [formative.render-form :refer [render-form*]]
             formative.render-form.table
             formative.render-form.div
+            formative.render-form.bootstrap
             [formative.render-field :refer [render-field]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
@@ -9,7 +10,7 @@
             [sundry.num :refer [parse-long]]
             [ring.middleware.nested-params :as np]))
 
-(def ^:dynamic *form-type* :table)
+(def ^:dynamic *form-type* :bootstrap-horizontal)
 
 (defn normalize-field [field]
   (assoc field

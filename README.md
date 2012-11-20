@@ -1,6 +1,9 @@
-# formative
+# Formative
 
 A Clojure library for generating [Hiccup](https://github.com/weavejester/hiccup) forms and parsing submitted form data.
+
+Minimal validation is performed: only enough to parse non-blank strings into values of the appropriate type. A higher level library should be used to do full, proper validation.
+
 
 ## Installation
 
@@ -70,7 +73,7 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 
 ### Parsing Form Data
 
-`formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) param map into a map of parsed form data. It will parse each field according to its `:type` and `:datatype` keys.
+`formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) `:form-params` or `:query-params` map into a map of parsed form data. It will parse each field according to its `:type` and `:datatype` keys.
 
 ```clj
 (fp/parse-params
@@ -82,7 +85,9 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 ;; => {:remember false, :secret-code 1234, :password "bazquux", :email "foobar@gmail.com"}
 ```
 
-You'll see that the `:remember` and `:secret-code` fields have been parsed from strings into their respective datatypes.
+Note that the `:remember` and `:secret-code` fields have been parsed from strings into their respective datatypes.
+
+Field values must conform to the correct string format - e.g., "123" for the integer 123. An exception will be thrown if a value is non-blank does not conform to its expected format. No further validation is performed.
 
 ## Form and Field Specifications
 

@@ -1,12 +1,11 @@
 (ns formative.parse
-  (:require [sundry.num :refer [parse-long parse-double]]
-            [ring.middleware.nested-params :as np]
+  (:require [ring.middleware.nested-params :as np]
             [clojure.string :as string]
             [formative.core :as f]))
 
 (defn throw-problem
   "Creates and throws an exception carrying information about a failed field
-  parse"
+  parse."
   ([spec value]
     (throw-problem spec value "%s is not valid"))
   ([spec value msg]
@@ -24,17 +23,24 @@
 (defmethod parse-input :default [_ v]
   v)
 
-(defmethod parse-input :int [_ v]
-  (parse-long v))
+(defn- parse-long [spec x]
+  (when-not (string/blank? x)
+    (try
+      (Long/valueOf x)
+      (catch Exception _
+        (throw-problem spec x "%s is not a valid integer")))))
 
-(defmethod parse-input :ints [_ v]
-  (map parse-long v))
+(defmethod parse-input :int [spec v]
+  (parse-long spec v))
 
-(defmethod parse-input :long [_ v]
-  (parse-long v))
+(defmethod parse-input :ints [spec v]
+  (map #(parse-long spec %) v))
 
-(defmethod parse-input :longs [_ v]
-  (map parse-long v))
+(defmethod parse-input :long [spec v]
+  (parse-long spec v))
+
+(defmethod parse-input :longs [spec v]
+  (map #(parse-long spec %) v))
 
 (defmethod parse-input :boolean [_ v]
   (Boolean/valueOf v))
@@ -42,35 +48,50 @@
 (defmethod parse-input :booleans [_ v]
   (map #(Boolean/valueOf %) v))
 
-(defmethod parse-input :float [_ v]
-  (parse-double v))
+(defn- parse-double [spec x]
+  (when-not (string/blank? x)
+    (try
+      (Double/valueOf x)
+      (catch Exception _
+        (throw-problem spec x "%s is not a valid decimal number")))))
 
-(defmethod parse-input :floats [_ v]
-  (map parse-double v))
+(defmethod parse-input :float [spec v]
+  (parse-double spec v))
 
-(defmethod parse-input :double [_ v]
-  (parse-double v))
+(defmethod parse-input :floats [spec v]
+  (map #(parse-double spec %) v))
 
-(defmethod parse-input :doubles [_ v]
-  (map parse-double v))
+(defmethod parse-input :double [spec v]
+  (parse-double spec v))
 
-(defn- parse-bigdec [x]
-  (try (BigDecimal. x) (catch Exception _)))
+(defmethod parse-input :doubles [spec v]
+  (map #(parse-double spec %) v))
 
-(defmethod parse-input :decimal [_ v]
-  (parse-bigdec v))
+(defn- parse-bigdec [spec x]
+  (when-not (string/blank? x)
+    (try
+      (BigDecimal. x)
+      (catch Exception _
+        (throw-problem spec x "%s is not a valid decimal number")))))
 
-(defmethod parse-input :decimals [_ v]
-  (map parse-bigdec v))
+(defmethod parse-input :decimal [spec v]
+  (parse-bigdec spec v))
 
-(defn- parse-bigint [x]
-  (try (bigint (BigInteger. x)) (catch Exception _)))
+(defmethod parse-input :decimals [spec v]
+  (map #(parse-bigdec spec %) v))
 
-(defmethod parse-input :bigint [_ v]
-  (parse-bigint v))
+(defn- parse-bigint [spec x]
+  (when-not (string/blank? x)
+    (try
+      (bigint (BigInteger. x))
+      (catch Exception _
+        (throw-problem spec x "%s is not a valid integer")))))
 
-(defmethod parse-input :bigints [_ v]
-  (map parse-bigint v))
+(defmethod parse-input :bigint [spec v]
+  (parse-bigint spec v))
+
+(defmethod parse-input :bigints [spec v]
+  (map #(parse-bigint spec %) v))
 
 (defn- parse-date [spec x]
   (when-not (string/blank? x)
@@ -113,8 +134,8 @@
     input))
 
 (defn parse-params
-  "Given a sequence of field specifications and a Ring params map,
-  returns a map of field names to parsed values."
+  "Given a sequence of field specifications and a Ring :form-params or
+  :query-params map, returns a map of field names to parsed values."
   [fields params]
   (let [fields (f/prep-fields fields {})
         ;; FIXME: Should probably not rely on a private Ring fn (shhh)

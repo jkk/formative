@@ -22,19 +22,20 @@
      (if (= :heading (:type field))
        [:legend (render-field field)]
        (list
-         [:div.label-shell {:class (if (#{:checkbox :submit} (:type field))
-                                     "empty-cell"
-                                     "label-cell")}
+         [:div {:class (if (#{:checkbox :submit} (:type field))
+                         "empty-shell"
+                         "label-shell")}
           (when (and (not (#{:checkbox} (:type field))) (:label field))
             [:label.control-label {:for field-id}
              (:label field)])]
          [:div.input-shell.controls
           (when (:prefix field)
             [:span.prefix (:prefix field)])
-          (render-field field)
-          (when (= :checkbox (:type field))
+          (if (= :checkbox (:type field))
             [:label.checkbox {:for field-id} " "
-             [:span.cb-label (:label field)]])
+             [:span.cb-label (:label field)]
+             (render-field field)]
+            (render-field field))
           (when (:suffix field)
             [:span.suffix (:suffix field)])
           (when (and (= :submit (:type field))

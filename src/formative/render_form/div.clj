@@ -18,9 +18,9 @@
      (if (= :heading (:type field))
        [:legend (render-field field)]
        (list
-         [:div.label-shell {:class (if (#{:checkbox :submit} (:type field))
-                                     "empty-cell"
-                                     "label-cell")}
+         [:div {:class (if (#{:checkbox :submit} (:type field))
+                         "empty-cell"
+                         "label-cell")}
           (when (and (not (#{:checkbox} (:type field))) (:label field))
             [:label {:for field-id}
              (:label field)])]

@@ -42,7 +42,7 @@ To build a form, you need a form specification, which is a map that looks like t
             :remember true}})
 ```
 
-The map can contain keys such as `:method` and `:action` that directly correspond to HTML form attributes. It can also contain special keys such as `:fields` and `:submit-label`. See [Form and Field Specifications](#form-specifications) for more about the specification format.
+The map can contain keys such as `:method` and `:action` that directly correspond to HTML form attributes. It can also contain special keys such as `:fields` and `:submit-label`. See [Form and Field Specifications](#form-and-field-specifications) for more about the specification format.
 
 ### Rendering a Form
 

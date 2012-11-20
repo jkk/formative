@@ -74,12 +74,13 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
    "email" "foobar@gmail.com"
    "password" "bazquux"
    "remember" "false"})
-;; => {:remember false, :secret-code 1234, :password "bazquux", :email "foobar@gmail.com"}
+;; Returns:
+{:remember false, :secret-code 1234, :password "bazquux", :email "foobar@gmail.com"}
 ```
 
 Note that the `:remember` and `:secret-code` fields have been parsed from strings into their respective datatypes.
 
-Field values must conform to the correct string format - e.g., "123" for the integer 123. An exception will be thrown if a value is non-blank does not conform to its expected format. No further validation is performed.
+Field values must conform to the correct string format - e.g., "123" for the integer 123. An exception will be thrown if a value is non-blank and does not conform to its expected format. No further validation is performed.
 
 ## Form and Field Specifications
 

@@ -126,16 +126,16 @@ A field specification is a map with the following keys:
 
                       The :html type expects an :html key, a string or Hiccup data.
       :datatype     - Datatype of the field used for parsing. Can be one of:
-                      :int, :long, :boolean, :float, :double, :decimal, :bigint,
-                      :date, :file.
+                      :str, :int, :long, :boolean, :float, :double, :decimal,
+                      :bigint, :date, :file. Defaults to :str.
 
                       All types can be appended with an "s" when a sequence
                       is expected - e.g., :ints for a sequence of integers. This
                       is useful for fields that have composite values, such as
                       :checkboxes.
 
-                      :date field values are expected to be in YYYY-MM-DD
-                      format.
+                      :date field values are expected to be in yyyy-MM-dd
+                      format by default. Set :date-format to change that.
 
                       :file fields must have an :upload-handler key which is
                       a function that takes two arguments: the field

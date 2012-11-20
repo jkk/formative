@@ -45,7 +45,8 @@
 (defmethod prep-field :checkbox [field values]
   (let [field (if (and (not (contains? field :value))
                        (not (contains? field :unchecked-value)))
-                (assoc field :value "true" :unchecked-value "false")
+                (assoc field :value "true" :unchecked-value "false"
+                       :datatype :boolean)
                 field)
         val (get values (:name field))]
     (assoc field

@@ -84,10 +84,10 @@
                                     [(merge spec (get fields2 fname))
                                      (dissoc fields2 fname)]
                                     [spec fields2])]
-                              [(conj ret fname spec*) fields2*]))
+                              [(conj ret spec*) fields2*]))
                           [[] fields2]
                           fields1)]
-    (apply concat ret leftovers)))
+    (concat ret leftovers)))
 
 (defn prep-form
   "Prepares a form for rendering by normalizing and populating fields, adding

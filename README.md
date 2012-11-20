@@ -29,7 +29,7 @@ The important namespaces are `formative.core` and `formative.parse`:
 To build a form, you need a form specification, which is a map that looks like this:
 
 ```clj
-(def test-form
+(def example-form
   {:method :post
    :action "/example/path"
    :submit-label "Do It"

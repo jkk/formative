@@ -15,7 +15,7 @@ Leiningen coordinate:
 
 The important namespaces are `formative.core` and `formative.parse`:
 
-```
+```clj
 (ns example.core
   (:require [formative.core :as f]
             [formative.parse :as fp]))
@@ -25,7 +25,7 @@ The important namespaces are `formative.core` and `formative.parse`:
 
 To build a form, you need a form specification, which is a map that looks like this:
 
-```
+```clj
 (def test-form
   {:method :post
    :action "/example/path"
@@ -45,7 +45,7 @@ The map can contain keys such as `:method` and `:action` that directly correspon
 
 You can render the form as Hiccup data using `formative.core/render-form`:
 
-```
+```clj
 (f/render-form example-form)
 ;; Returns:
 [:div {:class "form-shell form-horizontal"}
@@ -72,7 +72,7 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 
 `formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) param map into a map of parsed form data. It will parse each field according to its `:type` and `:datatype` keys.
 
-```
+```clj
 (fp/parse-params
   (:fields example-form)
   {"secret-code" "1234"

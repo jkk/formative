@@ -38,29 +38,65 @@
 (defmethod parse-input :boolean [_ v]
   (Boolean/valueOf v))
 
+(defmethod parse-input :booleans [_ v]
+  (map #(Boolean/valueOf %) v))
+
 (defmethod parse-input :float [_ v]
-  (try (Double/valueOf v) (catch Exception _)))
+  (parse-double v))
+
+(defmethod parse-input :floats [_ v]
+  (map parse-double v))
 
 (defmethod parse-input :double [_ v]
-  (try (Double/valueOf v) (catch Exception _)))
+  (parse-double v))
+
+(defmethod parse-input :doubles [_ v]
+  (map parse-double v))
+
+(defn- parse-bigdec [x]
+  (try (BigDecimal. x) (catch Exception _)))
 
 (defmethod parse-input :decimal [_ v]
-  (try (BigDecimal. v) (catch Exception _)))
+  (parse-bigdec v))
+
+(defmethod parse-input :decimals [_ v]
+  (map parse-bigdec v))
+
+(defn- parse-bigint [x]
+  (try (bigint (BigInteger. x)) (catch Exception _)))
+
+(defmethod parse-input :bigint [_ v]
+  (parse-bigint v))
+
+(defmethod parse-input :bigints [_ v]
+  (map parse-bigint v))
+
+(defn- parse-date [spec x]
+  (when-not (string/blank? x)
+    (try
+      (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") x)
+      (catch Exception e
+        (throw-problem spec x "%s is not a valid date")))))
 
 (defmethod parse-input :date [spec v]
-  (when-not (string/blank? v)
-    (try
-      (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") v)
-      (catch Exception e
-        (throw-problem spec v "%s is not a valid date")))))
+  (parse-date spec v))
 
-(defmethod parse-input :file [spec v]
+(defmethod parse-input :dates [spec v]
+  (map #(parse-date spec %) v))
+
+(defn- parse-file [spec x]
   (when-not (:upload-handler spec)
     (throw (IllegalStateException.
              (str "Missing :upload-handler for " (:name spec)))))
-  (if (string/blank? (:filename v))
+  (if (string/blank? (:filename x))
     ::absent
-    ((:upload-handler spec) spec v)))
+    ((:upload-handler spec) spec x)))
+
+(defmethod parse-input :file [spec v]
+  (parse-file spec v))
+
+(defmethod parse-input :files [spec v]
+  (map #(parse-file spec %) v))
 
 ;; TODO: more types
 

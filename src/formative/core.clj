@@ -6,9 +6,7 @@
             [formative.render-field :refer [render-field]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
-            [com.jkkramer.ordered.map :refer [ordered-map]]
-            [sundry.num :refer [parse-long]]
-            [ring.middleware.nested-params :as np]))
+            [com.jkkramer.ordered.map :refer [ordered-map]]))
 
 (def ^:dynamic *form-type* :bootstrap-horizontal)
 
@@ -53,9 +51,8 @@
 (defmethod prep-field :html [field values]
   field)
 
-(defn prep-fields [names+fields values]
-  (for [[fname field] (partition 2 names+fields)
-        :let [field (assoc field :name fname)]]
+(defn prep-fields [fields values]
+  (for [field fields]
     (-> field
         (normalize-field)
         (prep-field values))))
@@ -63,17 +60,18 @@
 (defn merge-fields [fields1 fields2]
   (let [fields2 (if (map? fields2)
                   fields2
-                  (into (ordered-map) (map vec (partition 2 fields2))))
+                  (into (ordered-map) (map (juxt :name identity) fields2)))
         [ret leftovers] (reduce
-                          (fn [[ret fields2] [fname spec]]
-                            (let [[spec* fields2*]
+                          (fn [[ret fields2] spec]
+                            (let [fname (:name spec)
+                                  [spec* fields2*]
                                   (if (contains? fields2 fname)
                                     [(merge spec (get fields2 fname))
                                      (dissoc fields2 fname)]
                                     [spec fields2])]
                               [(conj ret fname spec*) fields2*]))
                           [[] fields2]
-                          (partition 2 fields1))]
+                          fields1)]
     (apply concat ret leftovers)))
 
 (defn prep-form [params]
@@ -106,113 +104,9 @@
                    field))]
     [form-attrs fields]))
 
-(defn render-form [& params]
-  (let [[params kvs] (if (map? (first params))
-                       [(first params) (rest params)]
-                       [{} params])
-        params (merge params (apply hash-map kvs))]
-    (apply render-form* (prep-form params))))
+(defn render-form [params]
+  (apply render-form* (prep-form params)))
 
 (defmacro with-form-type [type & body]
   `(binding [*form-type* ~type]
      (do ~@body)))
-
-
-;;;;
-
-(defn throw-problem
-  ([spec value]
-    (throw-problem spec value "%s is not valid"))
-  ([spec value msg]
-    (throw (ex-info (format msg (name (:name spec)))
-                    {:value value
-                     :problems [{:field-name (:name spec)
-                                 :spec spec
-                                 :msg msg}]}))))
-
-(defmulti parse-input (fn [spec v]
-                        (:datatype spec (:type spec))))
-
-(defmethod parse-input :default [_ v]
-  v)
-
-(defmethod parse-input :int [_ v]
-  (parse-long v))
-
-(defmethod parse-input :ints [_ v]
-  (map parse-long v))
-
-(defmethod parse-input :long [_ v]
-  (parse-long v))
-
-(defmethod parse-input :longs [_ v]
-  (map parse-long v))
-
-(defmethod parse-input :boolean [_ v]
-  (Boolean/valueOf v))
-
-(defmethod parse-input :float [_ v]
-  (try (Double/valueOf v) (catch Exception _)))
-
-(defmethod parse-input :double [_ v]
-  (try (Double/valueOf v) (catch Exception _)))
-
-(defmethod parse-input :decimal [_ v]
-  (try (BigDecimal. v) (catch Exception _)))
-
-(defmethod parse-input :date [spec v]
-  (when-not (string/blank? v)
-    (try
-      (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") v)
-      (catch Exception e
-        (throw-problem spec v "%s is not a valid date")))))
-
-(defmethod parse-input :file [spec v]
-  (when-not (:upload-handler spec)
-    (throw (IllegalStateException.
-             (str "Missing :upload-handler for " (:name spec)))))
-  (if (string/blank? (:filename v))
-    ::absent
-    ((:upload-handler spec) spec v)))
-
-;; TODO: more types
-
-(defn- get-param [m kw]
-  (get m (name kw) (get m kw)))
-
-(defn- fix-input [input spec]
-  (if (and (= :checkboxes (:type spec))
-           (= "" (first input)))
-    (rest input)
-    input))
-
-;; TODO: doc
-(defn parse-params [fields params]
-  (let [;; FIXME: Should probably not rely on a private Ring fn (shhh)
-        input (#'np/nest-params params
-                                np/parse-nested-keys)]
-    (reduce
-      (fn [row [fname spec]]
-        (if (or (contains? input (name fname))
-                (contains? input fname))
-          (let [raw-val (fix-input
-                          (get-param input fname) spec)
-                spec* (assoc spec :name fname)
-                val (parse-input spec* raw-val)]
-            (if (= val ::absent)
-              row
-              (assoc row fname val)))
-          row))
-      {}
-      (partition 2 fields))))
-
-;;;;
-
-(defmacro with-fallback
-  [req form-fn & body]
-  `(try
-     ~@body
-     (catch clojure.lang.ExceptionInfo e#
-       (if-let [problems# (:problems (ex-data e#))]
-         (~form-fn ~req :problems problems#)
-         (throw e#)))))

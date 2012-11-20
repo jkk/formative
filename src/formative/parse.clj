@@ -120,7 +120,7 @@
                                 np/parse-nested-keys)]
     (reduce
       (fn [row spec]
-        (let [fname (:name spec)]
+        (let [fname (keyword (:name spec))]
           (if (or (contains? input (name fname))
                   (contains? input fname))
             (let [raw-val (fix-input

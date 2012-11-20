@@ -147,7 +147,7 @@
                       renderers typically add a class and style to highlight
                       problem fields.
 
-  A form field specification is a map with the following keys:
+  A field specification is a map with the following keys:
 
       :name         - Required name of the field, a keyword
       :type         - UI type of the field. Defaults to :text. Built-in types
@@ -168,9 +168,12 @@
                       The :html type expects an :html key.
       :datatype     - Datatype of the field when parsed. Can be one of:
                       :int, :long, :boolean, :float, :double, :decimal, :bigint,
-                      :date, :file. All types can be appended with an \"s\" when
-                      a sequence is expected - e.g., :ints for a sequence of
-                      integers.
+                      :date, :file.
+
+                      All types can be appended with an \"s\" when a sequence
+                      is expected - e.g., :ints for a sequence of integers. This
+                      is useful for fields that have composite values, such as
+                      :checkboxes.
 
                       :date field values are expected to be in YYYY-MM-DD
                       format.

@@ -2,7 +2,7 @@
 
 A Clojure library for generating [Hiccup](https://github.com/weavejester/hiccup) forms and parsing submitted form data.
 
-Minimal validation is performed: only enough to parse non-blank strings into values of the appropriate type. A higher level library should be used to do full, proper validation.
+By design, minimal validation is performed: only enough to parse non-blank strings into values of the appropriate type. A higher level library should be used to do full, proper validation.
 
 
 ## Installation

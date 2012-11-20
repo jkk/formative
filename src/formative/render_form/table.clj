@@ -38,8 +38,13 @@
   (let [[hidden-fields visible-fields] ((juxt filter remove)
                                         #(= :hidden (:type %)) fields)
         submit-only? (and (= 1 (count fields))
-                          (= :submit (:type (first fields))))]
-    [:div {:class (str "form-shell" (when submit-only? " submit-only"))}
+                          (= :submit (:type (first fields))))
+        shell-attrs {:class (str "form-shell" (when submit-only? " submit-only"))}
+        shell-attrs (if (:id form-attrs)
+                      (assoc shell-attrs :id (str (name (:id form-attrs))
+                                                  "-shell"))
+                      shell-attrs)]
+    [:div shell-attrs
      [:form (dissoc form-attrs :type)
       (list
        (map render-field hidden-fields)

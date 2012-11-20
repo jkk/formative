@@ -1,9 +1,11 @@
 (ns formative.parse
-  (:require [sundry.num :refer [parse-long]]
+  (:require [sundry.num :refer [parse-long parse-double]]
             [ring.middleware.nested-params :as np]
             [clojure.string :as string]))
 
 (defn throw-problem
+  "Creates and throws an exception carrying information about a failed field
+  parse"
   ([spec value]
     (throw-problem spec value "%s is not valid"))
   ([spec value msg]
@@ -13,8 +15,10 @@
                                  :spec spec
                                  :msg msg}]}))))
 
-(defmulti parse-input (fn [spec v]
-                        (:datatype spec (:type spec))))
+(defmulti parse-input
+  "Parses the value for a particular field specification"
+  (fn [spec v]
+    (:datatype spec (:type spec))))
 
 (defmethod parse-input :default [_ v]
   v)
@@ -70,7 +74,10 @@
     input))
 
 ;; TODO: doc
-(defn parse-params [fields params]
+(defn parse-params
+  "Given a sequence of field specifications and a Ring params map,
+  returns a map of field names to parsed values."
+  [fields params]
   (let [;; FIXME: Should probably not rely on a private Ring fn (shhh)
         input (#'np/nest-params params
                                 np/parse-nested-keys)]
@@ -93,6 +100,9 @@
 ;;;;
 
 (defmacro with-fallback
+  "Attempts to run body; if an ExceptionInfo with field problems is caught,
+  calls form-fn with a :problems keyword argument containing the problem
+  payload."
   [req form-fn & body]
   `(try
      ~@body

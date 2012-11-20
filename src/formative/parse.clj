@@ -75,7 +75,9 @@
 (defn- parse-date [spec x]
   (when-not (string/blank? x)
     (try
-      (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") x)
+      (.parse (java.text.SimpleDateFormat.
+                (:date-format spec "yyyy-MM-dd"))
+        x)
       (catch Exception e
         (throw-problem spec x "%s is not a valid date")))))
 

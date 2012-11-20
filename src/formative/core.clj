@@ -175,8 +175,8 @@
                       is useful for fields that have composite values, such as
                       :checkboxes.
 
-                      :date field values are expected to be in YYYY-MM-DD
-                      format.
+                      :date field values are expected to be in yyyy-MM-dd
+                      format by default. Set :date-format to change that. 
 
                       :file fields must have an :upload-handler key which is
                       a function that takes two arguments: the field

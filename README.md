@@ -53,16 +53,8 @@ You can render the form as Hiccup data using `formative.core/render-form`:
 ;; Returns:
 [:div {:class "form-shell form-horizontal"}
  [:form {:method :post, :action "/example/path"}
-  (([:input {:value 1234, :name "secret-code", :type :hidden}])
-    [:fieldset
-     ([:div {:id "row-field-email",
-             :class "control-group field-group email-row"}
-       ([:div {:class "label-shell"}
-         [:label.control-label {:for "field-email"} "Email"]]
-         [:div.input-shell.controls
-          [:input {:value nil, :id "field-email", :name "email", :type :email}]])]
-       ;; ...
-       )])]]
+  ;; ... etc ...
+  ]]
 ```
 
 Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this:

@@ -167,8 +167,8 @@
 
                       The :html type expects an :html key.
       :datatype     - Datatype of the field when parsed. Can be one of:
-                      :int, :long, :boolean, :float, :double, :decimal, :bigint,
-                      :date, :file.
+                      :str, :int, :long, :boolean, :float, :double, :decimal,
+                      :bigint, :date, :file. Defaults to :str.
 
                       All types can be appended with an \"s\" when a sequence
                       is expected - e.g., :ints for a sequence of integers. This

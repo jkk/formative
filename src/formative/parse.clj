@@ -1,7 +1,8 @@
 (ns formative.parse
   (:require [sundry.num :refer [parse-long parse-double]]
             [ring.middleware.nested-params :as np]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [formative.core :as f]))
 
 (defn throw-problem
   "Creates and throws an exception carrying information about a failed field
@@ -109,12 +110,12 @@
     (rest input)
     input))
 
-;; TODO: doc
 (defn parse-params
   "Given a sequence of field specifications and a Ring params map,
   returns a map of field names to parsed values."
   [fields params]
-  (let [;; FIXME: Should probably not rely on a private Ring fn (shhh)
+  (let [fields (f/prep-fields fields {})
+        ;; FIXME: Should probably not rely on a private Ring fn (shhh)
         input (#'np/nest-params params
                                 np/parse-nested-keys)]
     (reduce

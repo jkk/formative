@@ -33,8 +33,8 @@
             [:span.prefix (:prefix field)])
           (if (= :checkbox (:type field))
             [:label.checkbox {:for field-id} " "
-             [:span.cb-label (:label field)]
-             (render-field field)]
+             (render-field field) " "
+             [:span.cb-label (:label field)]]
             (render-field field))
           (when (:suffix field)
             [:span.suffix (:suffix field)])

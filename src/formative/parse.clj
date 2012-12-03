@@ -7,7 +7,7 @@
   "Creates and throws an exception carrying information about a failed field
   parse."
   ([spec value]
-    (throw-problem spec value "%s is not valid"))
+    (throw-problem spec value "incorrect format"))
   ([spec value msg]
     (throw (ex-info (format msg (name (:name spec)))
                     {:value value
@@ -28,7 +28,7 @@
     (try
       (Long/valueOf x)
       (catch Exception _
-        (throw-problem spec x "%s is not a valid integer")))))
+        (throw-problem spec x "must be an integer")))))
 
 (defmethod parse-input :int [spec v]
   (parse-long spec v))
@@ -53,7 +53,7 @@
     (try
       (Double/valueOf x)
       (catch Exception _
-        (throw-problem spec x "%s is not a valid decimal number")))))
+        (throw-problem spec x "must be a decimal number")))))
 
 (defmethod parse-input :float [spec v]
   (parse-double spec v))
@@ -72,7 +72,7 @@
     (try
       (BigDecimal. x)
       (catch Exception _
-        (throw-problem spec x "%s is not a valid decimal number")))))
+        (throw-problem spec x "must be a decimal number")))))
 
 (defmethod parse-input :decimal [spec v]
   (parse-bigdec spec v))
@@ -85,7 +85,7 @@
     (try
       (bigint (BigInteger. x))
       (catch Exception _
-        (throw-problem spec x "%s is not a valid integer")))))
+        (throw-problem spec x "must be an integer")))))
 
 (defmethod parse-input :bigint [spec v]
   (parse-bigint spec v))
@@ -100,7 +100,7 @@
                 (:date-format spec "yyyy-MM-dd"))
         x)
       (catch Exception e
-        (throw-problem spec x "%s is not a valid date")))))
+        (throw-problem spec x)))))
 
 (defmethod parse-input :date [spec v]
   (parse-date spec v))

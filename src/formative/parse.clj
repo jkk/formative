@@ -134,10 +134,14 @@
     input))
 
 (defn parse-params
-  "Given a sequence of field specifications and a Ring :form-params or
-  :query-params map, returns a map of field names to parsed values."
-  [fields params]
-  (let [fields (f/prep-fields fields {})
+  "Given a form specification or sequence of field specifications and a Ring
+  :form-params or :query-params map, returns a map of field names to parsed
+  values."
+  [form-or-fields params]
+  (let [fields (if (map? form-or-fields)
+                 (:fields form-or-fields)
+                 form-or-fields)
+        fields (f/prep-fields fields {})
         ;; FIXME: Should probably not rely on a private Ring fn (shhh)
         input (#'np/nest-params params
                                 np/parse-nested-keys)]
@@ -156,6 +160,16 @@
             row)))
       {}
       fields)))
+
+(defn parse-req
+  "Given a form specification or sequence of field specifications and a Ring
+  request, returns a map of form field names to parsed values. Checks
+  :form-params first, then :query-params."
+  [form-or-fields req]
+  (parse-params form-or-fields
+                (if (seq (:form-params req))
+                  (:form-params req)
+                  (:query-params req))))
 
 ;;;;
 

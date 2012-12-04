@@ -48,8 +48,8 @@
 (defn render-bootstrap-form [form-attrs fields class]
   (let [[hidden-fields visible-fields] ((juxt filter remove)
                                         #(= :hidden (:type %)) fields)
-        submit-only? (and (= 1 (count fields))
-                          (= :submit (:type (first fields))))
+        submit-only? (and (= 1 (count visible-fields))
+                          (= :submit (:type (first visible-fields))))
         shell-attrs {:class (str class
                                  (when submit-only? " submit-only"))}
         shell-attrs (if (:id form-attrs)

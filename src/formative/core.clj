@@ -87,7 +87,7 @@
                               [(conj ret spec*) fields2*]))
                           [[] fields2]
                           fields1)]
-    (concat ret leftovers)))
+    (concat ret (vals leftovers))))
 
 (defn prep-form
   "Prepares a form for rendering by normalizing and populating fields, adding

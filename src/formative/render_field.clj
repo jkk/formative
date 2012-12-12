@@ -120,6 +120,9 @@
 (defmethod render-field :html [field]
   (:html field))
 
+(defmethod render-field :labeled-html [field]
+  (:html field))
+
 (defmethod render-field :heading [field]
   [:h3 (:text field)])
 

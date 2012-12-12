@@ -61,6 +61,9 @@
 (defmethod prep-field :html [field values]
   field)
 
+(defmethod prep-field :labeled-html [field values]
+  (assoc field :label (:label field (field-name->label (:name field)))))
+
 (defn prep-fields
   "Normalizes field specifications and populates them with values"
   [fields values]

@@ -57,7 +57,7 @@
                                                   "-shell"))
                       shell-attrs)]
     [:div shell-attrs
-     [:form (dissoc form-attrs :type)
+     [:form (dissoc form-attrs :renderer)
       (list
        (map render-field hidden-fields)
        [:fieldset

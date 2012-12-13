@@ -8,7 +8,7 @@
             [clojure.string :as string]
             [com.jkkramer.ordered.map :refer [ordered-map]]))
 
-(def ^:dynamic *form-type* :bootstrap-horizontal)
+(def ^:dynamic *renderer* :bootstrap-horizontal)
 
 (defn normalize-field
   "Ensures :name and :type keys are in the right format"
@@ -101,7 +101,7 @@
                      spec [:action :method :enctype :accept :name :id :class
                            :onsubmit :onreset :accept-charset :autofill])
         form-attrs (assoc form-attrs
-                     :type (:type spec *form-type*))
+                     :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))
         fields (prep-fields (:fields spec) values)
         fields (if (:cancel-href spec)
@@ -137,7 +137,7 @@
 
   And the following special keys:
 
-      :type         - Determines the type of renderer to use. Built-in options:
+      :renderer     - Determines renderer to use. Built-in options:
                         :bootstrap-horizontal (the default)
                         :bootstrap-stacked
                         :table
@@ -192,6 +192,6 @@
   [spec]
   (apply render-form* (prep-form spec)))
 
-(defmacro with-form-type [type & body]
-  `(binding [*form-type* ~type]
+(defmacro with-renderer [renderer & body]
+  `(binding [*renderer* ~renderer]
      (do ~@body)))

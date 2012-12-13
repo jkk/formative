@@ -146,6 +146,11 @@
       :submit-label - Label to use on the submit button. Defaults to \"Submit\"
       :cancel-href  - When provided, shows a \"Cancel\" hyperlink next to the
                       submit button
+      :validator    - A function to call to validate parsed values for this
+                      form. The function should take a map of values and return
+                      a sequence of problem maps for each field that failed to
+                      validate. The problem map should contain the keys :keys
+                      and :msg.
       :problems     - Sequence of field names that are a \"problem\". Form
                       renderers typically add a class and style to highlight
                       problem fields.

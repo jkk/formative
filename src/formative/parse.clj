@@ -1,19 +1,10 @@
 (ns formative.parse
   (:require [ring.middleware.nested-params :as np]
             [clojure.string :as string]
-            [formative.core :as f]))
+            [formative.core :as f]
+            [formative.validate :as fv]))
 
-(defn throw-problem
-  "Creates and throws an exception carrying information about a failed field
-  parse."
-  ([spec value]
-    (throw-problem spec value "incorrect format"))
-  ([spec value msg]
-    (throw (ex-info (format msg (name (:name spec)))
-                    {:value value
-                     :problems [{:field-name (:name spec)
-                                 :spec spec
-                                 :msg msg}]}))))
+(defrecord ParseError [])
 
 (defmulti parse-input
   "Parses the value for a particular field specification"
@@ -28,7 +19,7 @@
     (try
       (Long/valueOf x)
       (catch Exception _
-        (throw-problem spec x "must be an integer")))))
+        (ParseError.)))))
 
 (defmethod parse-input :int [spec v]
   (parse-long spec v))
@@ -53,7 +44,7 @@
     (try
       (Double/valueOf x)
       (catch Exception _
-        (throw-problem spec x "must be a decimal number")))))
+        (ParseError.)))))
 
 (defmethod parse-input :float [spec v]
   (parse-double spec v))
@@ -72,7 +63,7 @@
     (try
       (BigDecimal. x)
       (catch Exception _
-        (throw-problem spec x "must be a decimal number")))))
+        (ParseError.)))))
 
 (defmethod parse-input :decimal [spec v]
   (parse-bigdec spec v))
@@ -85,7 +76,7 @@
     (try
       (bigint (BigInteger. x))
       (catch Exception _
-        (throw-problem spec x "must be an integer")))))
+        (ParseError.)))))
 
 (defmethod parse-input :bigint [spec v]
   (parse-bigint spec v))
@@ -100,7 +91,7 @@
                 (:date-format spec "yyyy-MM-dd"))
         x)
       (catch Exception e
-        (throw-problem spec x)))))
+        (ParseError.)))))
 
 (defmethod parse-input :date [spec v]
   (parse-date spec v))
@@ -133,33 +124,55 @@
     (rest input)
     input))
 
+(defn get-parse-errors [values]
+  (for [[k v] values
+        :when (instance? ParseError v)]
+    {:keys [k]
+     :msg (:msg v)}))
+
+(defn- parse-nested-params [fields np]
+  (reduce
+    (fn [vals spec]
+      (let [fname (keyword (:name spec))]
+        (if (or (contains? np (name fname))
+                (contains? np fname))
+          (let [raw-val (fix-input
+                          (get-param np fname) spec)
+                spec* (assoc spec :name fname)
+                val (parse-input spec* raw-val)]
+            (if (= val ::absent)
+              vals
+              (assoc vals fname val)))
+          vals)))
+    {}
+    fields))
+
 (defn parse-params
   "Given a form specification or sequence of field specifications and a Ring
   :form-params or :query-params map, returns a map of field names to parsed
-  values."
-  [form-or-fields params]
-  (let [fields (if (map? form-or-fields)
-                 (:fields form-or-fields)
-                 form-or-fields)
+  values.
+
+  Parsed values will be validated and an exception will be thrown if validation
+  fails. The exception carries a :problems key with details about the validation
+  failure.
+
+  Keyword options:
+    :validate - set to false to not validate parsed values"
+  [form-or-fields params & {:keys [validate] :or {validate true}}]
+  (let [[form fields] (if (map? form-or-fields)
+                        [form-or-fields (:fields form-or-fields)]
+                        [nil form-or-fields])
         fields (f/prep-fields fields {})
         ;; FIXME: Should probably not rely on a private Ring fn (shhh)
-        input (#'np/nest-params params
-                                np/parse-nested-keys)]
-    (reduce
-      (fn [row spec]
-        (let [fname (keyword (:name spec))]
-          (if (or (contains? input (name fname))
-                  (contains? input fname))
-            (let [raw-val (fix-input
-                            (get-param input fname) spec)
-                  spec* (assoc spec :name fname)
-                  val (parse-input spec* raw-val)]
-              (if (= val ::absent)
-                row
-                (assoc row fname val)))
-            row)))
-      {}
-      fields)))
+        nested-params (#'np/nest-params params
+                                        np/parse-nested-keys)
+        values (parse-nested-params fields nested-params)
+        problems (when (and form validate)
+                   (fv/validate form values))]
+    (if (seq problems)
+      (throw (ex-info "Problem parsing params"
+                      {:problems problems :form form :fields fields}))
+      values)))
 
 (defn parse-req
   "Given a form specification or sequence of field specifications and a Ring

@@ -70,12 +70,11 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 `formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) `:form-params` or `:query-params` map into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
 
 ```clj
-(fp/parse-params
-  (:fields example-form)
-  {"secret-code" "1234"
-   "email" "foobar@gmail.com"
-   "password" "bazquux"
-   "remember" "false"})
+(fp/parse-params example-form
+                 {"secret-code" "1234"
+                  "email" "foob ar@gmail.com"
+                  "password" "bazquux"
+                  "remember" "false"})
 ;; Returns:
 {:remember false, :secret-code 1234, :password "bazquux", :email "foobar@gmail.com"}
 ```

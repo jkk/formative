@@ -8,20 +8,23 @@
   (let [field-id (if (:id field)
                    (name (:id field))
                    (str *field-prefix* (:name field)))
-        field (assoc field :id field-id)]
+        field (assoc field :id field-id)
+        label? (and (not (false? (:label field)))
+                    (not= :html (:type field)))]
     [:tr {:id (str "row-" field-id)
           :class (str (name (:type field :text)) "-row"
                       (when (:problem field) " problem"))}
      (if (= :heading (:type field))
        [:th.heading-cell {:colspan 2} (render-field field)]
        (list
-        [:th {:class (if (#{:checkbox :submit} (:type field))
-                       "empty-cell"
-                       "label-cell")}
-         (when (and (not (#{:checkbox} (:type field))) (:label field))
-           [:label {:for field-id}
-            (:label field)])]
-        [:td.input-cell
+        (when label?
+          [:th {:class (if (#{:checkbox :submit} (:type field))
+                         "empty-cell"
+                         "label-cell")}
+           (when (and (not (#{:checkbox} (:type field))) (:label field))
+             [:label {:for field-id}
+              (:label field)])])
+        [:td.input-cell {:colspan (if label? 1 2)} 
          (when (:prefix field)
            [:span.prefix (:prefix field)])
          (render-field field)

@@ -72,7 +72,7 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 ```clj
 (fp/parse-params example-form
                  {"secret-code" "1234"
-                  "email" "foob ar@gmail.com"
+                  "email" "foobar@gmail.com"
                   "password" "bazquux"
                   "remember" "false"})
 ;; Returns:

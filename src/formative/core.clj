@@ -99,7 +99,8 @@
   [spec]
   (let [form-attrs (select-keys
                      spec [:action :method :enctype :accept :name :id :class
-                           :onsubmit :onreset :accept-charset :autofill])
+                           :onsubmit :onreset :accept-charset :autofill
+                           :novalidate :autocomplete])
         form-attrs (assoc form-attrs
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))

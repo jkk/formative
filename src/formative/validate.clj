@@ -89,26 +89,26 @@
 (defn integer [& keys]
   (make-validator
     keys #(and (not (nil? %)) (not (integer? %)))
-    "must be an integer"))
+    "must be a number"))
 
 (defn integers [& keys]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (integer? %)) v)))
-    "must be integers"))
+    "must be numbers"))
 
 (defn floating-point [& keys]
   (make-validator
     keys #(and (not (nil? %)) (not (float? %)))
-    "must be a floating point number"))
+    "must be a decimal number"))
 
 (defn floating-points [& keys]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (float? %)) v)))
-    "must be floating point numbers"))
+    "must be decimal numbers"))
 
 (defn decimal [& keys]
   (make-validator
@@ -120,7 +120,7 @@
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (decimal? %)) v)))
-    "must be decimals"))
+    "must be decimal numbers"))
 
 (defn min-val [min & keys]
   (make-validator

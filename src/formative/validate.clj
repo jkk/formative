@@ -11,8 +11,9 @@
 (defn contains [& keys]
   (make-validator keys (complement contains?) "must be present"))
 
-(defn not-blank [& keys]
-  (make-validator keys string/blank? "must not be blank"))
+(defn required [& keys]
+  (make-validator keys #(or (nil? %) (and (string? %) (string/blank? %)))
+                  "must not be blank"))
 
 (defn equal [& keys]
   (fn [m]

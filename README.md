@@ -114,7 +114,7 @@ There are a bunch of built-in validators in the `formative.validate` namespace. 
 (def example-form
   :method :post
   :validator (fv/combine
-               (fv/not-blank :secret-code :email :password)
+               (fv/required :secret-code :email :password)
                (fv/within 1 100 :secret-code))
   ...)
 ```

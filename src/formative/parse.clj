@@ -99,6 +99,16 @@
 (defmethod parse-input :dates [spec v]
   (map #(parse-date spec %) v))
 
+(defmethod parse-input :date-select [spec v]
+  (when (every? (comp (complement string/blank?) #(get v %))
+                ["year" "month" "day"])
+    (try
+      (java.util.Date. (- (Integer/valueOf (get v "year")) 1900)
+                       (dec (Integer/valueOf (get v "month")))
+                       (Integer/valueOf (get v "day")))
+      (catch Exception e
+        (ParseError.)))))
+
 (defn- parse-file [spec x]
   (when-not (:upload-handler spec)
     (throw (IllegalStateException.

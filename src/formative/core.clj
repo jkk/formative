@@ -163,8 +163,8 @@
       :type         - UI type of the field. Defaults to :text. Built-in types
                       include: :text, :textarea, :select, :checkbox,
                       :checkboxes, :radio, :html, :heading, :us-state,
-                      :ca-state, :country. Each type may have particular
-                      keys that it makes use of.
+                      :ca-state, :country, :date-select. Each type may have
+                      particular keys that it makes use of.
 
                       Selection fields such as :select, :checkboxes, and :radio
                       expect an :options key, which is a collection of options

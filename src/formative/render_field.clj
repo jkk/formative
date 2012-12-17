@@ -141,3 +141,49 @@
                        :type :select
                        :options (data/countries-by (or (:country-code field) :alpha2)))))
 
+(defn- normalize-date-val [d]
+  (when d
+    (cond
+      (instance? java.util.Date d) d
+      (integer? d) (java.util.Date. d)
+      (string? d) (try
+                    (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") d)
+                    (catch Exception _))
+      (map? d) (try
+                 (let [year (- (Integer/valueOf (:year d (get d "year"))) 1900)
+                       month (dec (Integer/valueOf (:month d (get d "month"))))
+                       day (Integer/valueOf (:month d (get d "day")))]
+                   (java.util.Date. year month day))
+                 (catch Exception _))
+      :else (throw (IllegalArgumentException. "Unrecognized date format")))))
+
+(defmethod render-field :date-select [field]
+  (let [date (normalize-date-val (:value field))
+        [year month day] (when date
+                           [(+ 1900 (.getYear date))
+                            (inc (.getMonth date))
+                            (.getDate date)])
+        this-year (+ 1900 (.getYear (java.util.Date.)))
+        year-start (:year-start field this-year)
+        year-end (:year-end field (+ this-year 20))]
+    [:div.date-select
+     (render-field {:type :select
+                    :name (str (:name field) "[month]")
+                    :value month
+                    :options (cons ["" "Month"]
+                                   (map vector
+                                        (range 1 13)
+                                        (.getMonths (java.text.DateFormatSymbols.))))})
+     " "
+     (render-field {:type :select
+                    :name (str (:name field) "[day]")
+                    :value day
+                    :options (cons ["" "Day"]
+                                   (map #(vector % %) (range 1 32)))})
+     " "
+     (render-field {:type :select
+                    :name (str (:name field) "[year]")
+                    :value year
+                    :options (cons ["" "Year"]
+                                 (map #(vector % %)
+                                      (range year-start (inc year-end))))})]))

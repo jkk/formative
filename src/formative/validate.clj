@@ -38,6 +38,14 @@
                (not (>= len (count %))))
     (str "cannot exceed " len " characters")))
 
+(defn in [coll & keys]
+  (let [coll-set (if (set? coll)
+                   coll (set coll))]
+    (make-validator
+      keys #(and (not (nil? %))
+                 (not (contains? coll-set %)))
+      (str "not an accepted value"))))
+
 (def ^:private zip-regex #"^\d{5}(?:[-\s]\d{4})?$")
 
 (defn us-zip [& keys]

@@ -25,7 +25,8 @@
     [:div.form-problems.alert.alert-error.clearfix
      [:ul
       ;; double duty - handle Formative and Modelo problems
-      (for [{:keys [keys field-name spec msg]} problems]
+      (for [{:keys [keys field-name spec msg]} problems
+            :when msg]
         (let [field-names (or (seq keys)
                               (when field-name [field-name]))
               field-labels (map #(get-field-label

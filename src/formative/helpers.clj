@@ -22,7 +22,7 @@
                          fields
                          (into {} (for [f fields]
                                     [(:name f) f])))]
-    [:div.form-problems.clearfix
+    [:div.form-problems.alert.alert-error.clearfix
      [:ul
       ;; double duty - handle Formative and Modelo problems
       (for [{:keys [keys field-name spec msg]} problems]

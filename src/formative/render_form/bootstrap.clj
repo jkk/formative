@@ -52,6 +52,7 @@
         submit-only? (and (= 1 (count visible-fields))
                           (= :submit (:type (first visible-fields))))
         shell-attrs {:class (str class
+                                 " bootstrap-form"
                                  (when submit-only? " submit-only"))}
         shell-attrs (if (:id form-attrs)
                       (assoc shell-attrs :id (str (name (:id form-attrs))

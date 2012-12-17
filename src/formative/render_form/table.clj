@@ -1,6 +1,7 @@
 (ns formative.render-form.table
   (:require [formative.render-form :refer [render-form*]]
-            [formative.render-field :refer [render-field]]))
+            [formative.render-field :refer [render-field]]
+            [formative.helpers :refer [render-problems]]))
 
 (def ^:dynamic *field-prefix* "field-")
 
@@ -37,7 +38,7 @@
          (when (:note field)
            [:div.note (:note field)])]))]))
 
-(defmethod render-form* :table [form-attrs fields]
+(defmethod render-form* :table [form-attrs fields opts]
   (let [[hidden-fields visible-fields] ((juxt filter remove)
                                         #(= :hidden (:type %)) fields)
         submit-only? (and (= 1 (count visible-fields))
@@ -48,6 +49,9 @@
                                                   "-shell"))
                       shell-attrs)]
     [:div shell-attrs
+     (when-let [problems (:problems opts)]
+       (when (map? (first problems))
+         (render-problems problems fields)))
      [:form (dissoc form-attrs :renderer)
       (list
        (map render-field hidden-fields)

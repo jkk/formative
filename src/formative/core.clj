@@ -4,6 +4,7 @@
             formative.render-form.div
             formative.render-form.bootstrap
             [formative.render-field :refer [render-field]]
+            [formative.helpers :refer [get-field-label]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
             [com.jkkramer.ordered.map :refer [ordered-map]]))
@@ -19,16 +20,6 @@
             (keyword (name (:type field)))
             :text)))
 
-(defn- ucfirst [^String s]
-  (str (Character/toUpperCase (.charAt s 0)) (subs s 1)))
-
-(defn field-name->label
-  "Turns a field name such as :foo-bar into a label like \"Foo bar\""
-  [fname]
-  (-> (name fname)
-      (string/replace #"[_-]" " ")
-      ucfirst))
-
 (defmulti prep-field
   "Prepares a field for rendering. The default preparation is to populate
   the :value key and add a label if not present. Each type may have its own
@@ -40,7 +31,7 @@
 (defmethod prep-field :default [field values]
   (assoc field
     :value (get values (:name field))
-    :label (:label field (field-name->label (:name field)))))
+    :label (get-field-label field)))
 
 (defmethod prep-field :checkbox [field values]
   (let [field (if (and (not (contains? field :value))
@@ -52,7 +43,7 @@
     (assoc field
       :value (:value field "true")
       :checked (= (str val) (str (:value field "true")))
-      :label (:label field (field-name->label (:name field))))))
+      :label (get-field-label field))))
 
 (defmethod prep-field :submit [field values]
   (assoc field
@@ -62,7 +53,7 @@
   field)
 
 (defmethod prep-field :labeled-html [field values]
-  (assoc field :label (:label field (field-name->label (:name field)))))
+  (assoc field :label (get-field-label field)))
 
 (defn prep-fields
   "Normalizes field specifications and populates them with values"
@@ -92,6 +83,17 @@
                           fields1)]
     (concat ret (vals leftovers))))
 
+(defn- prep-problems [problems]
+  (set
+    (if (map? (first problems))
+      (map name
+           (mapcat (fn [p]
+                     (or (:keys p)
+                         (when (:field-name p)
+                           [(:field-name p)])))
+                   problems))
+      (map name problems))))
+
 (defn prep-form
   "Prepares a form for rendering by normalizing and populating fields, adding
   a submit button field, etc. See render-form for a description of the form
@@ -118,14 +120,12 @@
                            :name "submit"
                            :cancel-href (:cancel-href spec)
                            :value (:submit-label spec "Submit")}]))
-        problems (if-not (set? (:problems spec))
-                   (set (map name (:problems spec)))
-                   (map name (:problems spec)))
+        problems (prep-problems (:problems spec))
         fields (for [field fields]
                  (if (problems (:name field))
                    (assoc field :problem true)
                    field))]
-    [form-attrs fields]))
+    [form-attrs fields spec]))
 
 (defn render-form
   "Given a form specification, returns a Hiccup data structure representing a
@@ -152,9 +152,10 @@
                       a sequence of problem maps for each field that failed to
                       validate. The problem map should contain the keys :keys
                       and :msg.
-      :problems     - Sequence of field names that are a \"problem\". Form
+      :problems     - Sequence of field names or problem maps. Form
                       renderers typically add a class and style to highlight
-                      problem fields.
+                      problem fields and, if problem maps are provided,
+                      show descriptive messages.
 
   A field specification is a map with the following keys:
 

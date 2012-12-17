@@ -1,6 +1,7 @@
 (ns formative.render-form.bootstrap
   (:require [formative.render-form :refer [render-form*]]
-            [formative.render-field :refer [render-field]]))
+            [formative.render-field :refer [render-field]]
+            [formative.helpers :refer [render-problems]]))
 
 (def ^:dynamic *field-prefix* "field-")
 
@@ -45,7 +46,7 @@
           (when (:note field)
             [:div.note.help-inline (:note field)])]))]))
 
-(defn render-bootstrap-form [form-attrs fields class]
+(defn render-bootstrap-form [form-attrs fields class opts]
   (let [[hidden-fields visible-fields] ((juxt filter remove)
                                         #(= :hidden (:type %)) fields)
         submit-only? (and (= 1 (count visible-fields))
@@ -57,14 +58,17 @@
                                                   "-shell"))
                       shell-attrs)]
     [:div shell-attrs
+     (when-let [problems (:problems opts)]
+       (when (map? (first problems))
+         (render-problems problems fields)))
      [:form (dissoc form-attrs :renderer)
       (list
        (map render-field hidden-fields)
        [:fieldset
         (map render-bootstrap-row visible-fields)])]]))
 
-(defmethod render-form* :bootstrap-horizontal [form-attrs fields]
-  (render-bootstrap-form form-attrs fields "form-shell form-horizontal"))
+(defmethod render-form* :bootstrap-horizontal [form-attrs fields opts]
+  (render-bootstrap-form form-attrs fields "form-shell form-horizontal" opts))
 
-(defmethod render-form* :bootstrap-stacked [form-attrs fields]
-  (render-bootstrap-form form-attrs fields "form-shell"))
+(defmethod render-form* :bootstrap-stacked [form-attrs fields opts]
+  (render-bootstrap-form form-attrs fields "form-shell" opts))

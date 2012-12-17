@@ -11,32 +11,39 @@
                    (str *field-prefix* (:name field)))
         field (assoc field :id field-id)
         label? (and (not (false? (:label field)))
-                    (not= :html (:type field)))]
+                    (not= :html (:type field)))
+        stacked? (= :stacked (:layout field))
+        input-el [:div.input-shell
+                  (when (:prefix field)
+                    [:span.prefix (:prefix field)])
+                  (render-field field)
+                  (when (= :checkbox (:type field))
+                    [:label {:for field-id} " " [:span.cb-label (:label field)]])
+                  (when (:suffix field)
+                    [:span.suffix (:suffix field)])
+                  (when (and (= :submit (:type field)) (:cancel-href field))
+                    [:span.cancel-link " " [:a {:href (:cancel-href field)} "Cancel"]])
+                  (when (:note field)
+                    [:div.note (:note field)])]
+        label-el (when (and (not (#{:checkbox} (:type field))) (:label field))
+                   [:div.label-shell
+                    [:label {:for field-id} (:label field)]])]
     [:tr {:id (str "row-" field-id)
           :class (str (name (:type field :text)) "-row"
-                      (when (:problem field) " problem"))}
+                      (when (:problem field) " problem")
+                      (when stacked? " stacked"))}
      (if (= :heading (:type field))
        [:th.heading-cell {:colspan 2} (render-field field)]
        (list
-        (when label?
+        (when (and label? (not stacked?))
           [:th {:class (if (#{:checkbox :submit} (:type field))
                          "empty-cell"
                          "label-cell")}
-           (when (and (not (#{:checkbox} (:type field))) (:label field))
-             [:label {:for field-id}
-              (:label field)])])
-        [:td.input-cell {:colspan (if label? 1 2)} 
-         (when (:prefix field)
-           [:span.prefix (:prefix field)])
-         (render-field field)
-         (when (= :checkbox (:type field))
-           [:label {:for field-id} " " [:span.cb-label (:label field)]])
-         (when (:suffix field)
-           [:span.suffix (:suffix field)])
-         (when (and (= :submit (:type field)) (:cancel-href field))
-           [:span.cancel-link " " [:a {:href (:cancel-href field)} "Cancel"]])
-         (when (:note field)
-           [:div.note (:note field)])]))]))
+           label-el])
+        [:td.input-cell {:colspan (if (and label? (not stacked?)) 1 2)}
+         (when stacked?
+           label-el)
+         input-el]))]))
 
 (defmethod render-form* :table [form-attrs fields opts]
   (let [[hidden-fields visible-fields] ((juxt filter remove)

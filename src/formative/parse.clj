@@ -184,7 +184,7 @@
                       {:problems problems :form form :fields fields}))
       values)))
 
-(defn parse-req
+(defn parse-request
   "Given a form specification or sequence of field specifications and a Ring
   request, returns a map of form field names to parsed values. Checks
   :form-params first, then :query-params."

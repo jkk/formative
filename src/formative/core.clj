@@ -3,6 +3,7 @@
             formative.render-form.table
             formative.render-form.div
             formative.render-form.bootstrap
+            formative.render-form.inline
             [formative.render-field :refer [render-field]]
             [formative.helpers :refer [get-field-label]]
             [clojure.walk :refer [stringify-keys]]

@@ -138,7 +138,6 @@ Built in validations:
 
 All validation specifications have corresponding validator functions in the `formative.validate` namespace.
 
-
 #### `:validator`
 
 A function that takes a map of parsed values and returns a problem map or sequence of problem maps. A problem map has the keys `:keys`, indicating which keys were problems, and `:msg`, a description of what's wrong. If `nil` or an empty sequence is returned, validation succeeds. 

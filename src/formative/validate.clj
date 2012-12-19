@@ -10,7 +10,9 @@
     (let [bad-keys (filter #(bad-pred (get m %))
                            (seqify keys))]
       (when (seq bad-keys)
-        {:keys bad-keys :msg msg}))))
+        (if (map? msg)
+          msg
+          {:keys bad-keys :msg msg})))))
 
 (defn contains [keys & [msg]]
   (make-validator keys (complement contains?)
@@ -28,7 +30,9 @@
   (let [keys (seqify keys)]
     (fn [m]
       (when-not (apply = (map #(get m %) keys))
-        {:keys keys :msg (or msg "must be equal")}))))
+        (if (map? msg)
+          msg
+          {:keys keys :msg (or msg "must be equal")})))))
 
 (defn matches [re keys & [msg]]
   (make-validator

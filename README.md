@@ -77,7 +77,7 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
                   "password" "barbazquux"
                   "remember" "false"})
 ;; Returns:
-{:remember false, :secret-code 1234, :password "bazquux", :email "foobar@gmail.com"}
+{:remember false, :secret-code 1234, :password "barbazquux", :email "foobar@gmail.com"}
 ```
 
 Note that the `:remember` and `:secret-code` fields have been parsed from strings into their respective datatypes.

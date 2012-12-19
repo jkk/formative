@@ -4,7 +4,7 @@ A Clojure library for dealing with web forms. Does three things:
 
 * Turns form specifications into rendered forms via pluggable renderers. Comes with [Hiccup](https://github.com/weavejester/hiccup) renderers for Bootstrap (horizontal and stacked) and a table-based layout.
 * Parses form data from Ring params
-* Validates parsed data
+* Validates parsed data using [Verily](https://github.com/jkk/verily)
 
 ## Installation
 
@@ -99,7 +99,7 @@ Any exception thrown due to a failed parse or validation will contain a `:proble
 
 ### Validating Parsed Data
 
-By default, only datatypes are validated. There are two ways to add your own validation to a form: `:validations` and `:validator`.
+Formative uses [Verily](https://github.com/jkk/verily) to validate parsed data. By default, only datatypes are validated. There are two ways to add your own validation to a form: `:validations` and `:validator`.
 
 #### `:validations`
 
@@ -107,7 +107,7 @@ A sequence of validation specifications. For example:
 
 ```
 [[:required [:foo :bar :password]]
- [:equal [:password confirm-password] "Passwords don't match, dummy"]
+ [:equal [:password :confirm-password] "Passwords don't match, dummy"]
  [:min-length 8 :password]]
 ```
 
@@ -136,17 +136,17 @@ Built in validations:
 * Datatype validations: `:string`, `:boolean`, `:integer`, `:float`, `:decimal`, `:date`
 * Datatype collection validations: `:strings`, `:booleans`, `:integers`, `:floats`, `:decimals`, `:dates`
 
-All validation specifications have corresponding validator functions in the `formative.validate` namespace.
-
 #### `:validator`
 
-A function that takes a map of parsed values and returns a problem map or sequence of problem maps. A problem map has the keys `:keys`, indicating which keys were problems, and `:msg`, a description of what's wrong. If `nil` or an empty sequence is returned, validation succeeds. 
+A function that takes a map of parsed values and returns a problem map or sequence of problem maps. A problem map has the keys `:keys`, indicating which keys were problems (optional), and `:msg`, a description of what's wrong. If `nil` or an empty sequence is returned, validation succeeds. 
 
 ```clj
 (defn validate-password [values]
   (when (#{"12345" "password" "hunter2"} (:password values))
-    {:keys [:password] :msg "You can't use that password"})))
+    {:keys [:password] :msg "You can't use that password"}))
 ```
+
+See [Verily](https://github.com/jkk/verily) for more about validation functions.
 
 ## Form and Field Specifications
 

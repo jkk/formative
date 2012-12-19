@@ -1,8 +1,10 @@
 # Formative
 
-A Clojure library for dealing with web forms. Does three things:
+A Clojure library for dealing with web forms.
 
-* Turns form specifications into rendered forms via pluggable renderers. Comes with [Hiccup](https://github.com/weavejester/hiccup) renderers for Bootstrap (horizontal and stacked) and a table-based layout.
+Does three things, given a form specification:
+
+* Renders a form via pluggable renderers. Comes with [Hiccup](https://github.com/weavejester/hiccup) renderers for Bootstrap and for a table-based layout
 * Parses form data from Ring params
 * Validates parsed data using [Verily](https://github.com/jkk/verily)
 

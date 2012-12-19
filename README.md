@@ -158,10 +158,11 @@ Valid keys for a form specification include the following HTML form attributes:
 
 And the following special keys:
 
-      :type         - Determines the type of renderer to use. Built-in options:
+      :renderer     - Determines the type of renderer to use. Built-in options:
                         :bootstrap-horizontal (the default)
                         :bootstrap-stacked
                         :table
+                        :inline
       :fields       - Sequence of form field specifications. See below.
       :values       - Map of values used to populate the form fields
       :submit-label - Label to use on the submit button. Defaults to "Submit"

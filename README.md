@@ -99,7 +99,7 @@ Any exception thrown due to a failed parse or validation will contain a `:proble
 
 ### Validating Parsed Data
 
-By default, only datatypes are validated. There are two ways to add your own validation to a form:
+By default, only datatypes are validated. There are two ways to add your own validation to a form: `:validations` and `:validator`.
 
 #### `:validations`
 

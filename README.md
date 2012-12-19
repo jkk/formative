@@ -111,7 +111,7 @@ A sequence of validation specifications. For example:
  [:min-length 8 :password]]
 ```
 
-All validation specifications accept a key or sequence of keys. The message is always optional.
+All validation specifications accept a key or sequence of keys. The message is always optional. Unless `:required` is used, all validations allow `nil` or blank.
 
 Built in validations:
 

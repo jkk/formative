@@ -20,10 +20,15 @@
   (make-validator keys #(or (nil? %) (and (string? %) (string/blank? %)))
                   (or msg "must not be blank")))
 
+(defn exact [val keys & [msg]]
+  (make-validator keys #(or (nil? %) (not= val %))
+                  (or msg "incorrect value")))
+
 (defn equal [keys & [msg]]
-  (fn [m]
-    (when-not (apply = (map #(get m %) keys))
-      {:keys keys :msg (or msg "must be equal")})))
+  (let [keys (seqify keys)]
+    (fn [m]
+      (when-not (apply = (map #(get m %) keys))
+        {:keys keys :msg (or msg "must be equal")}))))
 
 (defn matches [re keys & [msg]]
   (make-validator
@@ -180,6 +185,52 @@
   (fn [m]
     (apply concat (map seqify (keep #(% m) validators)))))
 
+(def validations-map
+  {:contains contains
+   :required required
+   :exact exact
+   :equal equal
+   :matches matches
+   :min-length min-length
+   :max-length max-length
+   :in in
+   :us-zip us-zip
+   :us-state us-state
+   :ca-state ca-state
+   :country country
+   :email email
+   :bool bool
+   :boolean bool
+   :bools bools
+   :booleans bools
+   :integer integer
+   :integers integers
+   :floating-point floating-point
+   :floating-points floating-points
+   :float floating-point
+   :floats floating-points
+   :decimal decimal
+   :decimals decimals
+   :min-val min-val
+   :at-least at-least
+   :max-val max-val
+   :at-most at-most
+   :within within
+   :date date
+   :after after
+   :before before})
+
+(defmulti validation->fn (fn [vspec] (first vspec)))
+
+(defmethod validation->fn :default [vspec]
+  (if-let [vfn (get validations-map (first vspec))]
+    (apply vfn (rest vspec))
+    (throw (IllegalArgumentException.
+             (str "Unknown validation " (first vspec))))))
+
+(defn validations->fn [validations]
+  (apply combine (map validation->fn validations)))
+
 (def type-validators
   {:us-zip us-zip
    :us-state us-state
@@ -216,5 +267,8 @@
   (let [type-validator (partial validate-types (:fields form))
         validator (if-let [custom-validator (:validator form)]
                     (combine type-validator custom-validator)
-                    type-validator)]
+                    type-validator)
+        validator (if-let [validations (:validations form)]
+                    (combine validator (validations->fn validations))
+                    validator)]
     (validator values)))

@@ -17,13 +17,12 @@ Leiningen coordinate:
 ## Usage
 
 
-The important namespaces are `formative.core`, `formative.parse`, and `formative.validate`:
+The important namespaces are `formative.core` and `formative.parse`.
 
 ```clj
 (ns example.core
   (:require [formative.core :as f]
-            [formative.parse :as fp]
-            [formative.validate :as fv]))
+            [formative.parse :as fp]))
 ```
 
 ### Building a Form
@@ -40,6 +39,8 @@ To build a form, you need a form specification, which is a map that looks like t
             {:name :email :type :email}
             {:name :password :type :password}
             {:name :remember :type :checkbox}]
+   :validations [[:required [:secret-code :email :password]]
+                 [:min-length 8 :password]]
    :values {:secret-code 1234
             :remember true}})
 ```
@@ -98,25 +99,53 @@ Any exception thrown due to a failed parse or validation will contain a `:proble
 
 ### Validating Parsed Data
 
-As mentioned in the previous section, parsed data will be validated by default. However, if you wish to validate the data yourself, you can do so with `formative.validate/validate`:
+By default, only datatypes are validated. There are two ways to add your own validation to a form:
 
-```clj
-(let [values (fp/parse-params example-form {"secret-code" "xxx"} :validate false)]
-  (fv/validate example-form values))
-;; ({:keys (:secret-code), :msg "must be an integer"})
+#### `:validations`
+
+A sequence of validation specifications. For example:
+
+```
+[[:required [:foo :bar :password]]
+ [:equal [:password confirm-password] "Passwords don't match, dummy"]
+ [:min-length 8 :password]]
 ```
 
-By default, only datatypes are validated. Additional validators can be added using the `:validator` form specification key, which expects a function that takes a map of parsed values and returns a sequence of probem maps (each with `:keys` and `:msg` keys).
+All validation specifications accept a key or sequence of keys. The message is always optional.
 
-There are a bunch of built-in validators in the `formative.validate` namespace. `formative.validate/combine` will combine validators into a single validator:
+Built in validations:
+
+* `:required <keys> [msg]` - must not be blank or nil
+* `:contains <keys> [msg]` - can be blank or nil but must be present in the values map
+* `:equal <keys> [msg]` - all keys must be equal
+* `:email <keys> [msg]` - must be a valid email
+* `:matches <regex> <keys> [msg]` - must match a regular expression
+* `:min-length <len> <keys> [msg]` - must be a certain length (for strings or collections)
+* `:max-length <len> <keys> [msg]` - must not exceed a certain length (for strings or collections)
+* `:min-val <min> <keys> [msg]` - must be at least a certain value
+* `:max-val <max> <keys> [msg]` - must be at most a certain value
+* `:within <min> <max> <keys> [msg]` - must be within a certain range (inclusive)
+* `:after <date> <keys> [msg]` - must be after a certain date
+* `:before <date> <keys> [msg]` - must be before a certain date
+* `:in <coll> <keys> [msg]` - must be contained within a collection
+* `:us-zip <keys> [msg]` - must be a valid US zip code
+* `:us-state <keys> [msg]` - must be a valid two-letter US state code
+* `:ca-state <keys> [msg]` - must be a valid two-letter Canadian province code
+* `:country <keys> [msg]` - must be a valid ISO alpha2 country code
+* Data type validations: `:boolean`, `:integer`, `:float`, `:decimal`, `:date`
+* Data type collection validations: `:booleans`, `:integers`, `:floats`, `:decimals`, `:dates`
+
+All validation specifications have corresponding validator functions in the `formative.validate` namespace.
+
+
+#### `:validator`
+
+A function that takes a map of parsed values and returns a problem map or sequence of problem maps. A problem map has the keys `:keys`, indicating which keys were problems, and `:msg`, a description of what's wrong. If `nil` or an empty sequence is returned, validation succeeds. 
 
 ```clj
-(def example-form
-  :method :post
-  :validator (fv/combine
-               (fv/required :secret-code :email :password)
-               (fv/within 1 100 :secret-code))
-  ...)
+(defn validate-password [values]
+  (when (#{"12345" "password" "hunter2"} (:password values))
+    {:keys [:password] :msg "You can't use that password"})))
 ```
 
 ## Form and Field Specifications
@@ -137,6 +166,7 @@ And the following special keys:
       :submit-label - Label to use on the submit button. Defaults to "Submit"
       :cancel-href  - When provided, shows a "Cancel" link or button next to the
                       submit button
+      :validations  - A sequence of validation specifications
       :validator    - A function to call to validate parsed values for this
                       form. The function should take a map of values and return
                       a sequence of problem maps for each field that failed to

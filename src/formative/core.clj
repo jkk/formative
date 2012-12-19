@@ -148,6 +148,7 @@
       :submit-label - Label to use on the submit button. Defaults to \"Submit\"
       :cancel-href  - When provided, shows a \"Cancel\" hyperlink next to the
                       submit button
+      :validations  - A sequence of validation specifications
       :validator    - A function to call to validate parsed values for this
                       form. The function should take a map of values and return
                       a sequence of problem maps for each field that failed to

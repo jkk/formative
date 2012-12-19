@@ -2,177 +2,179 @@
   (:require [formative.data :as data]
             [clojure.string :as string]))
 
+(defn seqify [x]
+  (if-not (sequential? x) [x] x))
+
 (defn make-validator [keys bad-pred msg]
   (fn [m]
-    (let [bad-keys (filter #(bad-pred (get m %)) keys)]
+    (let [bad-keys (filter #(bad-pred (get m %))
+                           (seqify keys))]
       (when (seq bad-keys)
         {:keys bad-keys :msg msg}))))
 
-(defn contains [& keys]
-  (make-validator keys (complement contains?) "must be present"))
+(defn contains [keys & [msg]]
+  (make-validator keys (complement contains?)
+                  (or msg "must be present")))
 
-(defn required [& keys]
+(defn required [keys & [msg]]
   (make-validator keys #(or (nil? %) (and (string? %) (string/blank? %)))
-                  "must not be blank"))
+                  (or msg "must not be blank")))
 
-(defn equal [& keys]
+(defn equal [keys & [msg]]
   (fn [m]
     (when-not (apply = (map #(get m %) keys))
-      {:keys keys :msg "must be equal"})))
+      {:keys keys :msg (or msg "must be equal")})))
 
-(defn matches [re & keys]
+(defn matches [re keys & [msg]]
   (make-validator
     keys #(and (not (string/blank? %))
                (not (re-matches re %)))
-    "incorrect format"))
+    (or msg "incorrect format")))
 
-(defn min-length [len & keys]
+(defn min-length [len keys & [msg]]
   (make-validator
     keys #(and (not (nil? %))
                (not (<= len (count %))))
-    (str "must be at least " len " characters")))
+    (or msg (str "must be at least " len " characters"))))
 
-(defn max-length [len & keys]
+(defn max-length [len keys & [msg]]
   (make-validator
     keys #(and (not (nil? %))
                (not (>= len (count %))))
-    (str "cannot exceed " len " characters")))
+    (or msg (str "cannot exceed " len " characters"))))
 
-(defn in [coll & keys]
+(defn in [coll keys & [msg]]
   (let [coll-set (if (set? coll)
                    coll (set coll))]
     (make-validator
       keys #(and (not (nil? %))
                  (not (contains? coll-set %)))
-      (str "not an accepted value"))))
+      (or msg (str "not an accepted value")))))
 
 (def ^:private zip-regex #"^\d{5}(?:[-\s]\d{4})?$")
 
-(defn us-zip [& keys]
+(defn us-zip [keys & [msg]]
   (make-validator keys #(and (not (string/blank? %))
                              (not (re-matches zip-regex %)))
-                  "must be a valid US zip code"))
+                  (or msg "must be a valid US zip code")))
 
 (def ^:private us-states (set (filter (complement string/blank?)
                                       (map first data/us-states))))
 
-(defn us-state [& keys]
+(defn us-state [keys & [msg]]
   (make-validator keys #(and (not (string/blank? %))
                              (not (us-states %)))
-                  "must be a valid US state"))
+                  (or msg "must be a valid US state")))
 
 (def ^:private ca-states (set (filter (complement string/blank?)
                                       (map first data/ca-states))))
 
-(defn ca-state [& keys]
+(defn ca-state [keys & [msg]]
   (make-validator keys #(and (not (string/blank? %))
                              (not (ca-states %)))
-                  "must be a valid Canadian state"))
+                  (or msg "must be a valid Canadian state")))
 
 (def ^:private alpha2-countries (set (keep :alpha2 data/countries)))
 
-(defn country [& keys]
+(defn country [keys & [msg]]
   (make-validator keys #(and (not (string/blank? %))
                              (not (alpha2-countries %)))
-                  "must be a valid country"))
+                  (or msg "must be a valid country")))
 
-(defn email [& keys]
+(defn email [keys & [msg]]
   (make-validator
     keys #(and (not (string/blank? %))
                (not (re-matches #"[^^]+@[^$]+" %))) ;RFC be damned
-    "must be a valid email"))
+    (or msg "must be a valid email")))
 
-(defn bool [& keys]
+(defn bool [keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (true? %)) (not (false? %)))
-    "must be true or false"))
+    (or msg "must be true or false")))
 
-(defn bools [& keys]
+(defn bools [keys & [msg]]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(and (not (true? %)) (not (false? %))) v)))
-    "must be all true or false"))
+    (or msg "must be all true or false")))
 
-(defn integer [& keys]
+(defn integer [keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (integer? %)))
-    "must be a number"))
+    (or msg "must be a number")))
 
-(defn integers [& keys]
+(defn integers [keys & [msg]]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (integer? %)) v)))
-    "must be numbers"))
+    (or msg "must be numbers")))
 
-(defn floating-point [& keys]
+(defn floating-point [keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (float? %)))
-    "must be a decimal number"))
+    (or msg "must be a decimal number")))
 
-(defn floating-points [& keys]
+(defn floating-points [keys & [msg]]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (float? %)) v)))
-    "must be decimal numbers"))
+    (or msg "must be decimal numbers")))
 
-(defn decimal [& keys]
+(defn decimal [keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (decimal? %)))
-    "must be a decimal number"))
+    (or msg "must be a decimal number")))
 
-(defn decimals [& keys]
+(defn decimals [keys & [msg]]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (decimal? %)) v)))
-    "must be decimal numbers"))
+    (or msg "must be decimal numbers")))
 
-(defn min-val [min & keys]
+(defn min-val [min keys & [msg]]
   (make-validator
     keys #(and (number? %) (> min %))
-    (str "cannot be less than " min)))
+    (or msg (str "cannot be less than " min))))
 
 (def at-least min-val)
 
-(defn max-val [max & keys]
+(defn max-val [max keys & [msg]]
   (make-validator
     keys #(and (number? %) (< max %))
-    (str "cannot be more than " max)))
+    (or msg (str "cannot be more than " max))))
 
 (def at-most max-val)
 
-(defn within [min max & keys]
+(defn within [min max keys & [msg]]
   (make-validator
     keys #(and (number? %) (or (> min %) (< max %)))
-    (str "must be within " min " and " max)))
+    (or msg (str "must be within " min " and " max))))
 
-(defn date [& keys]
+(defn date [keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (instance? java.util.Date %)))
-    "must be a date"))
+    (or msg "must be a date")))
 
-(defn dates [& keys]
+(defn dates [keys & [msg]]
   (make-validator
     keys (fn [v]
            (or (and (not (nil? v)) (not (sequential? v)))
                (some #(not (instance? java.util.Date %)) v)))
-    "must be dates"))
+    (or msg "must be dates")))
 
-(defn after [^java.util.Date date & keys]
+(defn after [^java.util.Date date keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (.after ^java.util.Date % date)))
-    (str "must be after " date)))
+    (or msg (str "must be after " date))))
 
-(defn before [^java.util.Date date & keys]
+(defn before [^java.util.Date date keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (.before ^java.util.Date % date)))
-    (str "must be before " date)))
-
-(defn seqify [x]
-  (if-not (sequential? x) [x] x))
+    (or msg (str "must be before " date))))
 
 (defn combine [& validators]
   (fn [m]

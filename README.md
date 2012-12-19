@@ -74,7 +74,7 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 (fp/parse-params example-form
                  {"secret-code" "1234"
                   "email" "foobar@gmail.com"
-                  "password" "bazquux"
+                  "password" "barbazquux"
                   "remember" "false"})
 ;; Returns:
 {:remember false, :secret-code 1234, :password "bazquux", :email "foobar@gmail.com"}

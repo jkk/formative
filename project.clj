@@ -1,5 +1,5 @@
 (defproject formative "0.1.0-SNAPSHOT"
-  :description "Generates Hiccup forms and parses submitted form data"
+  :description "Web forms - rendering, parsing, and validating"
   :url "https://github.com/jkk/formative"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

@@ -117,6 +117,7 @@ Built in validations:
 
 * `:required <keys> [msg]` - must not be blank or nil
 * `:contains <keys> [msg]` - can be blank or nil but must be present in the values map
+* `:exact <value> <keys> [msg]` - must be a particular value
 * `:equal <keys> [msg]` - all keys must be equal
 * `:email <keys> [msg]` - must be a valid email
 * `:matches <regex> <keys> [msg]` - must match a regular expression

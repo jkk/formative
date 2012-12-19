@@ -174,9 +174,10 @@ And the following special keys:
                       a sequence of problem maps for each field that failed to
                       validate. The problem map should contain the keys :keys
                       and :msg.
-      :problems     - Sequence of field names that are a "problem" (e.g., incorrect
-                      format). Form renderers typically add a class and style to
-                      highlight problem fields.
+      :problems     - Sequence of field names or problem maps. Form
+                      renderers typically add a class and style to highlight
+                      problem fields and, if problem maps are provided,
+                      show descriptive messages.
                       
 New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
 
@@ -216,6 +217,49 @@ A field specification is a map with the following keys:
                       specification, and the Ring file upload payload.
 
 Field types are extensible with the `formative.render-field/render-field` and `formative.parse/parse-input` multimethods.
+
+## Fuller Example
+
+```clj
+(ns example.core
+  (:require [formative.core :as f]
+            [formative.parse :as fp]
+            [hiccup.core :as hiccup]
+            [compojure.core :refer [defroutes GET POST]]))
+
+(def example-form
+  {:method :post
+   :fields [{:name :full-name}
+            {:name :email :type :email}
+            {:name :spam :type :checkbox :label "Yes, please spam me."}
+            {:name :password :type :password}
+            {:name :password-confirm :type :password}
+            {:name :flavors :type :checkboxes
+             :options ["Chocolate" "Vanilla" "Strawberry" "Mint"]}]
+   :validations [[:required [:full-name :email :password]]
+                 [:min-length 8 :password]
+                 [:equal [:password :password-confirm]]
+                 [:min-length 2 :flavors "Please select two or more flavors"]]})
+
+(defn show-example-form [req & {:keys [problems]}]
+  (let [defaults {:spam true}]
+    (hiccup/html
+      [:h1 "Example"]
+      (f/render-form (assoc example-form
+                            :values (merge defaults
+                                           (:params req))
+                            :problems problems)))))
+
+(defn submit-example-form [req]
+  (fp/with-fallback req show-example-form
+    (let [values (fp/parse-request example-form req)]
+      (str "<p>Thank you!</p><pre>" (prn-str values) "</pre>"))))
+
+(defroutes example-routes
+  (GET "/example" _ show-example-form)
+  (POST "/example" _ submit-example-form))
+
+```
 
 ## License
 

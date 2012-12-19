@@ -133,8 +133,8 @@ Built in validations:
 * `:us-state <keys> [msg]` - must be a valid two-letter US state code
 * `:ca-state <keys> [msg]` - must be a valid two-letter Canadian province code
 * `:country <keys> [msg]` - must be a valid ISO alpha2 country code
-* Data type validations: `:boolean`, `:integer`, `:float`, `:decimal`, `:date`
-* Data type collection validations: `:booleans`, `:integers`, `:floats`, `:decimals`, `:dates`
+* Datatype validations: `:string`, `:boolean`, `:integer`, `:float`, `:decimal`, `:date`
+* Datatype collection validations: `:strings`, `:booleans`, `:integers`, `:floats`, `:decimals`, `:dates`
 
 All validation specifications have corresponding validator functions in the `formative.validate` namespace.
 

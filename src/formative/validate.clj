@@ -96,6 +96,18 @@
                (not (re-matches #"[^^]+@[^$]+" %))) ;RFC be damned
     (or msg "must be a valid email")))
 
+(defn string [keys & [msg]]
+  (make-validator
+    keys #(and (not (nil? %)) (not (string? %)))
+    (or msg "must be a string")))
+
+(defn strings [keys & [msg]]
+  (make-validator
+    keys (fn [v]
+           (or (and (not (nil? v)) (not (sequential? v)))
+               (some #(not (string? %)) v)))
+    (or msg "must be strings")))
+
 (defn bool [keys & [msg]]
   (make-validator
     keys #(and (not (nil? %)) (not (true? %)) (not (false? %)))
@@ -203,6 +215,10 @@
    :ca-state ca-state
    :country country
    :email email
+   :str string
+   :string string
+   :strs strings
+   :strings strings
    :bool bool
    :boolean bool
    :bools bools
@@ -241,6 +257,8 @@
    :ca-state ca-state
    :country country
    :email email
+   :str string
+   :strs strings
    :boolean bool
    :booleans bools
    :int integer

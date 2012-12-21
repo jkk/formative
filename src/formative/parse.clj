@@ -115,6 +115,9 @@
 (defmethod parse-input :month-select [spec v]
   (parse-long spec v))
 
+(defmethod parse-input :currency [spec v]
+  (parse-bigdec spec v))
+
 (defn- parse-file [spec x]
   (when-not (:upload-handler spec)
     (throw (IllegalStateException.

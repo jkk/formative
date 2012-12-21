@@ -56,7 +56,8 @@
    :decimal v/decimal
    :decimals v/decimals
    :date v/date
-   :dates v/dates})
+   :dates v/dates
+   :currency v/decimal})
 
 (defn validate-types [fields values]
   (let [groups (group-by #(:datatype % (:type %))

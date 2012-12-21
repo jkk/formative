@@ -11,7 +11,7 @@
                           (keys field))]
     (select-keys field (concat allowed-keys data-keys))))
 
-(defn render-default-input [field]
+(defn render-default-input [field & [opts]]
   (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
                                       :checked :disabled :href :style :src :size
                                       :readonly :tabindex :onchange :onclick
@@ -23,7 +23,10 @@
                        (empty? (:value attrs)))
                 (dissoc attrs :value)
                 attrs)]
-    [:input attrs]))
+    (list
+      (when-let [prefix (:prefix opts)]
+        [:span.input-prefix prefix])
+      [:input attrs])))
 
 (defmethod render-field :default [field]
   (render-default-input field))
@@ -219,3 +222,6 @@
      (render-field (assoc field
                           :type :select
                           :options opts))]))
+
+(defmethod render-field :currency [field]
+  (render-default-input field {:prefix "$"}))

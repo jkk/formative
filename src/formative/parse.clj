@@ -180,8 +180,7 @@
         problems (when (and form validate)
                    (fv/validate form values))]
     (if (seq problems)
-      (throw (ex-info "Problem parsing params"
-                      {:problems problems :form form :fields fields}))
+      (throw (ex-info "Problem parsing params" {:problems problems}))
       values)))
 
 (defn parse-request

@@ -129,9 +129,9 @@
     [form-attrs fields spec]))
 
 (defn render-form
-  "Given a form specification, returns a Hiccup data structure representing a
-  form.
-
+  "Given a form specification, returns a rendering of a form - e.g., Hiccup
+  data, an HTML string, etc. 
+  
   Valid keys for spec include the following HTML form attributes:
 
       :action :method :enctype :accept :name :id :class

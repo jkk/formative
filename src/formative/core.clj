@@ -107,7 +107,10 @@
         form-attrs (assoc form-attrs
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))
-        fields (prep-fields (:fields spec) values)
+        fields (if (:tweaks spec)
+                 (merge-fields (:fields spec) (:tweaks spec))
+                 (:fields spec))
+        fields (prep-fields fields values)
         fields (if (:cancel-href spec)
                  (for [field fields]
                    (if (= :submit (:type field))
@@ -145,6 +148,8 @@
                         :table
                         :inline
       :fields       - Sequence of form field specifications. See below.
+      :tweaks       - Sequence of form field specifications which will be
+                      merged with :fields using merge-fields.
       :values       - Map of values used to populate the form fields
       :submit-label - Label to use on the submit button. Defaults to \"Submit\"
       :cancel-href  - When provided, shows a \"Cancel\" hyperlink next to the

@@ -3,23 +3,21 @@
             [clojure.string :as string]
             [jkkramer.verily :as v]))
 
-(def ^:private us-states (set (filter (complement string/blank?)
-                                      (map first data/us-states))))
+(def ^:private us-states (set (map first data/us-states)))
 
 (defn us-state [keys & [msg]]
   (v/make-validator keys #(and (not (string/blank? %))
                                (not (us-states %)))
                     (or msg "must be a valid US state")))
 
-(def ^:private ca-states (set (filter (complement string/blank?)
-                                      (map first data/ca-states))))
+(def ^:private ca-states (set (map first data/ca-states)))
 
 (defn ca-state [keys & [msg]]
   (v/make-validator keys #(and (not (string/blank? %))
                                (not (ca-states %)))
                     (or msg "must be a valid Canadian state")))
 
-(def ^:private alpha2-countries (set (keep :alpha2 data/countries)))
+(def ^:private alpha2-countries (set (map :alpha2 data/countries)))
 
 (defn country [keys & [msg]]
   (v/make-validator keys #(and (not (string/blank? %))

@@ -48,11 +48,23 @@
                                       :tabindex :onchange :onclick :onfocus
                                       :onblur])
         val (str (:value field))
-        opts (normalize-options (:options field))]
-    [:select attrs
-     (for [[v text] opts
-           :let [v (str v)]]
-       [:option {:value v :selected (= val v)} text])]))
+        opts (normalize-options (:options field))
+        opts (if (:first-option field)
+               (concat (normalize-options [(:first-option field)])
+                       opts)
+               opts)
+        opt-tags (for [[v text] opts
+                       :let [v (str v)]]
+                   [:option {:value v :selected (= val v)} text])
+        placeholder (if (true? (:placeholder field))
+                      "Select one..."
+                      (:placeholder field))
+        opt-tags (if (and placeholder (string/blank? val))
+                   (cons [:option {:value "" :disabled true :selected true}
+                          placeholder]
+                         opt-tags)
+                   opt-tags)]
+    [:select attrs opt-tags]))
 
 (defmethod render-field :checkbox [field]
   (list

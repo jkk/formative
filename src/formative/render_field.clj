@@ -187,3 +187,23 @@
                     :options (cons ["" "Year"]
                                  (map #(vector % %)
                                       (range year-start (inc year-end))))})]))
+
+(defmethod render-field :year-select [field]
+  (let [this-year (+ 1900 (.getYear (java.util.Date.)))
+        start (:start field this-year)
+        end (:end field (+ this-year 20))]
+    [:div.year-select
+     (render-field (assoc field
+                          :type :select
+                          :options (range start (inc end))))]))
+
+(defmethod render-field :month-select [field]
+  (let [opts (if (:numbers field)
+               (range 1 13)
+               (map vector
+                    (range 1 13)
+                    (.getMonths (java.text.DateFormatSymbols.))))]
+    [:div.month-select
+     (render-field (assoc field
+                          :type :select
+                          :options opts))]))

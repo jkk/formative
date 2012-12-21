@@ -109,6 +109,12 @@
       (catch Exception e
         (ParseError.)))))
 
+(defmethod parse-input :year-select [spec v]
+  (parse-long spec v))
+
+(defmethod parse-input :month-select [spec v]
+  (parse-long spec v))
+
 (defn- parse-file [spec x]
   (when-not (:upload-handler spec)
     (throw (IllegalStateException.

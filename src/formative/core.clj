@@ -4,7 +4,7 @@
             formative.render-form.div
             formative.render-form.bootstrap
             formative.render-form.inline
-            [formative.render-field :refer [render-field]]
+            [formative.render-field :as rfield]
             [formative.helpers :refer [get-field-label]]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
@@ -201,6 +201,16 @@
                       specification, and the Ring file upload payload."
   [spec]
   (apply render-form* (prep-form spec)))
+
+(defn render-field
+  "Render an individual form field element"
+  ([field]
+    (rfield/render-field
+      (prep-field (normalize-field field) {})))
+  ([field value]
+    (let [norm-field (normalize-field field)]
+      (rfield/render-field
+        (prep-field norm-field {(:name norm-field) value})))))
 
 (defmacro with-renderer [renderer & body]
   `(binding [*renderer* ~renderer]

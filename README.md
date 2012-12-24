@@ -253,7 +253,7 @@ Built-in types:
 	* `:options` - options to display; see below for format
 	* `:placeholder` - will be used as the text for a first, disabled option
 	* `:first-option` - an option to prepend to the other options
-* __`:checkbox`__ - defaults to true/false when no `:value` is given. Special keys:
+* __`:checkbox`__ - defaults to true/false when no :value is given. Special keys:
 	* `:value` value of a checked input (default `true`)
 	* `:unchecked-value` value to use when the input is unchecked (default `false`)
 * __`:checkboxes`__ - multiple checkboxes that parse to a collection of values. Special keys:
@@ -272,7 +272,7 @@ Built-in types:
 * __`:us-zip`__ - United States ZIP code
 * __`:ca-state`__ - Canadian province
 * __`:country`__ - Country
-* __`:date-select`__ - Date selector. Renders as multiple `:select` fields, parses as a `java.util.Date`
+* __`:date-select`__ - Date selector. Renders as multiple :select fields, parses as a `java.util.Date`
 	* `:year-start`
 	* `:year-end`
 * __`:year-select`__ - Year selector, parses to integer
@@ -280,7 +280,7 @@ Built-in types:
 	* `:end`
 * __`:month-select`__ - Month selector, parses to integer (1-12)
 	* `:numbers` - when true, shows numbers instead of month names
-* __`:currency`__ - parses as a `:decimal` datatype
+* __`:currency`__ - parses as a :decimal datatype
 * __`:file`__ - file upload. Special keys:
 	* `:upload-handler` - handler called when a file is uploaded. The field's specification and Ring param value are passed as arguments to the handler. The handler can return whatever value is appropriate (e.g., a String or a File).
 * __`:submit`__ - submit button (included by default, but can be added explicitly if you prefer)

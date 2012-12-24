@@ -263,7 +263,7 @@ Built-in types:
 	* `:options` - options to display; see below for format
 * __`:html`__ - custom, unlabeled HTML. Not included in parsing. Special keys:
 	* `:html` - HTML or Hiccup data
-* __`:labled-html`__ - custom, labeled HTML. Not included in parsing. Special keys:
+* __`:labeled-html`__ - custom, labeled HTML. Not included in parsing. Special keys:
 	* `:html` - HTML or Hiccup data
 * __`:heading`__ - form heading. Special keys:
 	* `:text` - heading text

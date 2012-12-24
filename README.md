@@ -261,9 +261,9 @@ Built-in types:
 	* `:cols` - number of columns to group checkboxes into
 * __`:radios`__ - multiple radio inputs that parse to a single value. Special keys:
 	* `:options` - options to display; see below for format
-* __`:html`__ - custom, unlabeled HTML. Special keys:
+* __`:html`__ - custom, unlabeled HTML. Not included in parsing. Special keys:
 	* `:html` - HTML or Hiccup data
-* __`:labled-html`__ - custom, labeled HTML. Special keys:
+* __`:labled-html`__ - custom, labeled HTML. Not included in parsing. Special keys:
 	* `:html` - HTML or Hiccup data
 * __`:heading`__ - form heading. Special keys:
 	* `:text` - heading text
@@ -272,15 +272,17 @@ Built-in types:
 * __`:us-zip`__ - United States ZIP code
 * __`:ca-state`__ - Canadian province
 * __`:country`__ - Country
-* __`:date-select`__ - Date selector. Rendered as multiple `:select` fields
+* __`:date-select`__ - Date selector. Renders as multiple `:select` fields, parses as a `java.util.Date`
 	* `:year-start`
 	* `:year-end`
-* __`:year-select`__ - Year selector
+* __`:year-select`__ - Year selector, parses to integer
 	* `:start`
 	* `:end`
-* __`:month-select`__ - Month selector
+* __`:month-select`__ - Month selector, parses to integer (1-12)
 	* `:numbers` - when true, shows numbers instead of month names
-* __`:currency`__
+* __`:currency`__ - parses as a `:decimal` datatype
+* __`:file`__ - file upload. Special keys:
+	* `:upload-handler` - handler called when a file is uploaded. The field's specification and Ring param value are passed as arguments to the handler. The handler can return whatever value is appropriate (e.g., a String or a File).
 * __`:submit`__ - submit button (included by default, but can be added explicitly if you prefer)
 
 The `:options` key for `:select` and other types accepts a collection of any of the following formats:

@@ -1,4 +1,4 @@
-(defproject formative "0.1.0-SNAPSHOT"
+(defproject formative "0.1.0"
   :description "Web forms - rendering, parsing, and validating"
   :url "https://github.com/jkk/formative"
   :license {:name "Eclipse Public License"
@@ -7,4 +7,4 @@
                  [hiccup "1.0.0"]
                  [com.jkkramer/ordered "1.3.5"]
                  [ring/ring-core "1.1.1"]
-                 [jkkramer/verily "0.2.0-SNAPSHOT"]])
+                 [jkkramer/verily "0.2.0"]])

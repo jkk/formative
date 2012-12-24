@@ -22,10 +22,10 @@
             :text)))
 
 (defmulti prep-field
-  "Prepares a field for rendering. The default preparation is to populate
-  the :value key and add a label if not present. Each type may have its own
-  particular preparation steps. For example, the :checkbox type adds a
-  :checked key."
+  "Prepares a field for rendering, dispatching on :type. The default
+  preparation is to populate the :value key and add a label if not present.
+  Each type may have its own particular preparation steps. For example, the
+  :checkbox type adds a :checked key."
   (fn [field values]
     (:type field)))
 
@@ -203,7 +203,7 @@
   (apply render-form* (prep-form spec)))
 
 (defn render-field
-  "Render an individual form field element"
+  "Render an individual form field element as Hiccup data"
   ([field]
     (rfield/render-field
       (prep-field (normalize-field field) {})))

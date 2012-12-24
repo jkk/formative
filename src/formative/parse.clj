@@ -7,7 +7,8 @@
 (defrecord ParseError [])
 
 (defmulti parse-input
-  "Parses the value for a particular field specification"
+  "Parses the value for a particular field specification, dispatching on
+  :datatype if present, otherwise :type."
   (fn [spec v]
     (:datatype spec (:type spec))))
 

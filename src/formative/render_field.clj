@@ -3,8 +3,10 @@
             [formative.data :as data]
             [clojure.string :as string]))
 
-(defmulti render-field (fn [field]
-                         (:type field)))
+(defmulti render-field
+  "Render a field. Dispatches on :type"
+  (fn [field]
+    (:type field)))
 
 (defn- get-input-attrs [field allowed-keys]
   (let [data-keys (filter #(re-find #"^data-" (name %))

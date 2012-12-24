@@ -272,7 +272,7 @@ Built-in types:
 * __`:us-zip`__ - United States ZIP code
 * __`:ca-state`__ - Canadian province
 * __`:country`__ - Country
-* __`:date-select`__ - Date selector. Renders as multiple :select fields, parses as a `java.util.Date`
+* __`:date-select`__ - Date selector. Renders as multiple :select fields, parses as a java.util.Date
 	* `:year-start`
 	* `:year-end`
 * __`:year-select`__ - Year selector, parses to integer

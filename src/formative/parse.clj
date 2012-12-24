@@ -1,6 +1,7 @@
 (ns formative.parse
   (:require [ring.middleware.nested-params :as np]
             [clojure.string :as string]
+            [clojure.walk :refer [stringify-keys]]
             [formative.core :as f]
             [formative.validate :as fv]))
 
@@ -167,10 +168,19 @@
     {}
     fields))
 
+(defn- normalize-params [params]
+  (if (keyword? (key (first params)))
+    (stringify-keys params)
+    ;; FIXME: Should probably not rely on a private Ring fn (shhh)
+    (#'np/nest-params params np/parse-nested-keys)))
+
 (defn parse-params
   "Given a form specification or sequence of field specifications and a Ring
-  :form-params or :query-params map, returns a map of field names to parsed
-  values.
+  params map, returns a map of field names to parsed values.
+
+  The Ring params map must be either 1) an untouched :query-params or
+  :form-params map; or 2) a params map with the following middleware
+  applied: wrap-params, wrap-nested-params, wrap-keyword-params.
 
   Parsed values will be validated and an exception will be thrown if validation
   fails. The exception carries a :problems key with details about the validation
@@ -183,9 +193,7 @@
                         [form-or-fields (:fields form-or-fields)]
                         [nil form-or-fields])
         fields (f/prep-fields fields {})
-        ;; FIXME: Should probably not rely on a private Ring fn (shhh)
-        nested-params (#'np/nest-params params
-                                        np/parse-nested-keys)
+        nested-params (normalize-params params)
         values (parse-nested-params fields nested-params)
         problems (when (and form validate)
                    (fv/validate form values))]

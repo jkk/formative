@@ -90,7 +90,7 @@ All of the built-in form renderers make use of `render-field` when rendering for
 
 ### Parsing Form Data
 
-`formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) `:form-params` or `:query-params` map into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
+`formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) params map into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
 
 ```clj
 (fp/parse-params example-form

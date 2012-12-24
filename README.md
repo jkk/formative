@@ -68,6 +68,26 @@ Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twit
 
 Note: Formative does not include Bootstrap itself or any styling. You are responsible for providing CSS, images, etc.
 
+New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
+
+You can also render individual elements for fields with `render-field`. Unlike `render-form*`, `render-field` always returns Hiccup data. `render-field` takes a field specification and an optional value:
+
+```clj
+(f/render-field {:name :flavor
+                 :type :select
+                 :options ["Chocolate" "Vanilla" "Strawberry"]}
+                "Vanilla")
+;; Returns:
+[:select {:name "flavor"}
+ ([:option {:value "Chocolate", :selected false} "Chocolate"]
+  [:option {:value "Vanilla", :selected true} "Vanilla"]
+  [:option {:value "Strawberry", :selected false} "Strawberry"])]
+```
+
+Notice that the "Vanilla" option is selected in our generated element.
+
+All of the built-in form renderers make use of `render-field` when rendering forms, but not all renderers are not required to do so.
+
 ### Parsing Form Data
 
 `formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) `:form-params` or `:query-params` map into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
@@ -182,14 +202,16 @@ And the following special keys:
                       
 New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
 
-A field specification is a map with the following keys:
+A field specification is a map with keys corresponding to HTML attributes and
+the following special keys:
 
       :name         - Required name of the field, a keyword
+      :label        - Optional display name. Auto-generated from :name if not provided
       :type         - UI type of the field. Defaults to :text. Built-in types
                       include: :text, :textarea, :select, :checkbox,
                       :checkboxes, :radio, :html, :heading, :us-state,
-                      :ca-state, :country, :date-select. Each type may have particular
-                      keys that it makes use of.
+                      :ca-state, :country, :date-select, :currency. Each type may
+                      have particular keys that it makes use of.
 
                       Selection fields such as :select, :checkboxes, and :radio
                       expect an :options key, which is a collection of options
@@ -201,9 +223,9 @@ A field specification is a map with the following keys:
                       The :heading type expects a :text key, a string or Hiccup data.
 
                       The :html type expects an :html key, a string or Hiccup data.
-      :datatype     - Datatype of the field used for parsing. Can be one of:
+      :datatype     - Optional. Datatype of the field used for parsing. Can be one of:
                       :str, :int, :long, :boolean, :float, :double, :decimal,
-                      :bigint, :date, :file. Defaults to :str.
+                      :bigint, :date, :file, :currency. Defaults to :str.
 
                       All types can be appended with an "s" when a sequence
                       is expected - e.g., :ints for a sequence of integers. This
@@ -216,6 +238,55 @@ A field specification is a map with the following keys:
                       :file fields must have an :upload-handler key which is
                       a function that takes two arguments: the field
                       specification, and the Ring file upload payload.
+
+## Field Types
+
+The `:type` of a field can determine how it renders, behaves, gets parsed, and validated.
+
+Without any `:type`, a "text" input type is assumed. If a `:type` is provided that Formative doesn't recognize, an `<input>` element with that type will be assumed.
+
+Built-in types:
+
+* __`:text`__ - the default type
+* __`:textarea`__
+* __`:select`__ - special keys:
+	* `:options` - options to display; see below for format
+	* `:placeholder` - will be used as the text for a first, disabled option
+	* `:first-option` - an option to prepend to the other options
+* __`:checkbox`__ - defaults to true/false when no `:value` is given. Special keys:
+	* `:value` value of a checked input (default `true`)
+	* `:unchecked-value` value to use when the input is unchecked (default `false`)
+* __`:checkboxes`__ - multiple checkboxes that parse to a collection of values. Special keys:
+	* `:options` - options to display; see below for format
+	* `:cols` - number of columns to group checkboxes into
+* __`:radios`__ - multiple radio inputs that parse to a single value. Special keys:
+	* `:options` - options to display; see below for format
+* __`:html`__ - custom, unlabeled HTML. Special keys:
+	* `:html` - HTML or Hiccup data
+* __`:labled-html`__ - custom, labeled HTML. Special keys:
+	* `:html` - HTML or Hiccup data
+* __`:heading`__ - form heading. Special keys:
+	* `:text` - heading text
+* __`:email`__ 
+* __`:us-state`__ - United States state
+* __`:us-zip`__ - United States ZIP code
+* __`:ca-state`__ - Canadian province
+* __`:country`__ - Country
+* __`:date-select`__ - Date selector; rendered as multiple `:select` fields
+	* `:year-start`
+	* `:year-end`
+* __`:year-select`__ - Year selector
+	* `:start`
+	* `:end`
+* __`:month-select`__ - Month selector
+	* `:numbers` - when true, shows numbers instead of month names
+* __`:currency`__
+
+The `:options` key for `:select` and other types accepts a collection of any of the following formats:
+
+* ["value" "label"]
+* {:value "value" :label "label"]
+* "value and label"
 
 Field types are extensible with the `formative.render-field/render-field` and `formative.parse/parse-input` multimethods.
 

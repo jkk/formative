@@ -62,7 +62,7 @@ Render a form using `formative.core/render-form`:
   ]]
 ```
 
-Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this:
+Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this when turned from Hiccup to HTML:
 
 ![schema](https://github.com/jkk/formative/raw/master/doc/bootstrap-horizontal.png)
 
@@ -70,7 +70,7 @@ Note: Formative does not include Bootstrap itself or any styling. You are respon
 
 New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
 
-You can also render individual elements for fields with `render-field`. Unlike `render-form*`, `render-field` always returns Hiccup data. `render-field` takes a field specification and an optional value:
+You can also render individual fields using `render-field`. Unlike `render-form*`, `render-field` _always_ returns Hiccup data. `render-field` takes a field specification and an optional value:
 
 ```clj
 (f/render-field {:name :flavor
@@ -102,7 +102,7 @@ All of the built-in form renderers make use of `render-field` when rendering for
 {:remember false, :secret-code 1234, :password "barbazquux", :email "foobar@gmail.com"}
 ```
 
-Note that the `:remember` and `:secret-code` fields have been parsed from strings into their respective datatypes.
+Notice that the `:remember` and `:secret-code` fields have been parsed from strings into their respective datatypes.
 
 By default, validation will be performed on the parsed values and an exception thrown if validation fails. If the `:validate` keyword option to `parse-params` is `false`, `ParseError` records will be used in place of values that failed to parse, and no validation will be done.
 
@@ -209,7 +209,7 @@ the following special keys:
       :label        - Optional display name. Auto-generated from :name if not provided
       :type         - UI type of the field. Defaults to :text. Built-in types
                       include: :text, :textarea, :select, :checkbox,
-                      :checkboxes, :radio, :html, :heading, :us-state,
+                      :checkboxes, :radios, :html, :heading, :us-state,
                       :ca-state, :country, :date-select, :currency. Each type may
                       have particular keys that it makes use of.
 
@@ -217,7 +217,7 @@ the following special keys:
                       expect an :options key, which is a collection of options
                       which conform to one of the following formats:
                         - ["value" "label"]
-                        - {:value "value" :label "label"]
+                        - {:value "value" :label "label"}
                         - "value and label"
 
                       The :heading type expects a :text key, a string or Hiccup data.
@@ -247,13 +247,13 @@ Without any `:type`, a "text" input type is assumed. If a `:type` is provided th
 
 Built-in types:
 
-* __`:text`__ - the default type
+* __`:text`__
 * __`:textarea`__
 * __`:select`__ - special keys:
 	* `:options` - options to display; see below for format
 	* `:placeholder` - will be used as the text for a first, disabled option
 	* `:first-option` - an option to prepend to the other options
-* __`:checkbox`__ - defaults to true/false when no `:value` is given. Special keys:
+* **`:checkbox`** - defaults to true/false when no `:value` is given. Special keys:
 	* `:value` value of a checked input (default `true`)
 	* `:unchecked-value` value to use when the input is unchecked (default `false`)
 * __`:checkboxes`__ - multiple checkboxes that parse to a collection of values. Special keys:
@@ -272,7 +272,7 @@ Built-in types:
 * __`:us-zip`__ - United States ZIP code
 * __`:ca-state`__ - Canadian province
 * __`:country`__ - Country
-* __`:date-select`__ - Date selector; rendered as multiple `:select` fields
+* **`:date-select`** - Date selector; rendered as multiple `:select` fields
 	* `:year-start`
 	* `:year-end`
 * __`:year-select`__ - Year selector
@@ -285,7 +285,7 @@ Built-in types:
 The `:options` key for `:select` and other types accepts a collection of any of the following formats:
 
 * ["value" "label"]
-* {:value "value" :label "label"]
+* {:value "value" :label "label"}
 * "value and label"
 
 Field types are extensible with the `formative.render-field/render-field` and `formative.parse/parse-input` multimethods.

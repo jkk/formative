@@ -253,7 +253,7 @@ Built-in types:
 	* `:options` - options to display; see below for format
 	* `:placeholder` - will be used as the text for a first, disabled option
 	* `:first-option` - an option to prepend to the other options
-* **`:checkbox`** - defaults to true/false when no `:value` is given. Special keys:
+* __`:checkbox`__ - defaults to true/false when no `:value` is given. Special keys:
 	* `:value` value of a checked input (default `true`)
 	* `:unchecked-value` value to use when the input is unchecked (default `false`)
 * __`:checkboxes`__ - multiple checkboxes that parse to a collection of values. Special keys:
@@ -272,7 +272,7 @@ Built-in types:
 * __`:us-zip`__ - United States ZIP code
 * __`:ca-state`__ - Canadian province
 * __`:country`__ - Country
-* **`:date-select`** - Date selector; rendered as multiple `:select` fields
+* __`:date-select`__ - Date selector. Rendered as multiple `:select` fields
 	* `:year-start`
 	* `:year-end`
 * __`:year-select`__ - Year selector
@@ -281,6 +281,7 @@ Built-in types:
 * __`:month-select`__ - Month selector
 	* `:numbers` - when true, shows numbers instead of month names
 * __`:currency`__
+* __`:submit`__ - submit button (included by default, but can be added explicitly if you prefer)
 
 The `:options` key for `:select` and other types accepts a collection of any of the following formats:
 

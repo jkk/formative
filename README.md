@@ -91,10 +91,10 @@ All of the built-in form renderers make use of `render-field`, but not all rende
 
 ```clj
 (fp/parse-params example-form
-                 {"secret-code" "1234"
-                  "email" "foobar@gmail.com"
-                  "password" "barbazquux"
-                  "remember" "false"})
+                 {:secret-code "1234"
+                  :email "foobar@gmail.com"
+                  :password "barbazquux"
+                  :remember "false"})
 ;; Returns:
 {:remember false, :secret-code 1234, :password "barbazquux", :email "foobar@gmail.com"}
 ```

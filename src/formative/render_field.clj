@@ -105,12 +105,11 @@
         (for [[oval olabel] colopts]
           (let [id (str (:id field) "__" (opt-slug oval))]
             [:div.cb-shell
-             [:span.cb-input-shell
-              (render-field {:name fname :id id :checked (contains? vals (str oval))
-                             :type :checkbox :value oval})]
-             " "
-             [:label {:for id}
-              [:nobr olabel]]]))])]))
+             [:label.checkbox {:for id} " "
+              [:span.cb-input-shell
+               (render-field {:name fname :id id :checked (contains? vals (str oval))
+                              :type :checkbox :value oval})] " "
+              [:span.cb-label [:nobr olabel]]]]))])]))
 
 (defn- render-radios [field]
   (let [val (str (:value field))
@@ -186,6 +185,7 @@
     [:div.date-select
      (render-field {:type :select
                     :name (str (:name field) "[month]")
+                    :class "input-medium"
                     :value month
                     :options (cons ["" "Month"]
                                    (map vector
@@ -194,12 +194,14 @@
      " "
      (render-field {:type :select
                     :name (str (:name field) "[day]")
+                    :class "input-small"
                     :value day
                     :options (cons ["" "Day"]
                                    (map #(vector % %) (range 1 32)))})
      " "
      (render-field {:type :select
                     :name (str (:name field) "[year]")
+                    :class "input-small"
                     :value year
                     :options (cons ["" "Year"]
                                  (map #(vector % %)
@@ -211,6 +213,7 @@
         end (:end field (+ this-year 20))]
     [:div.year-select
      (render-field (assoc field
+                          :class (str (:class field) " input-small")
                           :type :select
                           :options (range start (inc end))))]))
 
@@ -222,6 +225,7 @@
                     (.getMonths (java.text.DateFormatSymbols.))))]
     [:div.month-select
      (render-field (assoc field
+                          :class (str (:class field) " input-medium")
                           :type :select
                           :options opts))]))
 

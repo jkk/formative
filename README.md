@@ -116,6 +116,18 @@ Any exception thrown due to a failed parse or validation will contain a `:proble
 {:secret-code #formative.parse.ParseError{}}
 ```
 
+The `formative.parse/with-fallback` macro is a handy way to try parsing Ring params, and call a "fallback" function when it fails. The fallback function will be supplied the problems as its argument.
+
+```
+(defn submit-example-form [params]
+  ;; Calls (show-example-form params :problems problems) if parsing fails
+  (fp/with-fallback (partial show-example-form params :problems)
+    (let [values (fp/parse-params example-form params))]
+      ;; Success
+      (prn-str values)))
+
+```
+
 ### Validating Parsed Data
 
 Formative uses [Verily](https://github.com/jkk/verily) to validate parsed data. By default, only datatypes are validated. There are two ways to add your own validation to a form: `:validations` and `:validator`.

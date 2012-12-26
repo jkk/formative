@@ -214,13 +214,12 @@
 ;;;;
 
 (defmacro with-fallback
-  "Attempts to run body; if an ExceptionInfo with field problems is caught,
-  calls form-fn with a :problems keyword argument containing the problem
-  payload."
-  [req form-fn & body]
+  "Attempts to run body; if an ExceptionInfo with a :problems key is caught,
+  calls fallback-fn with the problems as the argument."
+  [fallback-fn & body]
   `(try
      ~@body
      (catch clojure.lang.ExceptionInfo e#
        (if-let [problems# (:problems (ex-data e#))]
-         (~form-fn ~req :problems problems#)
+         (~fallback-fn problems#)
          (throw e#)))))

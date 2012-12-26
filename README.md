@@ -34,9 +34,6 @@ To build a form, you need a form specification, which is a map that looks like t
 ```clj
 (def example-form
   {:method :post
-   :action "/example/path"
-   :submit-label "Do It"
-   :cancel-href "/example"
    :fields [{:name :secret-code :type :hidden :datatype :int}
             {:name :email :type :email}
             {:name :password :type :password}
@@ -56,21 +53,21 @@ Render a form using `formative.core/render-form`:
 ```clj
 (f/render-form example-form)
 ;; Returns:
-[:div {:class "form-shell form-horizontal"}
- [:form {:method :post, :action "/example/path"}
+[:div {:class "form-shell form-horizontal bootstrap-form"}
+ [:form {:method :post}
   ;; ... etc ...
   ]]
 ```
 
-Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this when turned from Hiccup to HTML:
+Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this:
 
-![schema](https://github.com/jkk/formative/raw/master/doc/bootstrap-horizontal.png)
+![form](https://github.com/jkk/formative/raw/master/doc/bootstrap-horizontal.png)
 
 Note: Formative does not include Bootstrap itself or any styling. You are responsible for providing CSS, images, etc.
 
 New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
 
-You can also render individual fields using `render-field`. Unlike `render-form*`, `render-field` _always_ returns Hiccup data. `render-field` takes a field specification and an optional value:
+You can also render individual fields using `formative.core/render-field`. Unlike `render-form`, `render-field` _always_ returns Hiccup data. `render-field` takes a field specification and an optional value:
 
 ```clj
 (f/render-field {:name :flavor
@@ -86,7 +83,7 @@ You can also render individual fields using `render-field`. Unlike `render-form*
 
 Notice that the "Vanilla" option is selected in our generated element.
 
-All of the built-in form renderers make use of `render-field` when rendering forms, but not all renderers are not required to do so.
+All of the built-in form renderers make use of `render-field`, but not all renderers are required to do so.
 
 ### Parsing Form Data
 
@@ -299,16 +296,19 @@ Field types are extensible with the `formative.render-field/render-field` and `f
 (ns example.core
   (:require [formative.core :as f]
             [formative.parse :as fp]
-            [hiccup.core :as hiccup]
+            [hiccup.page :as page]
             [compojure.core :refer [defroutes GET POST]]))
 
 (def example-form
   {:method :post
-   :fields [{:name :full-name}
+   :fields [{:name :h1 :type :heading :text "Section 1"}
+            {:name :full-name}
             {:name :email :type :email}
             {:name :spam :type :checkbox :label "Yes, please spam me."}
             {:name :password :type :password}
             {:name :password-confirm :type :password}
+            {:name :h1 :type :heading :text "Section 2"}
+            {:name :date :type :date-select}
             {:name :flavors :type :checkboxes
              :options ["Chocolate" "Vanilla" "Strawberry" "Mint"]}]
    :validations [[:required [:full-name :email :password]]
@@ -316,25 +316,32 @@ Field types are extensible with the `formative.render-field/render-field` and `f
                  [:equal [:password :password-confirm]]
                  [:min-length 2 :flavors "Please select two or more flavors"]]})
 
-(defn show-example-form [req & {:keys [problems]}]
+(defn show-example-form [params & {:keys [problems]}]
   (let [defaults {:spam true}]
-    (hiccup/html
-      [:h1 "Example"]
-      (f/render-form (assoc example-form
-                            :values (merge defaults
-                                           (:params req))
-                            :problems problems)))))
+    (page/html5
+      [:head
+       (page/include-css "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap.min.css")
+       [:style "body { margin: 2em; }"]]
+      [:body
+       [:h1 "Example"]
+       (f/render-form (assoc example-form
+                             :values (merge defaults params)
+                             :problems problems))])))
 
-(defn submit-example-form [req]
-  (fp/with-fallback req show-example-form
-    (let [values (fp/parse-request example-form req)]
+(defn submit-example-form [params]
+  (fp/with-fallback (partial show-example-form params :problems)
+    (let [values (fp/parse-params example-form params)]
       (str "<p>Thank you!</p><pre>" (prn-str values) "</pre>"))))
 
 (defroutes example-routes
-  (GET "/example" _ show-example-form)
-  (POST "/example" _ submit-example-form))
+  (GET "/example" [& params] (show-example-form params))
+  (POST "/example" [& params] (submit-example-form params)))
 
 ```
+
+The form will look something like this:
+
+![form](https://github.com/jkk/formative/raw/master/doc/fuller-example.png)
 
 ## License
 

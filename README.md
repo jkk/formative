@@ -118,7 +118,7 @@ Any exception thrown due to a failed parse or validation will contain a `:proble
 
 The `formative.parse/with-fallback` macro is a handy way to try parsing Ring params, and call a "fallback" function when it fails. The fallback function will be supplied the problems as its argument.
 
-```
+```clj
 (defn submit-example-form [params]
   ;; Calls (show-example-form params :problems problems) if parsing fails
   (fp/with-fallback (partial show-example-form params :problems)

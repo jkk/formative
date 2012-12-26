@@ -65,8 +65,6 @@ Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twit
 
 Note: Formative does not include Bootstrap itself or any styling. You are responsible for providing CSS, images, etc.
 
-New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
-
 You can also render individual fields using `formative.core/render-field`. Unlike `render-form`, `render-field` _always_ returns Hiccup data. `render-field` takes a field specification and an optional value:
 
 ```clj
@@ -84,6 +82,8 @@ You can also render individual fields using `formative.core/render-field`. Unlik
 Notice that the "Vanilla" option is selected in our generated element.
 
 All of the built-in form renderers make use of `render-field`, but not all renderers are required to do so.
+
+Custom form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
 
 ### Parsing Form Data
 

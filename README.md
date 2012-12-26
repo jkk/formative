@@ -290,7 +290,7 @@ The `:options` key for `:select` and other types accepts a collection of any of 
 
 Field types are extensible with the `formative.render-field/render-field` and `formative.parse/parse-input` multimethods.
 
-## Fuller Example
+## Realistic Example
 
 ```clj
 (ns example.core
@@ -316,22 +316,29 @@ Field types are extensible with the `formative.render-field/render-field` and `f
                  [:equal [:password :password-confirm]]
                  [:min-length 2 :flavors "Please select two or more flavors"]]})
 
+(defn layout [& body]
+  (page/html5
+    [:head
+     [:title "Example"]
+     (page/include-css "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap.min.css")
+     [:style "body { margin: 2em; }"]]
+    [:body
+     body]))
+
 (defn show-example-form [params & {:keys [problems]}]
   (let [defaults {:spam true}]
-    (page/html5
-      [:head
-       (page/include-css "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap.min.css")
-       [:style "body { margin: 2em; }"]]
-      [:body
-       [:h1 "Example"]
-       (f/render-form (assoc example-form
-                             :values (merge defaults params)
-                             :problems problems))])))
+    (layout
+      [:h1 "Example"]
+      (f/render-form (assoc example-form
+                            :values (merge defaults params)
+                            :problems problems)))))
 
 (defn submit-example-form [params]
   (fp/with-fallback (partial show-example-form params :problems)
     (let [values (fp/parse-params example-form params)]
-      (str "<p>Thank you!</p><pre>" (prn-str values) "</pre>"))))
+      (layout
+        [:h1 "Thank you!"]
+        [:pre (prn-str values)]))))
 
 (defroutes example-routes
   (GET "/example" [& params] (show-example-form params))

@@ -106,13 +106,13 @@ By default, validation will be performed on the parsed values and an exception t
 Any exception thrown due to a failed parse or validation will contain a `:problems` `ex-data` key with information about the failed exception.
 
 ```clj
-(fp/parse-params example-form {"secret-code" "xxx"})
+(fp/parse-params example-form {:secret-code "xxx"})
 ;; ExceptionInfo Problem parsing params  clojure.core/ex-info (core.clj:4227)
 
 (ex-data *e)
-;; {:problems ({:keys (:secret-code), :msg "must be an integer"}), …}
+;; {:problems ({:keys (:secret-code), :msg "must be a number"}), …}
 
-(fp/parse-params example-form {"secret-code" "xxx"} :validate false)
+(fp/parse-params example-form {:secret-code "xxx"} :validate false)
 {:secret-code #formative.parse.ParseError{}}
 ```
 

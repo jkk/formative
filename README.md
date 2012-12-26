@@ -319,7 +319,7 @@ Field types are extensible with the `formative.render-field/render-field` and `f
             {:name :spam :type :checkbox :label "Yes, please spam me."}
             {:name :password :type :password}
             {:name :password-confirm :type :password}
-            {:name :h1 :type :heading :text "Section 2"}
+            {:name :h2 :type :heading :text "Section 2"}
             {:name :date :type :date-select}
             {:name :flavors :type :checkboxes
              :options ["Chocolate" "Vanilla" "Strawberry" "Mint"]}]

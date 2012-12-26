@@ -13,7 +13,7 @@ Does three things, given a form specification:
 Leiningen coordinate:
 
 ```clj
-[formative "0.1.0"]
+[formative "0.2.0"]
 ```
 
 ## Usage

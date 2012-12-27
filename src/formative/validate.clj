@@ -65,7 +65,7 @@
         validators (for [[type tfields] groups
                          :let [validator (type-validators type)]
                          :when validator]
-                     (apply validator (map :name tfields)))]
+                     (validator (map :name tfields)))]
     ((apply v/combine validators) values)))
 
 (defn validate [form values]

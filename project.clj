@@ -7,4 +7,4 @@
                  [hiccup "1.0.0"]
                  [com.jkkramer/ordered "1.3.5"]
                  [ring/ring-core "1.1.1"]
-                 [jkkramer/verily "0.4.0"]])
+                 [jkkramer/verily "0.4.1"]])

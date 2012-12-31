@@ -125,7 +125,6 @@ The `formative.parse/with-fallback` macro is a handy way to try parsing Ring par
     (let [values (fp/parse-params example-form params))]
       ;; Success
       (prn-str values)))
-
 ```
 
 ### Validating Parsed Data
@@ -136,21 +135,26 @@ Formative uses [Verily](https://github.com/jkk/verily) to validate parsed data. 
 
 A sequence of validation specifications. For example:
 
-```
+```clj
 [[:required [:foo :bar :password]]
  [:equal [:password :confirm-password] "Passwords don't match, dummy"]
  [:min-length 8 :password]]
 ```
 
-All validation specifications accept a key or sequence of keys. The message is always optional. Unless `:required` is used, all validations allow `nil` or blank.
+All validation specifications accept a key or sequence of keys. The message is always optional.
+
+Unless `:required` is used, all validations allow the keys to be absent from the map, or have a `nil` value (or blank if a string-based type).
 
 Built in validations:
 
-* `:required <keys> [msg]` - must not be blank or nil
-* `:contains <keys> [msg]` - can be blank or nil but must be present in the values map
+* `:required <keys> [msg]` - must not absent, blank, or nil
+* `:contains <keys> [msg]` - must not be absent, but can be blank or nil
+* `:not-blank <keys> [msg]` - may be absent but not blank or nil
 * `:exact <value> <keys> [msg]` - must be a particular value
 * `:equal <keys> [msg]` - all keys must be equal
 * `:email <keys> [msg]` - must be a valid email
+* `:url <keys> [msg]` - must be a valid URL
+* `:web-url <keys> [msg]` - must be a valid website URL (http or https)
 * `:matches <regex> <keys> [msg]` - must match a regular expression
 * `:min-length <len> <keys> [msg]` - must be a certain length (for strings or collections)
 * `:max-length <len> <keys> [msg]` - must not exceed a certain length (for strings or collections)

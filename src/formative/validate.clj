@@ -41,6 +41,8 @@
    :email v/email
    :str v/string
    :strs v/strings
+   :clob v/string
+   :clobs v/strings
    :boolean v/bool
    :booleans v/bools
    :int v/integer

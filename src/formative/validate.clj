@@ -39,6 +39,8 @@
    :ca-state ca-state
    :country country
    :email v/email
+   :url v/url
+   :web-url v/web-url
    :str v/string
    :strs v/strings
    :clob v/string

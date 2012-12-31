@@ -24,16 +24,13 @@
                                     [(:name f) f])))]
     [:div.form-problems.alert.alert-error.clearfix
      [:ul
-      ;; double duty - handle Formative and Modelo problems
-      (for [{:keys [keys field-name spec msg]} problems
+      (for [{:keys [keys msg]} problems
             :when msg]
-        (let [field-names (or (seq keys)
-                              (when field-name [field-name]))
-              field-labels (map #(get-field-label
+        (let [field-labels (map #(get-field-label
                                    (or (fields-by-name %)
                                        (fields-by-name (name %))
                                        {:name %}))
-                                field-names)]
+                                keys)]
           [:li
            (when (seq field-labels)
              (list [:strong (string/join ", " field-labels)] ": "))

@@ -195,8 +195,10 @@
         fields (f/prep-fields fields {})
         nested-params (normalize-params params)
         values (parse-nested-params fields nested-params)
-        problems (when (and form validate)
-                   (fv/validate form values))]
+        problems (when validate
+                   (if form
+                     (fv/validate form values)
+                     (fv/validate-types fields values)))]
     (if (seq problems)
       (throw (ex-info "Problem parsing params" {:problems problems}))
       values)))

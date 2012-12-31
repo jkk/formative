@@ -63,13 +63,16 @@
    :dates v/dates
    :currency v/decimal})
 
+(defn- keywordize [x]
+  (if (keyword? x) x (keyword (name x))))
+
 (defn validate-types [fields values]
   (let [groups (group-by #(:datatype % (:type %))
                          fields)
         validators (for [[type tfields] groups
                          :let [validator (type-validators type)]
                          :when validator]
-                     (validator (map :name tfields)))]
+                     (validator (map (comp keywordize :name) tfields)))]
     ((apply v/combine validators) values)))
 
 (defn validate [form values]

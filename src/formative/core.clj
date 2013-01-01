@@ -66,11 +66,33 @@
 
 (defn merge-fields
   "Combines two sequences of field specifications into a single sequence,
-  merging field2 specs when the :name key matches, appending otherwise."
+  using the following rules for each fields2 spec:
+
+  - If the :name key matches an existing field, the spec is merged.
+  - If an :after key is set, the spec will be inserted after the field whose
+    :name matches :after.
+  - If a :before key is set, the spec will be inserted before the field whose
+    :name matches :before.
+  - Otherwise, the spec will be appended.
+
+  This function is mainly useful for making runtime tweaks to form fields."
   [fields1 fields2]
   (let [fields2 (if (map? fields2)
                   fields2
-                  (into (ordered-map) (map (juxt :name identity) fields2)))
+                  (into (ordered-map) (map (juxt :name identity)
+                                           fields2)))
+        after-fields (reduce
+                       (fn [m spec]
+                         (update-in m [(:after spec)]
+                                    (fnil conj []) (dissoc spec :after)))
+                       {}
+                       (filter :after (vals fields2)))
+        before-fields (reduce
+                       (fn [m spec]
+                         (update-in m [(:before spec)]
+                                    (fnil conj []) (dissoc spec :before)))
+                       {}
+                       (filter :before (vals fields2)))
         [ret leftovers] (reduce
                           (fn [[ret fields2] spec]
                             (let [fname (:name spec)
@@ -78,11 +100,18 @@
                                   (if (contains? fields2 fname)
                                     [(merge spec (get fields2 fname))
                                      (dissoc fields2 fname)]
-                                    [spec fields2])]
-                              [(conj ret spec*) fields2*]))
+                                    [spec fields2])
+                                  ret* (if-let [bspecs (get before-fields fname)]
+                                         (into ret bspecs)
+                                         ret)
+                                  ret* (conj ret* spec*)
+                                  ret* (if-let [aspecs (get after-fields fname)]
+                                         (into ret* aspecs)
+                                         ret*)]
+                              [ret* fields2*]))
                           [[] fields2]
                           fields1)]
-    (concat ret (vals leftovers))))
+    (concat ret (remove (some-fn :before :after) (vals leftovers)))))
 
 (defn- prep-problems [problems]
   (set

@@ -167,7 +167,7 @@
 
   A field specification is a map with the following keys:
 
-      :name         - Required name of the field, a keyword
+      :name         - Required name of the field, a keyword or string
       :type         - UI type of the field. Defaults to :text. Built-in types
                       include: :text, :textarea, :select, :checkbox,
                       :checkboxes, :radio, :html, :heading, :us-state,

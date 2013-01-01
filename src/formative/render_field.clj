@@ -230,4 +230,6 @@
                           :options opts))]))
 
 (defmethod render-field :currency [field]
-  (render-default-input field {:prefix "$"}))
+  (render-default-input
+    (assoc field :type :text)
+    {:prefix "$"}))

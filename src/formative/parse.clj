@@ -178,9 +178,9 @@
   "Given a form specification or sequence of field specifications and a Ring
   params map, returns a map of field names to parsed values.
 
-  The Ring params map must be either 1) an untouched :query-params or
-  :form-params map; or 2) a params map with the following middleware
-  applied: wrap-params, wrap-nested-params, wrap-keyword-params.
+  The Ring params map must be either 1) an untouched :query-params,
+  :form-params, or :multipart-params map; or 2) a params map with the following
+  middleware applied: wrap-params, wrap-nested-params, wrap-keyword-params.
 
   Parsed values will be validated and an exception will be thrown if validation
   fails. The exception carries a :problems key with details about the validation
@@ -209,9 +209,10 @@
   :form-params first, then :query-params."
   [form-or-fields req]
   (parse-params form-or-fields
-                (if (seq (:form-params req))
-                  (:form-params req)
-                  (:query-params req))))
+                (cond
+                  (seq (:form-params req)) (:form-params req)
+                  (seq (:multipart-params req)) (:multipart-params req)
+                  :else (:query-params req))))
 
 ;;;;
 

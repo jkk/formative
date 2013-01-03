@@ -220,15 +220,20 @@ A field specification is a map with keys corresponding to HTML attributes and
 the following special keys:
 
       :name         - Required name of the field, a keyword or string
-      :label        - Optional display name. Auto-generated from :name if not provided
+      :label        - Optional display name. Auto-generated from :name if not
+                      provided
       :type         - Type of the field. Defaults to :text. See below for
                       built-in types. If an unrecognized type is provided,
                       an <input> element with that type will be assumed.
                       Certain types imply particular parsing or validation
                       rules - e.g., an :email field must be a valid email.
-      :datatype     - Optional. Datatype of the field used for parsing. Can be one of:
+      :datatype     - Optional. Datatype of the field used for parsing. Can be
+                      one of:
+
                       :str, :int, :long, :boolean, :float, :double, :decimal,
-                      :bigint, :date, :file, :currency. Defaults to :str.
+                      :bigint, :date, :file.
+
+                      Defaults to :str.
 
                       All types can be appended with an "s" when a sequence
                       is expected - e.g., :ints for a sequence of integers. This
@@ -245,13 +250,7 @@ the following special keys:
       :prefix       - Content to insert before a field
       :suffix       - Content to insert after a field
 
-## Field Types
-
-The `:type` of a field can affect how it renders, behaves, gets parsed, and validated.
-
-Without any `:type`, a "text" input type is assumed. If a `:type` is provided that Formative doesn't recognize, an `<input>` element with that type will be assumed.
-
-Built-in types:
+Built-in field types:
 
 	  :text         - Single-line text input
 	  :textarea     - Multi-line text input

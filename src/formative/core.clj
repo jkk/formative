@@ -198,14 +198,20 @@
   A field specification is a map with the following keys:
 
       :name         - Required name of the field, a keyword or string
+      :label        - Optional display name. Auto-generated from :name if not
+                      provided
       :type         - Type of the field. Defaults to :text. See below for
                       built-in types. If an unrecognized type is provided,
                       an <input> element with that type will be assumed.
                       Certain types imply particular parsing or validation
                       rules - e.g., an :email field must be a valid email.
-      :datatype     - Datatype of the field when parsed. Can be one of:
+      :datatype     - Optional. Datatype of the field used for parsing. Can be
+                      one of:
+
                       :str, :int, :long, :boolean, :float, :double, :decimal,
-                      :bigint, :date, :file. Defaults to :str.
+                      :bigint, :date, :file.
+
+                      Defaults to :str.
 
                       All types can be appended with an \"s\" when a sequence
                       is expected - e.g., :ints for a sequence of integers. This

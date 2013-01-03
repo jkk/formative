@@ -188,7 +188,8 @@ See [Verily](https://github.com/jkk/verily) for more about validation functions.
 Valid keys for a form specification include the following HTML form attributes:
 
       :action :method :enctype :accept :name :id :class
-      :onsubmit :onreset :accept-charset :autofill
+      :onsubmit :onreset :accept-charset :autofill :novalidate
+      :autocomplete
 
 And the following special keys:
 

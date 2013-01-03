@@ -254,7 +254,7 @@ the following special keys:
 
 ## Field Types
 
-The `:type` of a field can determine how it renders, behaves, gets parsed, and validated.
+The `:type` of a field determines how it renders, behaves, gets parsed, and validated.
 
 Without any `:type`, a "text" input type is assumed. If a `:type` is provided that Formative doesn't recognize, an `<input>` element with that type will be assumed.
 
@@ -274,12 +274,6 @@ Built-in types:
 	* `:cols` - number of columns to group checkboxes into
 * __`:radios`__ - multiple radio inputs that parse to a single value. Special keys:
 	* `:options` - options to display; see below for format
-* __`:html`__ - custom, unlabeled HTML. Not included in parsing. Special keys:
-	* `:html` - HTML or Hiccup data
-* __`:labeled-html`__ - custom, labeled HTML. Not included in parsing. Special keys:
-	* `:html` - HTML or Hiccup data
-* __`:heading`__ - form heading. Special keys:
-	* `:text` - heading text
 * __`:email`__ 
 * __`:us-state`__ - United States state
 * __`:us-zip`__ - United States ZIP code
@@ -303,6 +297,15 @@ The `:options` key for `:select` and other types accepts a collection of any of 
 * ["value" "label"]
 * {:value "value" :label "label"}
 * "value and label"
+
+The follow presentational types are also available. They are excluded from parsing.
+
+* __`:heading`__ - form heading. Special keys:
+	* `:text` - heading text
+* __`:html`__ - custom, unlabeled HTML. Special keys:
+	* `:html` - HTML string or Hiccup data
+* __`:labeled-html`__ - custom, labeled HTML. Special keys:
+	* `:html` - HTML string or Hiccup data
 
 Field types are extensible with the `formative.render-field/render-field` and `formative.parse/parse-input` multimethods.
 

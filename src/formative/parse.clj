@@ -134,7 +134,14 @@
 (defmethod parse-input :files [spec v]
   (map #(parse-file spec %) v))
 
-;; TODO: more types
+(defmethod parse-input :heading [spec v]
+  ::absent)
+
+(defmethod parse-input :html [spec v]
+  ::absent)
+
+(defmethod parse-input :labeled-html [spec v]
+  ::absent)
 
 (defn- get-param [m kw]
   (get m (name kw) (get m kw)))

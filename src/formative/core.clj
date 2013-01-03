@@ -198,22 +198,11 @@
   A field specification is a map with the following keys:
 
       :name         - Required name of the field, a keyword or string
-      :type         - UI type of the field. Defaults to :text. Built-in types
-                      include: :text, :textarea, :select, :checkbox,
-                      :checkboxes, :radio, :html, :heading, :us-state,
-                      :ca-state, :country, :date-select. Each type may have
-                      particular keys that it makes use of.
-
-                      Selection fields such as :select, :checkboxes, and :radio
-                      expect an :options key, which is a collection of options
-                      which conform to one of the following formats:
-                        - [\"value\" \"label\"]
-                        - {:value \"value\" :label \"label\"]
-                        - \"value and label\"
-
-                      The :heading type expects a :text key.
-
-                      The :html type expects an :html key.
+      :type         - Type of the field. Defaults to :text. See below for
+                      built-in types. If an unrecognized type is provided,
+                      an <input> element with that type will be assumed.
+                      Certain types imply particular parsing or validation
+                      rules - e.g., an :email field must be a valid email.
       :datatype     - Datatype of the field when parsed. Can be one of:
                       :str, :int, :long, :boolean, :float, :double, :decimal,
                       :bigint, :date, :file. Defaults to :str.
@@ -228,12 +217,85 @@
 
                       :file fields must have an :upload-handler key which is
                       a function that takes two arguments: the field
-                      specification, and the Ring file upload payload."
+                      specification, and the Ring file upload payload.
+      :note         - A bit of explanatory content to accompany the field
+      :prefix       - Content to insert before a field
+      :suffix       - Content to insert after a field
+
+  Built-in field types:
+
+	  :text         - Single-line text input
+	  :textarea     - Multi-line text input
+	  :select       - Dropdown. Special keys:
+                        :options - options to display; see below for format
+                        :placeholder - text for a first, disabled option
+                        :first-option - option to prepend to the other options
+    :checkbox     - Defaults to true/false when no :value is given. Special
+                    keys:
+                      :value - value of a checked input (default true)
+                      :unchecked-value - value of an unchecked input (default
+                        false)
+    :checkboxes   - Multiple checkboxes that parse to a collection of values.
+                    Special keys:
+                      :options - options to display; see below for format
+                      :cols - number of columns to group checkboxes into
+    :radios       - Multiple radio inputs that parse to a single value.
+                    Special keys:
+                      :options - options to display; see below for format
+    :email        - Email text input
+    :us-state     - United States state dropdown. Accepts :select special
+                    keys.
+    :us-zip       - United States ZIP code
+    :ca-state     - Canadian province
+    :country      - Country dropdown. Accepts :select special keys.
+    :date-select  - Date dropdown. Renders as multiple :select fields, parses
+                    as a java.util.Date. Special keys:
+                      :year-start
+                      :year-end
+    :year-select  - Year dropdown, parses to integer. Accepts :select special
+                    keys plus:
+                      :start
+                      :end
+    :month-select - Month dropdown, parses to integer (1-12). Accepts :select
+                    special keys plus:
+                      :numbers - when true, shows numbers instead of month
+                                 names
+    :currency     - Text input for money. Parses as a :decimal datatype
+    :file         - File upload input. Special keys:
+                      :upload-handler - handler called when a file is
+                        uploaded. The field's specification and Ring param
+                        value are passed as arguments to the handler. The
+                        handler can return whatever value is appropriate
+                        (e.g., a String or a File).
+    :submit       - Submit button. Included by default, but can be added
+                    explicitly if you prefer. Unlike with a default submit
+                    button, its value will be parsed.
+
+  The :options key for :select and other types accepts a collection of any
+  of the following formats:
+
+    [\"value\" \"label\"]
+    {:value \"value\" :label \"label\"}
+    \"value and label\"
+
+  The follow presentational types are also available. They are excluded from
+  parsing.
+
+    :heading      - Section heading. Special keys:
+                      :text - heading text
+    :html         - Custom, unlabeled HTML. Special keys:
+                      :html - HTML string or Hiccup data
+    :labeled-html - Custom, labeled HTML. Special keys:
+                      :html - HTML string or Hiccup data
+
+  Field types are extensible with the `formative.render/render-field` and
+  `formative.parse/parse-input` multimethods."
   [spec]
   (apply r/render-form (prep-form spec)))
 
 (defn render-field
-  "Render an individual form field element as Hiccup data"
+  "Render an individual form field element as Hiccup data. See render-form
+  for field specification format."
   ([field]
     (r/render-field
       (prep-field (normalize-field field) {})))

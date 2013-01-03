@@ -221,22 +221,11 @@ the following special keys:
 
       :name         - Required name of the field, a keyword or string
       :label        - Optional display name. Auto-generated from :name if not provided
-      :type         - UI type of the field. Defaults to :text. Built-in types
-                      include: :text, :textarea, :select, :checkbox,
-                      :checkboxes, :radios, :html, :heading, :us-state,
-                      :ca-state, :country, :date-select, :currency. Each type may
-                      have particular keys that it makes use of.
-
-                      Selection fields such as :select, :checkboxes, and :radio
-                      expect an :options key, which is a collection of options
-                      which conform to one of the following formats:
-                        - ["value" "label"]
-                        - {:value "value" :label "label"}
-                        - "value and label"
-
-                      The :heading type expects a :text key, a string or Hiccup data.
-
-                      The :html type expects an :html key, a string or Hiccup data.
+      :type         - Type of the field. Defaults to :text. See below for
+                      built-in types. If an unrecognized type is provided,
+                      an <input> element with that type will be assumed.
+                      Certain types imply particular parsing or validation
+                      rules - e.g., an :email field must be a valid email.
       :datatype     - Optional. Datatype of the field used for parsing. Can be one of:
                       :str, :int, :long, :boolean, :float, :double, :decimal,
                       :bigint, :date, :file, :currency. Defaults to :str.
@@ -252,61 +241,79 @@ the following special keys:
                       :file fields must have an :upload-handler key which is
                       a function that takes two arguments: the field
                       specification, and the Ring file upload payload.
+      :note         - A bit of explanatory content to accompany the field
+      :prefix       - Content to insert before a field
+      :suffix       - Content to insert after a field
 
 ## Field Types
 
-The `:type` of a field determines how it renders, behaves, gets parsed, and validated.
+The `:type` of a field can affect how it renders, behaves, gets parsed, and validated.
 
 Without any `:type`, a "text" input type is assumed. If a `:type` is provided that Formative doesn't recognize, an `<input>` element with that type will be assumed.
 
 Built-in types:
 
-* __`:text`__
-* __`:textarea`__
-* __`:select`__ - special keys:
-	* `:options` - options to display; see below for format
-	* `:placeholder` - will be used as the text for a first, disabled option
-	* `:first-option` - an option to prepend to the other options
-* __`:checkbox`__ - defaults to true/false when no :value is given. Special keys:
-	* `:value` value of a checked input (default `true`)
-	* `:unchecked-value` value to use when the input is unchecked (default `false`)
-* __`:checkboxes`__ - multiple checkboxes that parse to a collection of values. Special keys:
-	* `:options` - options to display; see below for format
-	* `:cols` - number of columns to group checkboxes into
-* __`:radios`__ - multiple radio inputs that parse to a single value. Special keys:
-	* `:options` - options to display; see below for format
-* __`:email`__ 
-* __`:us-state`__ - United States state
-* __`:us-zip`__ - United States ZIP code
-* __`:ca-state`__ - Canadian province
-* __`:country`__ - Country
-* __`:date-select`__ - Date selector. Renders as multiple :select fields, parses as a java.util.Date
-	* `:year-start`
-	* `:year-end`
-* __`:year-select`__ - Year selector, parses to integer
-	* `:start`
-	* `:end`
-* __`:month-select`__ - Month selector, parses to integer (1-12)
-	* `:numbers` - when true, shows numbers instead of month names
-* __`:currency`__ - parses as a :decimal datatype
-* __`:file`__ - file upload. Special keys:
-	* `:upload-handler` - handler called when a file is uploaded. The field's specification and Ring param value are passed as arguments to the handler. The handler can return whatever value is appropriate (e.g., a String or a File).
-* __`:submit`__ - submit button (included by default, but can be added explicitly if you prefer)
+	  :text         - Single-line text input
+	  :textarea     - Multi-line text input
+	  :select       - Dropdown. Special keys:
+                        :options - options to display; see below for format
+                        :placeholder - text for a first, disabled option
+                        :first-option - option to prepend to the other options
+      :checkbox     - Defaults to true/false when no :value is given. Special
+                      keys:
+                        :value - value of a checked input (default true)
+                        :unchecked-value - value of an unchecked input (default
+                          false)
+      :checkboxes   - Multiple checkboxes that parse to a collection of values.
+                      Special keys:
+                        :options - options to display; see below for format
+                        :cols - number of columns to group checkboxes into
+      :radios       - Multiple radio inputs that parse to a single value.
+                      Special keys:
+                        :options - options to display; see below for format
+      :email        - Email text input
+      :us-state     - United States state dropdown. Accepts :select special
+                      keys.
+      :us-zip       - United States ZIP code
+      :ca-state     - Canadian province
+      :country      - Country dropdown. Accepts :select special keys.
+      :date-select  - Date dropdown. Renders as multiple :select fields, parses
+                      as a java.util.Date. Special keys:
+                        :year-start
+                        :year-end
+      :year-select  - Year dropdown, parses to integer. Accepts :select special
+                      keys plus:
+                        :start
+                        :end
+      :month-select - Month dropdown, parses to integer (1-12). Accepts :select
+                      special keys plus:
+                        :numbers - when true, shows numbers instead of month
+                                   names
+      :currency     - Text input for money. Parses as a :decimal datatype
+      :file         - File upload input. Special keys:
+                        :upload-handler - handler called when a file is
+                          uploaded. The field's specification and Ring param
+                          value are passed as arguments to the handler. The
+                          handler can return whatever value is appropriate
+                          (e.g., a String or a File).
+      :submit       - Submit button. Included by default, but can be added
+                      explicitly if you prefer. Unlike with a default submit
+                      button, its value will be parsed.
 
-The `:options` key for `:select` and other types accepts a collection of any of the following formats:
+The :options key for :select and other types accepts a collection of any of the following formats:
 
-* ["value" "label"]
-* {:value "value" :label "label"}
-* "value and label"
+      ["value" "label"]
+      {:value "value" :label "label"}
+      "value and label"
 
 The follow presentational types are also available. They are excluded from parsing.
 
-* __`:heading`__ - form heading. Special keys:
-	* `:text` - heading text
-* __`:html`__ - custom, unlabeled HTML. Special keys:
-	* `:html` - HTML string or Hiccup data
-* __`:labeled-html`__ - custom, labeled HTML. Special keys:
-	* `:html` - HTML string or Hiccup data
+      :heading      - Section heading. Special keys:
+                        :text - heading text
+      :html         - Custom, unlabeled HTML. Special keys:
+                        :html - HTML string or Hiccup data
+      :labeled-html - Custom, labeled HTML. Special keys:
+                        :html - HTML string or Hiccup data
 
 Field types are extensible with the `formative.render/render-field` and `formative.parse/parse-input` multimethods.
 

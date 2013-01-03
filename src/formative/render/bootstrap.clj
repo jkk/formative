@@ -1,7 +1,6 @@
-(ns formative.render-form.bootstrap
-  (:require [formative.render-form :refer [render-form*]]
-            [formative.render-field :refer [render-field]]
-            [formative.helpers :refer [render-problems]]))
+(ns formative.render.bootstrap
+  (:require [formative.render :refer [render-form render-field
+                                      render-problems]]))
 
 (def ^:dynamic *field-prefix* "field-")
 
@@ -68,8 +67,8 @@
        [:fieldset
         (map render-bootstrap-row visible-fields)])]]))
 
-(defmethod render-form* :bootstrap-horizontal [form-attrs fields opts]
+(defmethod render-form :bootstrap-horizontal [form-attrs fields opts]
   (render-bootstrap-form form-attrs fields "form-shell form-horizontal" opts))
 
-(defmethod render-form* :bootstrap-stacked [form-attrs fields opts]
+(defmethod render-form :bootstrap-stacked [form-attrs fields opts]
   (render-bootstrap-form form-attrs fields "form-shell" opts))

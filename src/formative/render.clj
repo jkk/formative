@@ -1,10 +1,65 @@
-(ns formative.render-field
+(ns formative.render
   (:require [hiccup.core :refer [h]]
             [formative.data :as data]
             [clojure.string :as string]))
 
+(defmulti render-form
+  "Renders a form, dispatching on :renderer in form-attrs. Can return any
+  representation of a form that the implementor chooses - Hiccup data, string,
+  etc.
+
+  This multimethod exists as an extension mechanism for anyone that wants to
+  build their own form renderer. Library consumers should call
+  formative.core/render-form.
+
+  Arguments:
+      form-attrs - HTML attributes of the form, plus a :renderer key
+      fields     - normalized, prepared fields to include in the form
+      opts       - the full form specification with all keys untouched"
+  (fn [form-attrs fields opts]
+    (:renderer form-attrs)))
+
+(defn- ucfirst [^String s]
+  (str (Character/toUpperCase (.charAt s 0)) (subs s 1)))
+
+(defn get-field-label
+  "Determines what to use for a field's label. Uses the :label key if set,
+  otherwise renders :name as a string - e.g., :foo-bar => \"Foo Bar\"."
+  [field]
+  (if (contains? field :label)
+    (when (:label field)
+      (ucfirst (:label field)))
+    (-> (:name field)
+      name
+      (string/replace #"[_-]" " ")
+      (string/replace #"\bid\b" "ID")
+      ucfirst)))
+
+(defn render-problems
+  "Renders a form problems as Hiccup data. Lists the each set of keys with
+  their corresponding message."
+  [problems & [fields]]
+  (let [problems (if (map? problems) [problems] problems)
+        fields-by-name (if (map? fields)
+                         fields
+                         (into {} (for [f fields]
+                                    [(:name f) f])))]
+    [:div.form-problems.alert.alert-error.clearfix
+     [:ul
+      (for [{:keys [keys msg]} problems
+            :when msg]
+        (let [field-labels (map #(get-field-label
+                                   (or (fields-by-name %)
+                                       (fields-by-name (name %))
+                                       {:name %}))
+                                keys)]
+          [:li
+           (when (seq field-labels)
+             (list [:strong (string/join ", " field-labels)] ": "))
+           msg]))]]))
+
 (defmulti render-field
-  "Render a field. Dispatches on :type"
+  "Render a field as Hiccup data. Dispatches on :type"
   (fn [field]
     (:type field)))
 

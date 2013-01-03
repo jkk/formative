@@ -1,11 +1,9 @@
 (ns formative.core
-  (:require [formative.render-form :refer [render-form*]]
-            formative.render-form.table
-            formative.render-form.div
-            formative.render-form.bootstrap
-            formative.render-form.inline
-            [formative.render-field :as rfield]
-            [formative.helpers :refer [get-field-label]]
+  (:require [formative.render :as r]
+            formative.render.table
+            formative.render.div
+            formative.render.bootstrap
+            formative.render.inline
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
             [com.jkkramer.ordered.map :refer [ordered-map]]))
@@ -32,7 +30,7 @@
 (defmethod prep-field :default [field values]
   (assoc field
     :value (get values (:name field))
-    :label (get-field-label field)))
+    :label (r/get-field-label field)))
 
 (defmethod prep-field :checkbox [field values]
   (let [field (if (and (not (contains? field :value))
@@ -44,7 +42,7 @@
     (assoc field
       :value (:value field "true")
       :checked (= (str val) (str (:value field "true")))
-      :label (get-field-label field))))
+      :label (r/get-field-label field))))
 
 (defmethod prep-field :submit [field values]
   (assoc field
@@ -54,7 +52,7 @@
   field)
 
 (defmethod prep-field :labeled-html [field values]
-  (assoc field :label (get-field-label field)))
+  (assoc field :label (r/get-field-label field)))
 
 (defn prep-fields
   "Normalizes field specifications and populates them with values"
@@ -161,7 +159,7 @@
     [form-attrs fields spec]))
 
 (defn render-form
-  "Given a form specification, returns a rendering of a form - e.g., Hiccup
+  "Given a form specification, returns a rendering of the form - e.g., Hiccup
   data, an HTML string, etc. 
   
   Valid keys for spec include the following HTML form attributes:
@@ -176,6 +174,8 @@
                         :bootstrap-stacked
                         :table
                         :inline
+                      Custom renderers can be created by implementing the
+                      formative.render/render-form multimethod. 
       :fields       - Sequence of form field specifications. See below.
       :tweaks       - Sequence of form field specifications which will be
                       merged with :fields using merge-fields.
@@ -229,16 +229,16 @@
                       a function that takes two arguments: the field
                       specification, and the Ring file upload payload."
   [spec]
-  (apply render-form* (prep-form spec)))
+  (apply r/render-form (prep-form spec)))
 
 (defn render-field
   "Render an individual form field element as Hiccup data"
   ([field]
-    (rfield/render-field
+    (r/render-field
       (prep-field (normalize-field field) {})))
   ([field value]
     (let [norm-field (normalize-field field)]
-      (rfield/render-field
+      (r/render-field
         (prep-field norm-field {(:name norm-field) value})))))
 
 (defmacro with-renderer [renderer & body]

@@ -83,7 +83,7 @@ Notice that the "Vanilla" option is selected in our generated element.
 
 All of the built-in form renderers make use of `render-field`, but not all renderers are required to do so.
 
-Custom form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
+Custom form renderers can be implemented using the `formative.render/render-form` multimethod.
 
 ### Parsing Form Data
 
@@ -213,7 +213,7 @@ And the following special keys:
                       problem fields and, if problem maps are provided,
                       show descriptive messages.
                       
-New form renderers can be implemented using the `formative.render-form/render-form*` multimethod.
+New form renderers can be implemented using the `formative.render/render-form` multimethod.
 
 A field specification is a map with keys corresponding to HTML attributes and
 the following special keys:
@@ -307,7 +307,7 @@ The follow presentational types are also available. They are excluded from parsi
 * __`:labeled-html`__ - custom, labeled HTML. Special keys:
 	* `:html` - HTML string or Hiccup data
 
-Field types are extensible with the `formative.render-field/render-field` and `formative.parse/parse-input` multimethods.
+Field types are extensible with the `formative.render/render-field` and `formative.parse/parse-input` multimethods.
 
 ## Realistic Example
 

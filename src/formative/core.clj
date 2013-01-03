@@ -132,6 +132,7 @@
                            :onsubmit :onreset :accept-charset :autofill
                            :novalidate :autocomplete])
         form-attrs (assoc form-attrs
+                     :method (:method spec :post)
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))
         fields (if (:tweaks spec)
@@ -168,7 +169,9 @@
       :onsubmit :onreset :accept-charset :autofill :novalidate
       :autocomplete
 
-  And the following special keys:
+  Unlike an HTML form, :method defaults to :post.
+
+  The following special keys are also supported:
 
       :renderer     - Determines renderer to use. Built-in options:
                         :bootstrap-horizontal (the default)

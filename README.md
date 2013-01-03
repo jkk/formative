@@ -33,8 +33,7 @@ To build a form, you need a form specification, which is a map that looks like t
 
 ```clj
 (def example-form
-  {:method :post
-   :fields [{:name :secret-code :type :hidden :datatype :int}
+  {:fields [{:name :secret-code :type :hidden :datatype :int}
             {:name :email :type :email}
             {:name :password :type :password}
             {:name :remember :type :checkbox}]
@@ -44,7 +43,7 @@ To build a form, you need a form specification, which is a map that looks like t
             :remember true}})
 ```
 
-The map can contain keys such as `:method` and `:action` that directly correspond to HTML form attributes. It can also contain special keys such as `:fields` and `:submit-label`. See [Form and Field Specifications](#form-and-field-specifications) for more about the specification format.
+The map can contain keys such as `:method` and `:action` that directly correspond to HTML form attributes (although unlike HTML, "post" is the default `:method`). It can also contain special keys such as `:fields` and `:submit-label`. See [Form and Field Specifications](#form-and-field-specifications) for more about the specification format.
 
 ### Rendering a Form
 
@@ -191,7 +190,9 @@ Valid keys for a form specification include the following HTML form attributes:
       :onsubmit :onreset :accept-charset :autofill :novalidate
       :autocomplete
 
-And the following special keys:
+Unlike an HTML form, :method defaults to :post.
+
+The following special keys are also supported:
 
       :renderer     - Determines the type of renderer to use. Built-in options:
                         :bootstrap-horizontal (the default)
@@ -326,8 +327,7 @@ Field types are extensible with the `formative.render/render-field` and `formati
             [compojure.core :refer [defroutes GET POST]]))
 
 (def example-form
-  {:method :post
-   :fields [{:name :h1 :type :heading :text "Section 1"}
+  {:fields [{:name :h1 :type :heading :text "Section 1"}
             {:name :full-name}
             {:name :email :type :email}
             {:name :spam :type :checkbox :label "Yes, please spam me."}

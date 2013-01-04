@@ -13,6 +13,7 @@
 (defn normalize-field
   "Ensures :name and :type keys are in the right format"
   [field]
+  {:pre [(:name field)]}
   (assoc field
     :name (name (:name field))
     :type (if (:type field)

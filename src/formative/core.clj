@@ -146,7 +146,8 @@
                      (assoc field :cancel-href (:cancel-href spec))
                      field))
                  fields)
-        fields (if (some #(= :submit (:type %)) fields)
+        fields (if (or (some #(= :submit (:type %)) fields)
+                       (nil? (:submit-label spec ::absent)))
                  fields
                  (concat fields
                          [{:type :submit

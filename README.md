@@ -1,12 +1,10 @@
 # Formative
 
-A Clojure library for dealing with web forms.
+A Clojure library for dealing with web forms. In particular, it can:
 
-Does three things, given a form specification:
-
-* Renders a form via pluggable renderers. Comes with [Hiccup](https://github.com/weavejester/hiccup) renderers for Bootstrap and for a table-based layout
-* Parses form data from Ring params
-* Validates parsed data using [Verily](https://github.com/jkk/verily)
+* Render a form via pluggable renderers (comes with Bootstrap and other renderers built in)
+* Parse form data from Ring params
+* Validate parsed data using [Verily](https://github.com/jkk/verily)
 
 ## Installation
 
@@ -62,7 +60,16 @@ Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twit
 
 ![form](https://github.com/jkk/formative/raw/master/doc/bootstrap-horizontal.png)
 
-Note: Formative does not include Bootstrap itself or any styling. You are responsible for providing CSS, images, etc.
+Note: Formative does not include any CSS or images. You are responsible for providing those yourself.
+
+Renderers are pluggable and can return any kind of format -- e.g., Hiccup or string. Formative comes with several built-in Hiccup renderers which you can set using the `:renderer` form specification key:
+
+* `:bootstrap-horizontal` (the default)
+* `:bootstrap-stacked`
+* `:table`
+* `:inline`
+
+Custom form renderers can be implemented using the `formative.render/render-form` multimethod.
 
 You can also render individual fields using `formative.core/render-field`. Unlike `render-form`, `render-field` _always_ returns Hiccup data. `render-field` takes a field specification and an optional value:
 
@@ -81,8 +88,6 @@ You can also render individual fields using `formative.core/render-field`. Unlik
 Notice that the "Vanilla" option is selected in our generated element.
 
 All of the built-in form renderers make use of `render-field`, but not all renderers are required to do so.
-
-Custom form renderers can be implemented using the `formative.render/render-form` multimethod.
 
 ### Parsing Form Data
 

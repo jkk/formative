@@ -9,7 +9,8 @@
 
 (defmulti parse-input
   "Parses the value for a particular field specification, dispatching on
-  :datatype if present, otherwise :type."
+  :datatype if present, otherwise :type. Takes [field-spec value] as
+  arguments."
   (fn [spec v]
     (:datatype spec (:type spec))))
 

@@ -156,12 +156,6 @@
     (rest input)
     input))
 
-(defn get-parse-errors [values]
-  (for [[k v] values
-        :when (parse-error? v)]
-    {:keys [k]
-     :msg (:msg v)}))
-
 (defn- parse-nested-params [fields np]
   (reduce
     (fn [vals spec]

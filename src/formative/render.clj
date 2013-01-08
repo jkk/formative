@@ -79,7 +79,7 @@
         attrs (if (and (= :submit (:type attrs))
                        (empty? (:value attrs)))
                 (dissoc attrs :value)
-                attrs)]
+                (assoc attrs :value (str (:value attrs))))]
     (list
       (when-let [prefix (:prefix opts)]
         [:span.input-prefix prefix])
@@ -115,7 +115,7 @@
                opts)
         opt-tags (for [[v text] opts
                        :let [v (str v)]]
-                   [:option {:value v :selected (= val v)} text])
+                   [:option {:value (str v) :selected (= val (str v))} text])
         placeholder (if (true? (:placeholder field))
                       "Select one..."
                       (:placeholder field))
@@ -163,7 +163,7 @@
              [:label.checkbox {:for id} " "
               [:span.cb-input-shell
                (render-field {:name fname :id id :checked (contains? vals (str oval))
-                              :type :checkbox :value oval})] " "
+                              :type :checkbox :value (str oval)})] " "
               [:span.cb-label [:nobr olabel]]]]))])]))
 
 (defn- render-radios [field]

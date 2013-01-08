@@ -306,7 +306,7 @@ The :options key for :select and other types accepts a collection of any of the 
       {:value "value" :label "label"}
       "value and label"
 
-The follow presentational types are also available. They are excluded from parsing.
+The following presentational types are also available. They are excluded from parsing.
 
       :heading      - Section heading. Special keys:
                         :text - heading text

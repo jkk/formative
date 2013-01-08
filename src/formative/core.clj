@@ -289,7 +289,7 @@
     {:value \"value\" :label \"label\"}
     \"value and label\"
 
-  The follow presentational types are also available. They are excluded from
+  The following presentational types are also available. They are excluded from
   parsing.
 
     :heading      - Section heading. Special keys:

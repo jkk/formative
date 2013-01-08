@@ -117,7 +117,7 @@ Any exception thrown due to a failed parse or validation will contain a `:proble
 ;; {:problems ({:keys (:secret-code), :msg "must be a number"}), …}
 
 (fp/parse-params example-form {:secret-code "xxx"} :validate false)
-{:secret-code #formative.parse.ParseError{}}
+{:secret-code #formative.parse.ParseError{:bad-value "xxx"}}
 ```
 
 The `formative.parse/with-fallback` macro is a handy way to try parsing Ring params, and call a "fallback" function when it fails. The fallback function will be supplied the problems as its argument.

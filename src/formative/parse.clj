@@ -5,7 +5,10 @@
             [formative.core :as f]
             [formative.validate :as fv]))
 
-(defrecord ParseError [])
+(defrecord ParseError [bad-value])
+
+(defn parse-error? [x]
+  (instance? ParseError x))
 
 (defmulti parse-input
   "Parses the value for a particular field specification, dispatching on
@@ -22,7 +25,7 @@
     (try
       (Long/valueOf x)
       (catch Exception _
-        (ParseError.)))))
+        (->ParseError x)))))
 
 (defmethod parse-input :int [spec v]
   (parse-long spec v))
@@ -47,7 +50,7 @@
     (try
       (Double/valueOf x)
       (catch Exception _
-        (ParseError.)))))
+        (->ParseError x)))))
 
 (defmethod parse-input :float [spec v]
   (parse-double spec v))
@@ -66,7 +69,7 @@
     (try
       (BigDecimal. x)
       (catch Exception _
-        (ParseError.)))))
+        (->ParseError x)))))
 
 (defmethod parse-input :decimal [spec v]
   (parse-bigdec spec v))
@@ -79,7 +82,7 @@
     (try
       (bigint (BigInteger. x))
       (catch Exception _
-        (ParseError.)))))
+        (->ParseError x)))))
 
 (defmethod parse-input :bigint [spec v]
   (parse-bigint spec v))
@@ -94,7 +97,7 @@
                 (:date-format spec "yyyy-MM-dd"))
         x)
       (catch Exception e
-        (ParseError.)))))
+        (->ParseError x)))))
 
 (defmethod parse-input :date [spec v]
   (parse-date spec v))
@@ -110,7 +113,7 @@
                        (dec (Integer/valueOf (get v "month")))
                        (Integer/valueOf (get v "day")))
       (catch Exception e
-        (ParseError.)))))
+        (->ParseError v)))))
 
 (defmethod parse-input :year-select [spec v]
   (parse-long spec v))
@@ -155,7 +158,7 @@
 
 (defn get-parse-errors [values]
   (for [[k v] values
-        :when (instance? ParseError v)]
+        :when (parse-error? v)]
     {:keys [k]
      :msg (:msg v)}))
 

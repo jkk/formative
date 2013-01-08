@@ -41,7 +41,7 @@ To build a form, you need a form specification, which is a map that looks like t
             :remember true}})
 ```
 
-The map can contain keys such as `:method` and `:action` that directly correspond to HTML form attributes (although unlike HTML, "post" is the default `:method`). It can also contain special keys such as `:fields` and `:submit-label`. See [Form and Field Specifications](#form-and-field-specifications) for more about the specification format.
+The map can contain keys such as `:method` and `:action` that directly correspond to HTML form attributes (although unlike HTML, "post" is the default `:method`). It can also contain special keys such as `:fields` and `:submit-label`. See the [Form Specification](#form-specification) section for more about the specification format.
 
 ### Rendering a Form
 
@@ -187,7 +187,9 @@ A function that takes a map of parsed values and returns a problem map or sequen
 
 See [Verily](https://github.com/jkk/verily) for more about validation functions.
 
-## Form and Field Specifications
+## Quick Reference
+
+### Form Specification
 
 Valid keys for a form specification include the following HTML form attributes:
 
@@ -222,6 +224,8 @@ The following special keys are also supported:
                       
 New form renderers can be implemented using the `formative.render/render-form` multimethod.
 
+### Field Specification
+
 A field specification is a map with keys corresponding to HTML attributes and
 the following special keys:
 
@@ -255,6 +259,8 @@ the following special keys:
       :note         - A bit of explanatory content to accompany the field
       :prefix       - Content to insert before a field
       :suffix       - Content to insert after a field
+
+### Field Types
 
 Built-in field types:
 

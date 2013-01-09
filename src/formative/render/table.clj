@@ -26,7 +26,9 @@
                     [:div.note (:note field)])]
         label-el (when (and (not (#{:checkbox} (:type field))) (:label field))
                    [:div.label-shell
-                    [:label {:for field-id} (:label field)]])]
+                    (:label-prefix field)
+                    [:label {:for field-id} (:label field)]
+                    (:label-suffix field)])]
     [:tr {:id (str "row-" field-id)
           :class (str (name (:type field :text)) "-row"
                       (when (:problem field) " problem")

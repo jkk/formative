@@ -27,8 +27,9 @@
   otherwise renders :name as a string - e.g., :foo-bar => \"Foo Bar\"."
   [field]
   (if (contains? field :label)
-    (when (:label field)
-      (ucfirst (:label field)))
+    (if (string? (:label field))
+      (ucfirst (:label field))
+      (:label field))
     (-> (:name field)
       name
       (string/replace #"[_-]" " ")

@@ -72,7 +72,8 @@
   (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
                                       :checked :disabled :href :style :src :size
                                       :readonly :tabindex :onchange :onclick
-                                      :onfocus :onblur :placeholder :autofill])
+                                      :onfocus :onblur :placeholder :autofill
+                                      :multiple])
         attrs (if (:type attrs)
                 attrs
                 (assoc attrs :type :text))

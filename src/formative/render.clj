@@ -214,13 +214,15 @@
                        :type :select
                        :options (data/countries-by (or (:country-code field) :alpha2)))))
 
-(defn- normalize-date-val [d]
+(defn- normalize-date-val [d & [format]]
   (when d
     (cond
       (instance? java.util.Date d) d
       (integer? d) (java.util.Date. d)
       (string? d) (try
-                    (.parse (java.text.SimpleDateFormat. "yyyy-MM-dd") d)
+                    (.parse (java.text.SimpleDateFormat.
+                              (or format "yyyy-MM-dd"))
+                      d)
                     (catch Exception _))
       (map? d) (try
                  (let [year (- (Integer/valueOf (:year d (get d "year"))) 1900)
@@ -229,6 +231,23 @@
                    (java.util.Date. year month day))
                  (catch Exception _))
       :else (throw (IllegalArgumentException. "Unrecognized date format")))))
+
+(defmethod render-field :date [field]
+  (let [date (normalize-date-val (:value field) (:date-format field))]
+    (render-default-input
+      (assoc field :value
+             (.format (java.text.SimpleDateFormat.
+                        (:date-format field "yyyy-MM-dd"))
+               date)))))
+
+(defmethod render-field :date-text [field]
+  (let [date (normalize-date-val (:value field) (:date-format field))]
+    (render-default-input
+      (assoc field
+             :type :text
+             :value (.format (java.text.SimpleDateFormat.
+                               (:date-format field "yyyy-MM-dd"))
+                      date)))))
 
 (defmethod render-field :date-select [field]
   (let [date (normalize-date-val (:value field))

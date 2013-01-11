@@ -105,6 +105,12 @@
 (defmethod parse-input :dates [spec v]
   (map #(parse-date spec %) v))
 
+(defmethod parse-input :date-text [spec v]
+  (parse-date spec v))
+
+(defmethod parse-input :date-texts [spec v]
+  (map #(parse-date spec %) v))
+
 (defmethod parse-input :date-select [spec v]
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])

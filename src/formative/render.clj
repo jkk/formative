@@ -236,18 +236,20 @@
   (let [date (normalize-date-val (:value field) (:date-format field))]
     (render-default-input
       (assoc field :value
-             (.format (java.text.SimpleDateFormat.
-                        (:date-format field "yyyy-MM-dd"))
-               date)))))
+             (when date
+               (.format (java.text.SimpleDateFormat.
+                          (:date-format field "yyyy-MM-dd"))
+                 date))))))
 
 (defmethod render-field :date-text [field]
   (let [date (normalize-date-val (:value field) (:date-format field))]
     (render-default-input
       (assoc field
              :type :text
-             :value (.format (java.text.SimpleDateFormat.
-                               (:date-format field "yyyy-MM-dd"))
-                      date)))))
+             :value (when date
+                      (.format (java.text.SimpleDateFormat.
+                                 (:date-format field "yyyy-MM-dd"))
+                        date))))))
 
 (defmethod render-field :date-select [field]
   (let [date (normalize-date-val (:value field))

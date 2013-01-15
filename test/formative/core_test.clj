@@ -58,7 +58,11 @@
                           {:name :before-test :before :a}
                           {:name :after-test2 :after :f}
                           {:name :limbo :after :after-test2}
-                          {:name :limbo2 :after :xxx}])
+                          {:name :limbo2 :after :xxx}
+                          {:name :appended2}
+                          {:name :appended3}
+                          {:name :appended4}
+                          {:name :appended5}])
          '({:name :before-test}
             {:name :a, :datatype :int, :type :hidden}
             {:name :b, :type :email}
@@ -72,6 +76,10 @@
             {:name :h, :type :select, :options ["foo" "bar" "baz"]}
             {:name :foo-bar-baz}
             {:name "Foo_Bar[]"}
-            {:name :appended, :type :text}))))
+            {:name :appended, :type :text}
+            {:name :appended2}
+            {:name :appended3}
+            {:name :appended4}
+            {:name :appended5}))))
 
 ;(run-tests)

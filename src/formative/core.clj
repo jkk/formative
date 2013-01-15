@@ -5,8 +5,7 @@
             formative.render.bootstrap
             formative.render.inline
             [clojure.walk :refer [stringify-keys]]
-            [clojure.string :as string]
-            [com.jkkramer.ordered.map :refer [ordered-map]]))
+            [clojure.string :as string]))
 
 (def ^:dynamic *renderer* :bootstrap-horizontal)
 
@@ -76,30 +75,30 @@
 
   This function is mainly useful for making runtime tweaks to form fields."
   [fields1 fields2]
-  (let [fields2 (if (map? fields2)
-                  fields2
-                  (into (ordered-map) (map (juxt :name identity)
-                                           fields2)))
+  (let [fields2-map (if (map? fields2)
+                      fields2
+                      (into {} (map (juxt :name identity)
+                                    fields2)))
         after-fields (reduce
                        (fn [m spec]
                          (update-in m [(:after spec)]
                                     (fnil conj []) (dissoc spec :after)))
                        {}
-                       (filter :after (vals fields2)))
+                       (filter :after fields2))
         before-fields (reduce
                        (fn [m spec]
                          (update-in m [(:before spec)]
                                     (fnil conj []) (dissoc spec :before)))
                        {}
-                       (filter :before (vals fields2)))
+                       (filter :before fields2))
         [ret leftovers] (reduce
-                          (fn [[ret fields2] spec]
+                          (fn [[ret f2m] spec]
                             (let [fname (:name spec)
-                                  [spec* fields2*]
-                                  (if (contains? fields2 fname)
-                                    [(merge spec (get fields2 fname))
-                                     (dissoc fields2 fname)]
-                                    [spec fields2])
+                                  [spec* f2m*]
+                                  (if (contains? f2m fname)
+                                    [(merge spec (get f2m fname))
+                                     (dissoc f2m fname)]
+                                    [spec f2m])
                                   ret* (if-let [bspecs (get before-fields fname)]
                                          (into ret bspecs)
                                          ret)
@@ -107,10 +106,11 @@
                                   ret* (if-let [aspecs (get after-fields fname)]
                                          (into ret* aspecs)
                                          ret*)]
-                              [ret* fields2*]))
-                          [[] fields2]
+                              [ret* f2m*]))
+                          [[] fields2-map]
                           fields1)]
-    (concat ret (remove (some-fn :before :after) (vals leftovers)))))
+    (concat ret (remove (some-fn :before :after)
+                        (filter (comp leftovers :name) fields2)))))
 
 (defn- prep-problems [problems]
   (set

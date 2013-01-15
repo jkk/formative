@@ -11,7 +11,7 @@ A Clojure library for dealing with web forms. In particular, it can:
 Leiningen coordinate:
 
 ```clj
-[formative "0.2.1"]
+[formative "0.3.0"]
 ```
 
 ## Usage

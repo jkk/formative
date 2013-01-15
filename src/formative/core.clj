@@ -225,10 +225,6 @@
 
                       :date field values are expected to be in yyyy-MM-dd
                       format by default. Set :date-format to change that. 
-
-                      :file fields must have an :upload-handler key which is
-                      a function that takes two arguments: the field
-                      specification, and the Ring file upload payload.
       :note         - A bit of explanatory content to accompany the field
       :prefix       - Content to insert before a field
       :suffix       - Content to insert after a field
@@ -273,7 +269,7 @@
                                  names
     :currency     - Text input for money. Parses as a :decimal datatype
     :file         - File upload input. Special keys:
-                      :upload-handler - handler called when a file is
+                      :upload-handler - optional handler called when a file is
                         uploaded. The field's specification and Ring param
                         value are passed as arguments to the handler. The
                         handler can return whatever value is appropriate

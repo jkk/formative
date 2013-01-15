@@ -131,12 +131,12 @@
   (parse-bigdec spec v))
 
 (defn- parse-file [spec x]
-  (when-not (:upload-handler spec)
-    (throw (IllegalStateException.
-             (str "Missing :upload-handler for " (:name spec)))))
-  (if (string/blank? (:filename x))
-    ::absent
-    ((:upload-handler spec) spec x)))
+  (cond
+    (or (nil? x) (and (map? x)
+                      (contains? x :filename)
+                      (string/blank? (:filename x)))) ::absent
+    (:upload-handler spec) ((:upload-handler spec) spec x)
+    :else x))
 
 (defmethod parse-input :file [spec v]
   (parse-file spec v))

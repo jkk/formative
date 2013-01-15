@@ -74,7 +74,7 @@
                                       :checked :disabled :href :style :src :size
                                       :readonly :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder :autofill
-                                      :multiple])
+                                      :multiple :title])
         attrs (if (:type attrs)
                 attrs
                 (assoc attrs :type :text))

@@ -6,12 +6,14 @@ A Clojure library for dealing with web forms. In particular, it can:
 * Parse form data from Ring params
 * Validate parsed data using [Verily](https://github.com/jkk/verily)
 
+See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuapp.com/) ([demo source](https://github.com/jkk/formative-demo))
+
 ## Installation
 
 Leiningen coordinate:
 
 ```clj
-[formative "0.3.0"]
+[formative "0.3.1"]
 ```
 
 ## Usage
@@ -324,64 +326,9 @@ The following presentational types are also available. They are excluded from pa
 
 Field types are extensible with the `formative.render/render-field` and `formative.parse/parse-input` multimethods.
 
-## Realistic Example
+## Demo
 
-```clj
-(ns example.core
-  (:require [formative.core :as f]
-            [formative.parse :as fp]
-            [hiccup.page :as page]
-            [compojure.core :refer [defroutes GET POST]]))
-
-(def example-form
-  {:fields [{:name :h1 :type :heading :text "Section 1"}
-            {:name :full-name}
-            {:name :email :type :email}
-            {:name :spam :type :checkbox :label "Yes, please spam me."}
-            {:name :password :type :password}
-            {:name :password-confirm :type :password}
-            {:name :h2 :type :heading :text "Section 2"}
-            {:name :date :type :date-select}
-            {:name :flavors :type :checkboxes
-             :options ["Chocolate" "Vanilla" "Strawberry" "Mint"]}]
-   :validations [[:required [:full-name :email :password]]
-                 [:min-length 8 :password]
-                 [:equal [:password :password-confirm]]
-                 [:min-length 2 :flavors "Please select two or more flavors"]]})
-
-(defn layout [& body]
-  (page/html5
-    [:head
-     [:title "Example"]
-     (page/include-css "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.2.2/css/bootstrap.min.css")
-     [:style "body { margin: 2em; }"]]
-    [:body
-     body]))
-
-(defn show-example-form [params & {:keys [problems]}]
-  (let [defaults {:spam true}]
-    (layout
-      [:h1 "Example"]
-      (f/render-form (assoc example-form
-                            :values (merge defaults params)
-                            :problems problems)))))
-
-(defn submit-example-form [params]
-  (fp/with-fallback (partial show-example-form params :problems)
-    (let [values (fp/parse-params example-form params)]
-      (layout
-        [:h1 "Thank you!"]
-        [:pre (prn-str values)]))))
-
-(defroutes example-routes
-  (GET "/example" [& params] (show-example-form params))
-  (POST "/example" [& params] (submit-example-form params)))
-
-```
-
-The form will look something like this:
-
-![form](https://github.com/jkk/formative/raw/master/doc/fuller-example.png)
+See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuapp.com) or [view the demo source](https://github.com/jkk/formative-demo).
 
 ## License
 

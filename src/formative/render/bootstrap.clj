@@ -15,8 +15,10 @@
                 field)]
     [:div {:id (str "row-" field-id)
            :class (str (if (= :submit (:type field))
-                         "control-group submit-group "
-                         "control-group field-group ")
+                         "form-actions submit-group "
+                         "field-group ")
+                       (when-not (#{:heading :html} (:type field))
+                         " control-group ")
                        (name (:type field :text)) "-row"
                        (when (:problem field) " error problem"))}
      (if (= :heading (:type field))
@@ -28,7 +30,8 @@
           (when (and (not (#{:checkbox} (:type field))) (:label field))
             [:label.control-label {:for field-id}
              (:label field)])]
-         [:div.input-shell.controls
+         [:div {:class (str "input-shell" (when-not (#{:submit :html} (:type field))
+                                            " controls"))}
           (when (:prefix field)
             [:span.prefix (:prefix field)])
           (if (= :checkbox (:type field))

@@ -48,6 +48,22 @@
           (when (:note field)
             [:div.note.help-inline (:note field)])]))]))
 
+(defn- group-fieldsets [fields]
+  (loop [ret []
+         group []
+         fields fields]
+    (if (empty? fields)
+      (if (seq group)
+        (conj ret group)
+        ret)
+      (if (#{:heading :submit} (:type (first fields)))
+        (recur (if (seq group) (conj ret group) ret)
+               [(first fields)]
+               (rest fields))
+        (recur ret
+               (conj group (first fields))
+               (rest fields))))))
+
 (defn render-bootstrap-form [form-attrs fields class opts]
   (let [[hidden-fields visible-fields] ((juxt filter remove)
                                         #(= :hidden (:type %)) fields)
@@ -67,8 +83,9 @@
      [:form (dissoc form-attrs :renderer)
       (list
        (map render-field hidden-fields)
-       [:fieldset
-        (map render-bootstrap-row visible-fields)])]]))
+       (for [fieldset (group-fieldsets visible-fields)]
+         [:fieldset {:class (str "fieldset-" (name (:name (first fieldset))))}
+          (map render-bootstrap-row fieldset)]))]]))
 
 (defmethod render-form :bootstrap-horizontal [form-attrs fields opts]
   (render-bootstrap-form form-attrs fields "form-shell form-horizontal" opts))

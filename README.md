@@ -317,7 +317,8 @@ The :options key for :select and other types accepts a collection of any of the 
 
 The following presentational types are also available. They are excluded from parsing.
 
-      :heading      - Section heading. Special keys:
+      :heading      - Section heading. In the default renderer, acts as a fieldset
+                      separator. Special keys:
                         :text - heading text
       :html         - Custom, unlabeled HTML. Special keys:
                         :html - HTML string or Hiccup data

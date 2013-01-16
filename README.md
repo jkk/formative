@@ -209,6 +209,8 @@ The following special keys are also supported:
                         :table
                         :inline
       :fields       - Sequence of form field specifications. See below.
+      :tweaks       - Sequence of form field specifications which will be
+                      merged with :fields using merge-fields.
       :values       - Map of values used to populate the form fields
       :submit-label - Label to use on the submit button. Defaults to "Submit"
       :cancel-href  - When provided, shows a "Cancel" link or button next to the

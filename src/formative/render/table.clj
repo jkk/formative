@@ -46,6 +46,22 @@
            label-el)
          input-el]))]))
 
+(defn- group-fieldsets [fields]
+  (loop [ret []
+         group []
+         fields fields]
+    (if (empty? fields)
+      (if (seq group)
+        (conj ret group)
+        ret)
+      (if (#{:heading :submit} (:type (first fields)))
+        (recur (if (seq group) (conj ret group) ret)
+               [(first fields)]
+               (rest fields))
+        (recur ret
+               (conj group (first fields))
+               (rest fields))))))
+
 (defmethod render-form :table [form-attrs fields opts]
   (let [[hidden-fields visible-fields] ((juxt filter remove)
                                         #(= :hidden (:type %)) fields)
@@ -64,5 +80,7 @@
       (list
        (map render-field hidden-fields)
        [:table.form-table
-        (map render-form-row visible-fields)])]]))
+        (for [fieldset (group-fieldsets visible-fields)]
+          [:tbody {:class (str "fieldset-" (name (:name (first fieldset))))}
+           (map render-form-row fieldset)])])]]))
 

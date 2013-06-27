@@ -45,7 +45,7 @@
                          fields
                          (into {} (for [f fields]
                                     [(:name f) f])))]
-    [:div.form-problems.alert.alert-error.clearfix
+    [:div.form-problems.alert.alert-error.alert-block.clearfix
      [:ul
       (for [{:keys [keys msg]} problems
             :when msg]

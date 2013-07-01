@@ -31,10 +31,10 @@
   (apply us-state (rest vspec)))
 
 (defmethod v/validation->fn :ca-state [vspec]
-  (apply us-state (rest vspec)))
+  (apply ca-state (rest vspec)))
 
 (defmethod v/validation->fn :country [vspec]
-  (apply us-state (rest vspec)))
+  (apply country (rest vspec)))
 
 (def type-validators
   {:us-zip v/us-zip

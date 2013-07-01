@@ -56,7 +56,8 @@
             
             {:name :f-heading :type :heading}
             {:name :f-labeled-html :type :labeled-html}
-            {:name :f-html :type :html}]})
+            {:name :f-html :type :html}
+            {:name "foo[bar][baz]" :datatype :int}]})
 
 (def good-params
   {:f-default "foo"
@@ -96,7 +97,8 @@
    :f-currency "123.45"
    :f-heading "foo"
    :f-labeled-html "foo"
-   :f-html "foo"})
+   :f-html "foo"
+   :foo {:bar {:baz "1"}}})
 
 (def good-values
   {:f-default "foo"
@@ -135,7 +137,8 @@
    :f-date-select (java.util.Date. 112 11 25)
    :f-year-select 2012
    :f-month-select 12
-   :f-currency 123.45M})
+   :f-currency 123.45M
+   :foo {:bar {:baz 1}}})
 
 (deftest parse-test
   (testing "Known-good params"

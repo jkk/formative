@@ -4,6 +4,7 @@
             formative.render.div
             formative.render.bootstrap
             formative.render.inline
+            [formative.util :as fu]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]))
 
@@ -29,7 +30,7 @@
 
 (defmethod prep-field :default [field values]
   (assoc field
-    :value (get values (:name field))
+    :value (get-in values (fu/expand-name (:name field)))
     :label (r/get-field-label field)))
 
 (defmethod prep-field :checkbox [field values]
@@ -38,7 +39,7 @@
                 (assoc field :value "true" :unchecked-value "false"
                        :datatype :boolean)
                 field)
-        val (get values (:name field))]
+        val (get-in values (fu/expand-name (:name field)))]
     (assoc field
       :value (:value field "true")
       :checked (= (str val) (str (:value field "true")))

@@ -157,8 +157,17 @@
 (defmethod parse-input :us-tel [spec v]
   (fu/normalize-us-tel v))
 
-(defn- get-param [m kw]
-  (get m (name kw) (get m kw)))
+(defn- contains-in? [m keys]
+  (loop [m m, keys keys]
+    (if (seq keys)
+      (let [k (first keys)
+            v (get m k ::not-found)]
+        (when (not= ::not-found v)
+          (recur v (rest keys))))
+      m)))
+
+(defn- get-param [m ks]
+  (get-in m ks (get-in m (map keyword ks))))
 
 (defn- fix-input [input spec]
   (if (and (= :checkboxes (:type spec))
@@ -169,16 +178,16 @@
 (defn- parse-nested-params [fields np]
   (reduce
     (fn [vals spec]
-      (let [fname (keyword (:name spec))]
-        (if (or (contains? np (name fname))
-                (contains? np fname))
+      (let [sname (fu/expand-name (:name spec))
+            kname (map keyword sname)]
+        (if (or (contains-in? np sname)
+                (contains-in? np kname))
           (let [raw-val (fix-input
-                          (get-param np fname) spec)
-                spec* (assoc spec :name fname)
-                val (parse-input spec* raw-val)]
+                          (get-param np sname) spec)
+                val (parse-input spec raw-val)]
             (if (= val ::absent)
               vals
-              (assoc vals fname val)))
+              (assoc-in vals kname val)))
           vals)))
     {}
     fields))

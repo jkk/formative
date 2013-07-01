@@ -43,7 +43,7 @@
                :label "H",
                :value nil}
               {:name "foo-bar-baz", :type :text, :label "Foo bar baz", :value nil}
-              {:name "Foo_Bar[]", :type :text, :label "Foo Bar[]", :value nil}
+              {:name "Foo_Bar[]", :type :text, :label "Foo Bar", :value nil}
               {:type :submit,
                :name "submit",
                :cancel-href "/example",

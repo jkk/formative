@@ -34,8 +34,11 @@
     (-> (:name field)
       name
       (string/replace #"[_-]" " ")
+      (string/replace #"^[^\[]+\[([^\]])" "$1")
+      (string/replace #"[\[\]]" " ")
       (string/replace #"\bid\b" "ID")
-      ucfirst)))
+      ucfirst
+      string/trim)))
 
 (defn render-problems
   "Renders a form problems as Hiccup data. Lists the each set of keys with

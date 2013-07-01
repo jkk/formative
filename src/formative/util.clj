@@ -1,6 +1,16 @@
 (ns formative.util
   (:require [clojure.string :as string]))
 
+(defn expand-name
+  "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"
+  [name]
+  (let [[_ name1 more-names] (re-matches #"^([^\[]+)((?:\[[^\]]+?\])*)$" name)]
+    (if name1
+      (if (seq more-names)
+        (into [name1] (map second (re-seq #"\[([^\]]+)\]" more-names)))
+        [name1])
+      [name])))
+
 (defn normalize-us-tel [v]
   (when-not (string/blank? v)
     (-> v

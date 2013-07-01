@@ -1,5 +1,6 @@
 (ns formative.validate
   (:require [formative.data :as data]
+            [formative.util :as fu]
             [clojure.string :as string]
             [jkkramer.verily :as v]))
 
@@ -36,6 +37,15 @@
 (defmethod v/validation->fn :country [vspec]
   (apply country (rest vspec)))
 
+(defn us-tel [keys & [msg]]
+  (v/make-validator keys #(and (not= :jkkramer/verily/absent %)
+                               (not (string/blank? %))
+                               (not (fu/valid-us-tel? %)))
+                    (or msg "must be a valid US phone number")))
+
+(defmethod v/validation->fn :us-tel [vspec]
+  (apply us-tel (rest vspec)))
+
 (def type-validators
   {:us-zip v/us-zip
    :us-state us-state
@@ -44,6 +54,7 @@
    :email v/email
    :url v/url
    :web-url v/web-url
+   :us-tel us-tel
    :str v/string
    :strs v/strings
    :clob v/string

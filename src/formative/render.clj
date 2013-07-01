@@ -1,6 +1,7 @@
 (ns formative.render
   (:require [hiccup.core :refer [h]]
             [formative.data :as data]
+            [formative.util :as fu]
             [clojure.string :as string]))
 
 (defmulti render-form
@@ -311,3 +312,7 @@
   (render-default-input
     (assoc field :type :text)
     {:prefix "$"}))
+
+(defmethod render-field :us-tel [field]
+  (render-default-input
+    (assoc field :type :tel :value (fu/format-us-tel (:value field)))))

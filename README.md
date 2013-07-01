@@ -161,6 +161,7 @@ Built in validations:
 * `:email <keys> [msg]` - must be a valid email
 * `:url <keys> [msg]` - must be a valid URL
 * `:web-url <keys> [msg]` - must be a valid website URL (http or https)
+* `:us-tel <keys> [msg]` - must be a valid US phone number
 * `:matches <regex> <keys> [msg]` - must match a regular expression
 * `:min-length <len> <keys> [msg]` - must be a certain length (for strings or collections)
 * `:max-length <len> <keys> [msg]` - must not exceed a certain length (for strings or collections)
@@ -288,6 +289,9 @@ Built-in field types:
       :us-zip       - United States ZIP code
       :ca-state     - Canadian province
       :country      - Country dropdown. Accepts :select special keys.
+      :us-tel       - United States phone number (10 digits plus optional
+                      "x" + extension). Will be normalized and formatted
+                      automatically.
       :date-select  - Date dropdown. Renders as multiple :select fields, parses
                       as a java.util.Date. Special keys:
                         :year-start

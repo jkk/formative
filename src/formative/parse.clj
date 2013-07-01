@@ -3,7 +3,8 @@
             [clojure.string :as string]
             [clojure.walk :refer [stringify-keys]]
             [formative.core :as f]
-            [formative.validate :as fv]))
+            [formative.validate :as fv]
+            [formative.util :as fu]))
 
 (defrecord ParseError [bad-value])
 
@@ -152,6 +153,9 @@
 
 (defmethod parse-input :labeled-html [spec v]
   ::absent)
+
+(defmethod parse-input :us-tel [spec v]
+  (fu/normalize-us-tel v))
 
 (defn- get-param [m kw]
   (get m (name kw) (get m kw)))

@@ -38,7 +38,7 @@
   (apply country (rest vspec)))
 
 (defn us-tel [keys & [msg]]
-  (v/make-validator keys #(and (not= :jkkramer/verily/absent %)
+  (v/make-validator keys #(and (not= :jkkramer.verily/absent %)
                                (not (string/blank? %))
                                (not (fu/valid-us-tel? %)))
                     (or msg "must be a valid US phone number")))

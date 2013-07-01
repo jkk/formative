@@ -49,6 +49,7 @@
             {:name :f-us-state :type :us-state}
             {:name :f-ca-state :type :ca-state}
             {:name :f-country :type :country}
+            {:name :f-us-tel :type :us-tel}
             {:name :f-date-select :type :date-select}
             {:name :f-year-select :type :year-select}
             {:name :f-month-select :type :month-select}
@@ -91,6 +92,7 @@
    :f-us-state "NY"
    :f-ca-state "ON"
    :f-country "US"
+   :f-us-tel "(234) 567-8901x123"
    :f-date-select {:month "12" :day "25" :year "2012"}
    :f-year-select "2012"
    :f-month-select "12"
@@ -134,6 +136,7 @@
    :f-us-state "NY"
    :f-ca-state "ON"
    :f-country "US"
+   :f-us-tel "2345678901x123"
    :f-date-select (java.util.Date. 112 11 25)
    :f-year-select 2012
    :f-month-select 12

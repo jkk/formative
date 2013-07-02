@@ -320,6 +320,8 @@ Built-in field types:
                       explicitly if you prefer. Unlike with a default submit
                       button, its value will be parsed.
 
+#### :options
+
 The :options key for :select and other types accepts a collection of any of the following formats:
 
       ["value" "label"]
@@ -327,6 +329,10 @@ The :options key for :select and other types accepts a collection of any of the 
       "value and label"
 
 The :options value can also be a function of no arguments or a Delay object -- either of which must yield a collection in one of the above formats.
+
+By default, a field with :options set only accepts values from within :options when validated. Set `:validate-options` to false on the field to accept any value.
+
+#### Presentational Field Types
 
 The following presentational types are also available. They are excluded from parsing.
 

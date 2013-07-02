@@ -84,8 +84,22 @@
                          :when validator]
                      (if (:datatype-error field)
                        (validator (:name field) (:datatype-error field))
-                       (validator (:name field))))]
-    ((apply v/combine validators) values)))
+                       (validator (:name field))))
+        opt-validators (for [field fields
+                             :when (and (:options field)
+                                        (not (false? (:validate-options field))))]
+                         (let [opts (map first (fu/normalize-options
+                                                 (:options field)))
+                               opts (if (:first-option field)
+                                      (cons (ffirst (fu/normalize-options
+                                                      [(:first-option field)]))
+                                            opts)
+                                      opts)]
+                           (if (or (= :checkboxes (:type field))
+                                   (:multiple field))
+                             (v/every-in opts (:name field))
+                             (v/in opts (:name field)))))]
+    ((apply v/combine (concat validators opt-validators)) values)))
 
 (defn validate [form values]
   (let [type-validator (if (= false (:validate-types form))

@@ -193,10 +193,11 @@
     fields))
 
 (defn- normalize-params [params]
-  (if (keyword? (key (first params)))
-    (stringify-keys params)
-    ;; FIXME: Should probably not rely on a private Ring fn (shhh)
-    (#'np/nest-params params np/parse-nested-keys)))
+  (when (seq params)
+    (if (keyword? (key (first params)))
+      (stringify-keys params)
+      ;; FIXME: Should probably not rely on a private Ring fn (shhh)
+      (#'np/nest-params params np/parse-nested-keys))))
 
 (defn parse-params
   "Given a form specification or sequence of field specifications and a Ring

@@ -122,6 +122,19 @@
       (assoc form :fields new-fields)
       new-fields)))
 
+(defn remove-fields
+  "Removes fields from form-or-fields according to their name"
+  [form-or-fields names]
+  (let [[form fields] (if (map? form-or-fields)
+                        [form-or-fields (:fields form-or-fields)]
+                        [nil form-or-fields])
+        names-set (if (set? names) names (into #{} names))
+        new-fields (remove (comp names-set :name)
+                           fields)]
+    (if form
+      (assoc form :fields new-fields)
+      new-fields)))
+
 (defn- prep-problems [problems]
   (set
     (if (map? (first problems))

@@ -83,4 +83,9 @@
             {:name :appended4}
             {:name :appended5}))))
 
+(deftest remove-fields-test
+  (is (= (:fields
+           (f/remove-fields {:fields [{:name :a} {:name :b} {:name :c}]} [:b]))
+         [{:name :a} {:name :c}])))
+
 ;(run-tests)

@@ -177,4 +177,32 @@
                       :msg "must not be blank"}]
                     (:problems (ex-data ex)))))))
 
+(def form2
+  {:fields [{:name :a :datatype :int}]
+   :validations [[:int :a "nope"]]})
+
+(deftest validate-types-test
+  (testing ":validate-types true (default)"
+           (let [ex (try
+                      (fp/parse-params form2 {:a "x"})
+                      (catch Exception ex
+                        ex))]
+             (is (= '({:keys (:a), :msg "must be a number"}
+                       {:keys (:a), :msg "nope"})
+                    (:problems (ex-data ex))))))
+  (testing ":validate-types false"
+           (let [ex (try
+                      (fp/parse-params (assoc form2 :validate-types false)
+                                       {:a "x"})
+                      (catch Exception ex
+                        ex))]
+             (is (= '({:keys (:a), :msg "nope"})
+                    (:problems (ex-data ex))))))
+  (testing ":validate-types false, without :validations"
+           (is (= (fp/parse-params (-> form2
+                                     (dissoc :validations)
+                                     (assoc :validate-types false))
+                                   {:a "x"})
+                  {:a (fp/->ParseError "x")}))))
+
 ;(run-tests)

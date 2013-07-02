@@ -135,7 +135,9 @@ The `formative.parse/with-fallback` macro is a handy way to try parsing Ring par
 
 ### Validating Parsed Data
 
-Formative uses [Verily](https://github.com/jkk/verily) to validate parsed data. By default, only datatypes are validated. There are two ways to add your own validation to a form: `:validations` and `:validator`.
+Formative uses [Verily](https://github.com/jkk/verily) to validate parsed data. By default, only datatypes are validated (unless `:validate-types` is set to `false`).
+
+There are two ways to add your own validation to a form: `:validations` and `:validator`.
 
 #### `:validations`
 
@@ -204,28 +206,29 @@ Unlike an HTML form, :method defaults to :post.
 
 The following special keys are also supported:
 
-      :renderer     - Determines the type of renderer to use. Built-in options:
-                        :bootstrap-horizontal (the default)
-                        :bootstrap-stacked
-                        :table
-                        :inline
-      :fields       - Sequence of form field specifications. See below.
-      :tweaks       - Sequence of form field specifications which will be
-                      merged with :fields using merge-fields.
-      :values       - Map of values used to populate the form fields
-      :submit-label - Label to use on the submit button. Defaults to "Submit"
-      :cancel-href  - When provided, shows a "Cancel" link or button next to the
-                      submit button
-      :validations  - A sequence of validation specifications
-      :validator    - A function to call to validate parsed values for this
-                      form. The function should take a map of values and return
-                      a sequence of problem maps for each field that failed to
-                      validate. The problem map should contain the keys :keys
-                      and :msg.
-      :problems     - Sequence of field names or problem maps. Form
-                      renderers typically add a class and style to highlight
-                      problem fields and, if problem maps are provided,
-                      show descriptive messages.
+      :renderer       - Determines the type of renderer to use. Built-in options:
+                          :bootstrap-horizontal (the default)
+                          :bootstrap-stacked
+                          :table
+                          :inline
+      :fields         - Sequence of form field specifications. See below.
+      :tweaks         - Sequence of form field specifications which will be
+                        merged with :fields using merge-fields.
+      :values         - Map of values used to populate the form fields
+      :submit-label   - Label to use on the submit button. Defaults to "Submit"
+      :cancel-href    - When provided, shows a "Cancel" link or button next to the
+                        submit button
+      :validations    - A sequence of validation specifications
+      :validator      - A function to call to validate parsed values for this
+                        form. The function should take a map of values and return
+                        a sequence of problem maps for each field that failed to
+                        validate. The problem map should contain the keys :keys
+                        and :msg.
+      :validate-types - Whether to validate datatypes; true by default.
+      :problems       - Sequence of field names or problem maps. Form
+                        renderers typically add a class and style to highlight
+                        problem fields and, if problem maps are provided,
+                        show descriptive messages.
                       
 New form renderers can be implemented using the `formative.render/render-form` multimethod.
 

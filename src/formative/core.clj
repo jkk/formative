@@ -196,6 +196,7 @@
                       a sequence of problem maps for each field that failed to
                       validate. The problem map should contain the keys :keys
                       and :msg.
+      :validate-types - Whether to validate datatypes; true by default.
       :problems     - Sequence of field names or problem maps. Form
                       renderers typically add a class and style to highlight
                       problem fields and, if problem maps are provided,
@@ -285,6 +286,9 @@
     [\"value\" \"label\"]
     {:value \"value\" :label \"label\"}
     \"value and label\"
+
+  The :options value can also be a function of no arguments or a Delay object --
+  either of which must yield a collection in one of the above formats.
 
   The following presentational types are also available. They are excluded from
   parsing.

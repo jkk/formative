@@ -87,7 +87,9 @@
     ((apply v/combine validators) values)))
 
 (defn validate [form values]
-  (let [type-validator (partial validate-types (:fields form))
+  (let [type-validator (if (= false (:validate-types form))
+                         (constantly nil)
+                         (partial validate-types (:fields form)))
         validator (if-let [custom-validator (:validator form)]
                     (v/combine type-validator custom-validator)
                     type-validator)

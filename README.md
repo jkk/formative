@@ -192,6 +192,25 @@ A function that takes a map of parsed values and returns a problem map or sequen
 
 See [Verily](https://github.com/jkk/verily) for more about validation functions.
 
+## Making Changes at Runtime
+
+Typically form specifications are defined as vars, so you can refer to them easily from functions. However, many forms incorporate or depend on runtime data. For example, you might add or remove fields depending on the access level of the user.
+
+You are of course free to tweak the form map yourself to make the appropriate runtime changes before rendering it. But `merge-fields` and `remove-fields` may come in handy and save you time.
+
+`merge-fields` can modify and insert/append fields. `remove-fields` removes fields. Both can operate on a form or a sequence of fields. Example:
+
+```clj
+(let [form {:fields [{:name :a} {:name :b} {:name :c}]}]
+  (-> form
+      (f/merge-fields [{:name :a :datatype :int}
+                       {:name :d :before :c}])
+      (f/remove-fields [:b])))
+;; {:fields ({:datatype :int, :name :a} {:name :d} {:name :c})}
+```
+
+As shown above, `merge-fields` will look for `:before` and `:after` keys in the given fields to decide whether to insert the field or append it.
+
 ## Quick Reference
 
 ### Form Specification

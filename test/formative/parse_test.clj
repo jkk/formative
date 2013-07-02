@@ -178,7 +178,7 @@
                     (:problems (ex-data ex)))))))
 
 (def form2
-  {:fields [{:name :a :datatype :int}]
+  {:fields [{:name :a :datatype :int :datatype-error "foobar"}]
    :validations [[:int :a "nope"]]})
 
 (deftest validate-types-test
@@ -187,7 +187,7 @@
                       (fp/parse-params form2 {:a "x"})
                       (catch Exception ex
                         ex))]
-             (is (= '({:keys (:a), :msg "must be a number"}
+             (is (= '({:keys (:a), :msg "foobar"}
                        {:keys (:a), :msg "nope"})
                     (:problems (ex-data ex))))))
   (testing ":validate-types false"

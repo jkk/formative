@@ -78,12 +78,13 @@
    :currency v/decimal})
 
 (defn validate-types [fields values]
-  (let [groups (group-by #(:datatype % (:type %))
-                         fields)
-        validators (for [[type tfields] groups
-                         :let [validator (type-validators type)]
+  (let [validators (for [field fields
+                         :let [type (:datatype field (:type field))
+                               validator (type-validators type)]
                          :when validator]
-                     (validator (map :name tfields)))]
+                     (if (:datatype-error field)
+                       (validator (:name field) (:datatype-error field))
+                       (validator (:name field))))]
     ((apply v/combine validators) values)))
 
 (defn validate [form values]

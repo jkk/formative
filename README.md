@@ -260,6 +260,8 @@ the following special keys:
 
                       :date field values are expected to be in yyyy-MM-dd
                       format by default. Set :date-format to change that.
+      :datatype-error - Optional custom error message to use if datatype
+                      validation fails.
       :note         - A bit of explanatory content to accompany the field
       :prefix       - Content to insert before a field
       :suffix       - Content to insert after a field

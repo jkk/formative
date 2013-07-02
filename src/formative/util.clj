@@ -1,6 +1,17 @@
 (ns formative.util
   (:require [clojure.string :as string]))
 
+(defn normalize-options [opts]
+  (let [opts (cond
+               (fn? opts) (opts)
+               (delay? opts) @opts
+               :else opts)]
+    (if (coll? (first opts))
+      (if (map? (first opts))
+        (map (juxt :value :label) opts)
+        opts)
+      (map #(vector % %) opts))))
+
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"
   [name]

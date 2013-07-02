@@ -101,22 +101,15 @@
                                       :onfocus :onblur :placeholder])]
     [:textarea attrs (h (:value field))]))
 
-(defn normalize-options [opts]
-  (if (coll? (first opts))
-    (if (map? (first opts))
-      (map (juxt :value :label) opts)
-      opts)
-    (map #(vector % %) opts)))
-
 (defmethod render-field :select [field]
   (let [attrs (get-input-attrs field [:name :id :class :autofocus
                                       :disabled :multiple :size :readonly
                                       :tabindex :onchange :onclick :onfocus
                                       :onblur])
         val (str (:value field))
-        opts (normalize-options (:options field))
+        opts (fu/normalize-options (:options field))
         opts (if (:first-option field)
-               (concat (normalize-options [(:first-option field)])
+               (concat (fu/normalize-options [(:first-option field)])
                        opts)
                opts)
         opt-tags (for [[v text] opts
@@ -147,7 +140,7 @@
 
 (defmethod render-field :checkboxes [field]
   (let [vals (set (map str (:value field)))
-        opts (normalize-options (:options field))
+        opts (fu/normalize-options (:options field))
         fname (str (name (:name field)) "[]")
         cols (:cols field 1)
         cb-per-col (+ (quot (count opts) cols)
@@ -174,7 +167,7 @@
 
 (defn- render-radios [field]
   (let [val (str (:value field))
-        opts (normalize-options (:options field))]
+        opts (fu/normalize-options (:options field))]
     [:div.radios
      (for [[oval olabel] opts]
        (let [id (str (:id field) "__" (opt-slug oval))]

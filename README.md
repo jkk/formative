@@ -321,6 +321,8 @@ The :options key for :select and other types accepts a collection of any of the 
       {:value "value" :label "label"}
       "value and label"
 
+The :options value can also be a function of no arguments or a Delay object -- either of which must yield a collection in one of the above formats.
+
 The following presentational types are also available. They are excluded from parsing.
 
       :heading      - Section heading. In the default renderer, acts as a fieldset

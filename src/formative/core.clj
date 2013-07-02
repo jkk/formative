@@ -74,9 +74,15 @@
     :name matches :before.
   - Otherwise, the spec will be appended.
 
+  If a form is given, its fields will be used and the updated form will be
+  returned.
+
   This function is mainly useful for making runtime tweaks to form fields."
-  [fields1 fields2]
-  (let [fields2-map (if (map? fields2)
+  [form-or-fields1 fields2]
+  (let [[form fields1] (if (map? form-or-fields1)
+                         [form-or-fields1 (:fields form-or-fields1)]
+                         [nil form-or-fields1])
+        fields2-map (if (map? fields2)
                       fields2
                       (into {} (map (juxt :name identity)
                                     fields2)))
@@ -109,9 +115,12 @@
                                          ret*)]
                               [ret* f2m*]))
                           [[] fields2-map]
-                          fields1)]
-    (concat ret (remove (some-fn :before :after)
-                        (filter (comp leftovers :name) fields2)))))
+                          fields1)
+        new-fields (concat ret (remove (some-fn :before :after)
+                                       (filter (comp leftovers :name) fields2)))]
+    (if form
+      (assoc form :fields new-fields)
+      new-fields)))
 
 (defn- prep-problems [problems]
   (set
@@ -137,10 +146,7 @@
                      :method (:method spec :post)
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))
-        fields (if (:tweaks spec)
-                 (merge-fields (:fields spec) (:tweaks spec))
-                 (:fields spec))
-        fields (prep-fields fields values)
+        fields (prep-fields (:fields spec) values)
         fields (if (:cancel-href spec)
                  (for [field fields]
                    (if (= :submit (:type field))
@@ -184,8 +190,6 @@
                       Custom renderers can be created by implementing the
                       formative.render/render-form multimethod. 
       :fields       - Sequence of form field specifications. See below.
-      :tweaks       - Sequence of form field specifications which will be
-                      merged with :fields using merge-fields.
       :values       - Map of values used to populate the form fields
       :submit-label - Label to use on the submit button. Defaults to \"Submit\"
       :cancel-href  - When provided, shows a \"Cancel\" hyperlink next to the

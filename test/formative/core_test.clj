@@ -50,19 +50,20 @@
                :value "Do It"})))))
 
 (deftest merge-fields-test
-  (is (= (f/merge-fields (:fields form1)
-                         [{:name :c :type :textarea :label "Merged"}
-                          {:name :e :html [:b "howdy"]}
-                          {:name :appended :type :text}
-                          {:name :after-test :after :f}
-                          {:name :before-test :before :a}
-                          {:name :after-test2 :after :f}
-                          {:name :limbo :after :after-test2}
-                          {:name :limbo2 :after :xxx}
-                          {:name :appended2}
-                          {:name :appended3}
-                          {:name :appended4}
-                          {:name :appended5}])
+  (is (= (:fields
+           (f/merge-fields form1
+                           [{:name :c :type :textarea :label "Merged"}
+                            {:name :e :html [:b "howdy"]}
+                            {:name :appended :type :text}
+                            {:name :after-test :after :f}
+                            {:name :before-test :before :a}
+                            {:name :after-test2 :after :f}
+                            {:name :limbo :after :after-test2}
+                            {:name :limbo2 :after :xxx}
+                            {:name :appended2}
+                            {:name :appended3}
+                            {:name :appended4}
+                            {:name :appended5}]))
          '({:name :before-test}
             {:name :a, :datatype :int, :type :hidden}
             {:name :b, :type :email}

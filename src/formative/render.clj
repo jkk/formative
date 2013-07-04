@@ -257,7 +257,7 @@
         this-year (+ 1900 (.getYear (java.util.Date.)))
         year-start (:year-start field this-year)
         year-end (:year-end field (+ this-year 20))]
-    [:div.date-select
+    [:span.date-select
      (render-field {:type :select
                     :name (str (:name field) "[month]")
                     :class "input-medium"
@@ -324,7 +324,7 @@
                        :else [h "am"])
                      [h]))
         seconds? (:seconds field false)]
-    [:div.time-select
+    [:span.time-select
      (render-field {:type :select
                     :name (str (:name field) "[h]")
                     :class "input-small"
@@ -358,6 +358,12 @@
                         :value ampm
                         :first-option ["" "--"]
                         :options ["am" "pm"]})))]))
+
+(defmethod render-field :datetime-select [field]
+  [:span.datetime-select
+   (render-field (assoc field :type :date-select))
+   " "
+   (render-field (assoc field :type :time-select))])
 
 (defmethod render-field :currency [field]
   (render-default-input

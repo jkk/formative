@@ -149,6 +149,26 @@
       (catch Exception e
         (->ParseError v)))))
 
+(defmethod parse-input :datetime-select [spec v]
+  (when (every? (comp (complement string/blank?) #(get v %))
+                ["year" "month" "day"])
+    (try
+      (when-let [date (java.util.Date. (- (Integer/valueOf (get v "year")) 1900)
+                                       (dec (Integer/valueOf (get v "month")))
+                                       (Integer/valueOf (get v "day")))]
+        (when (every? (comp (complement string/blank?) #(get v %))
+                      ["h" "m"])
+          (try
+            (when-let [time (fu/normalize-time-val v)]
+              (doto date
+                (.setHours (.getHours time))
+                (.setMinutes (.getMinutes time))
+                (.setSeconds (.getSeconds time))))
+            (catch Exception e
+              (->ParseError v)))))
+      (catch Exception e
+        (->ParseError v)))))
+
 (defmethod parse-input :currency [spec v]
   (parse-bigdec spec v))
 

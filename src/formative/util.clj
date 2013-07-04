@@ -15,8 +15,8 @@
 (defn normalize-time-val [t]
   (when t
     (cond
-      (instance? java.sql.Time) t
-      (instance? java.util.Date) t
+      (instance? java.sql.Time t) t
+      (instance? java.util.Date t) t
       (string? t) (try
                     (.parse (java.text.SimpleDateFormat. "H:m") t)
                     (catch Exception _
@@ -34,7 +34,7 @@
                      m (Integer/valueOf (:m t (get t "m" 0)))
                      s (Integer/valueOf (:s t (get t "s" 0)))]
                  (java.sql.Time. h m s))
-      :else (throw (IllegalArgumentException. "Unrecognized date format")))))
+      :else (throw (IllegalArgumentException. "Unrecognized time format")))))
 
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"

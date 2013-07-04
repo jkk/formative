@@ -12,6 +12,30 @@
         opts)
       (map #(vector % %) opts))))
 
+(defn normalize-time-val [t]
+  (when t
+    (cond
+      (instance? java.sql.Time) t
+      (instance? java.util.Date) t
+      (string? t) (try
+                    (.parse (java.text.SimpleDateFormat. "H:m") t)
+                    (catch Exception _
+                      (try
+                        (.parse (java.text.SimpleDateFormat. "H:m:s") t)
+                        (catch Exception _))))
+      (map? t) (let [h (Integer/valueOf (:h t (get t "h")))
+                     ampm (:ampm t (get t "ampm"))
+                     h (if ampm
+                         (cond
+                           (= 12 h) (if (= "am" ampm) 0 12)
+                           (= "pm" ampm) (- h 12)
+                           :else h)
+                         h)
+                     m (Integer/valueOf (:m t (get t "m" 0)))
+                     s (Integer/valueOf (:s t (get t "s" 0)))]
+                 (java.sql.Time. h m s))
+      :else (throw (IllegalArgumentException. "Unrecognized date format")))))
+
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"
   [name]

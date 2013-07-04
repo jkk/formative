@@ -233,7 +233,7 @@
                       one of:
 
                       :str, :int, :long, :boolean, :float, :double, :decimal,
-                      :bigint, :date, :file.
+                      :bigint, :date, :time, :file.
 
                       Defaults to :str.
 
@@ -288,6 +288,12 @@
                     special keys plus:
                       :numbers - when true, shows numbers instead of month
                                  names
+    :time-select  - Time dropdown. Renders as multiple :select fields, parses
+                    as a java.sql.Time. Special keys:
+                      :ampm - true to use am/pm (the default); false to use
+                              24-hour format
+                      :step - step between minutes/seconds; default 5
+                      :seconds - whether to include a seconds field
     :currency     - Text input for money. Parses as a :decimal datatype
     :file         - File upload input. Special keys:
                       :upload-handler - optional handler called when a file is

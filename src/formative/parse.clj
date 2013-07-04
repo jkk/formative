@@ -128,6 +128,27 @@
 (defmethod parse-input :month-select [spec v]
   (parse-long spec v))
 
+(defn- parse-time [spec x]
+  (when-not (string/blank? x)
+    (try
+      (fu/normalize-time-val x)
+      (catch Exception e
+        (->ParseError x)))))
+
+(defmethod parse-input :time [spec v]
+  (parse-time spec v))
+
+(defmethod parse-input :times [spec v]
+  (map #(parse-time spec %) v))
+
+(defmethod parse-input :time-select [spec v]
+  (when (every? (comp (complement string/blank?) #(get v %))
+                ["h" "m"])
+    (try
+      (fu/normalize-time-val v)
+      (catch Exception e
+        (->ParseError v)))))
+
 (defmethod parse-input :currency [spec v]
   (parse-bigdec spec v))
 

@@ -13,6 +13,7 @@
             {:name :f-decimal :datatype :decimal}
             {:name :f-bigint :datatype :bigint}
             {:name :f-date :datatype :date}
+            {:name :f-time :datatype :time}
             
             {:name :f-ints :datatype :ints}
             {:name :f-longs :datatype :longs}
@@ -22,6 +23,7 @@
             {:name :f-decimals :datatype :decimals}
             {:name :f-bigints :datatype :bigints}
             {:name :f-dates :datatype :dates}
+            {:name :f-times :datatype :times}
             
             {:name :f-textarea :type :textarea}
             {:name :f-select1 :type :select :options ["foo" "bar" "baz"]}
@@ -53,6 +55,7 @@
             {:name :f-date-select :type :date-select}
             {:name :f-year-select :type :year-select}
             {:name :f-month-select :type :month-select}
+            {:name :f-time-select :type :time-select}
             {:name :f-currency :type :currency}
             
             {:name :f-heading :type :heading}
@@ -70,6 +73,7 @@
    :f-decimal "123.45"
    :f-bigint "13918723981723918723987129387198273198273918273"
    :f-date "2012-12-25"
+   :f-time "23:06"
    :f-ints ["123" "456" "789"]
    :f-longs ["123" "456" "789"]
    :f-booleans ["true" "true" "false"]
@@ -79,6 +83,7 @@
    :f-bigints ["13918723981723918723987129387198273198273918273"
                "29038402938402938402983409283049203948209384209"]
    :f-dates ["2012-01-01" "2012-02-03" "2012-10-04"]
+   :f-times ["0:01" "23:02" "12:00"]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 "true"
@@ -96,6 +101,7 @@
    :f-date-select {:month "12" :day "25" :year "2012"}
    :f-year-select "2012"
    :f-month-select "12"
+   :f-time-select {:h "12" :m "0" :ampm "pm"}
    :f-currency "123.45"
    :f-heading "foo"
    :f-labeled-html "foo"
@@ -112,6 +118,7 @@
    :f-decimal 123.45M
    :f-bigint 13918723981723918723987129387198273198273918273N
    :f-date (java.util.Date. 112 11 25)
+   :f-time (java.sql.Time. 23 6 0)
    :f-ints [123 456 789]
    :f-longs [123 456 789]
    :f-booleans [true true false]
@@ -123,6 +130,9 @@
    :f-dates [(java.util.Date. 112 0 1)
              (java.util.Date. 112 1 3)
              (java.util.Date. 112 9 4)]
+   :f-times [(java.sql.Time. 0 1 0)
+             (java.sql.Time. 23 2 0)
+             (java.sql.Time. 12 0 0)]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 true
@@ -140,6 +150,7 @@
    :f-date-select (java.util.Date. 112 11 25)
    :f-year-select 2012
    :f-month-select 12
+   :f-time-select (java.sql.Time. 12 0 0)
    :f-currency 123.45M
    :foo {:bar {:baz 1}}})
 

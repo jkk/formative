@@ -304,6 +304,61 @@
                           :type :select
                           :options opts))]))
 
+(defn- round [x step]
+  (int (* (Math/floor (/ x (double step)) ) step)))
+
+(defmethod render-field :time-select [field]
+  (let [step (:step field 5)
+        ampm? (:ampm field true)
+        time (fu/normalize-time-val (:value field))
+        [h m s] (when time
+                  [(.getHours time)
+                   (round (.getMinutes time) step)
+                   (round (.getSeconds time) step)])
+        [h ampm] (when h
+                   (if ampm?
+                     (cond
+                       (zero? h) [12 "am"]
+                       (= 12 h) [12 "pm"]
+                       (< 12 h) [(- h 12) "pm"]
+                       :else [h "am"])
+                     [h]))
+        seconds? (:seconds field false)]
+    [:div.time-select
+     (render-field {:type :select
+                    :name (str (:name field) "[h]")
+                    :class "input-small"
+                    :value h
+                    :first-option ["" "--"]
+                    :options (if ampm? (range 1 13) (range 0 24))})
+     " "
+     (render-field {:type :select
+                    :name (str (:name field) "[m]")
+                    :class "input-small"
+                    :value m
+                    :first-option ["" "--"]
+                    :options (map (juxt identity #(format "%02d" %))
+                                  (range 0 60 step))})
+     (when seconds?
+       (list
+         " "
+         (render-field {:type :select
+                        :name (str (:name field) "[s]")
+                        :class "input-small"
+                        :value s
+                        :first-option ["" "--"]
+                        :options (map (juxt identity #(format "%02d" %))
+                                      (range 0 60 step))})))
+     (when ampm?
+       (list
+         " "
+         (render-field {:type :select
+                        :name (str (:name field) "[ampm]")
+                        :class "input-small"
+                        :value ampm
+                        :first-option ["" "--"]
+                        :options ["am" "pm"]})))]))
+
 (defmethod render-field :currency [field]
   (render-default-input
     (assoc field :type :text)

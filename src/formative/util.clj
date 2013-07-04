@@ -1,5 +1,9 @@
 (ns formative.util
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [clj-time.core :as ct]
+            [clj-time.coerce :as cc]
+            [clj-time.format :as cf])
+  (:import org.joda.time.DateTime))
 
 (defn normalize-options [opts]
   (let [opts (cond
@@ -12,17 +16,56 @@
         opts)
       (map #(vector % %) opts))))
 
-(defn normalize-time-val [t]
+(defn parse-date [s & [format]]
+  (cc/to-date
+    (cf/parse (cf/formatter (or format "yyyy-MM-dd"))
+              s)))
+
+(defn normalize-date [d & [format]]
+  (when d
+    (cond
+      (instance? org.joda.time.DateTime d) (cc/to-date d)
+      (instance? java.util.Date d) d
+      (integer? d) (java.util.Date. d)
+      (string? d) (try
+                    (parse-date d format)
+                    (catch Exception _))
+      (map? d) (try
+                 (let [year (Integer/valueOf (:year d (get d "year")))
+                       month (Integer/valueOf (:month d (get d "month")))
+                       day (Integer/valueOf (:day d (get d "day")))]
+                   (cc/to-date (ct/date-time year month day)))
+                 (catch Exception _))
+      :else (throw (ex-info "Unrecognized date format" {:date d})))))
+
+(defn format-date [d & [format]]
+  (cf/unparse (cf/formatter (or format "yyyy-MM-dd"))
+              (cc/to-date-time d)))
+
+(defn get-year-month-day [date]
+  (let [date* (cc/to-date-time date)]
+    [(ct/year date*)
+     (ct/month date*)
+     (ct/day date*)]))
+
+(defn parse-time [s]
+  (try
+    (cc/to-date (cf/parse (cf/formatter "H:m") s))
+    (catch Exception _
+      (cc/to-date (cf/parse (cf/formatter "H:m:s") s)))))
+
+(defn with-time [^DateTime datetime h m s]
+  (.withTime datetime h m s 0))
+
+(defn normalize-time [t]
   (when t
     (cond
+      (instance? org.joda.time.DateTime t) (cc/to-date t)
       (instance? java.sql.Time t) t
       (instance? java.util.Date t) t
       (string? t) (try
-                    (.parse (java.text.SimpleDateFormat. "H:m") t)
-                    (catch Exception _
-                      (try
-                        (.parse (java.text.SimpleDateFormat. "H:m:s") t)
-                        (catch Exception _))))
+                    (parse-time t)
+                    (catch Exception _))
       (map? t) (let [h (Integer/valueOf (:h t (get t "h")))
                      ampm (:ampm t (get t "ampm"))
                      h (if ampm
@@ -33,8 +76,9 @@
                          h)
                      m (Integer/valueOf (:m t (get t "m" 0)))
                      s (Integer/valueOf (:s t (get t "s" 0)))]
-                 (java.sql.Time. h m s))
-      :else (throw (IllegalArgumentException. "Unrecognized time format")))))
+                 (java.sql.Time.
+                   (cc/to-long (with-time (ct/epoch) h m s))))
+      :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"

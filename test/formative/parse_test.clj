@@ -1,6 +1,9 @@
 (ns formative.parse-test
   (:require [clojure.test :refer [run-tests deftest testing is are]]
-            [formative.parse :as fp]))
+            [formative.parse :as fp]
+            [formative.util :as fu]
+            [clj-time.core :as ct]
+            [clj-time.coerce :as cc]))
 
 (def form1
   {:fields [{:name :f-default}
@@ -117,8 +120,8 @@
    :f-double 123.45
    :f-decimal 123.45M
    :f-bigint 13918723981723918723987129387198273198273918273N
-   :f-date (java.util.Date. 112 11 25)
-   :f-time (java.sql.Time. 23 6 0)
+   :f-date (cc/to-date (ct/date-time 2012 12 25))
+   :f-time (fu/parse-time "23:06")
    :f-ints [123 456 789]
    :f-longs [123 456 789]
    :f-booleans [true true false]
@@ -127,12 +130,12 @@
    :f-decimals [123.45M 678.90M]
    :f-bigints [13918723981723918723987129387198273198273918273N
                29038402938402938402983409283049203948209384209N]
-   :f-dates [(java.util.Date. 112 0 1)
-             (java.util.Date. 112 1 3)
-             (java.util.Date. 112 9 4)]
-   :f-times [(java.sql.Time. 0 1 0)
-             (java.sql.Time. 23 2 0)
-             (java.sql.Time. 12 0 0)]
+   :f-dates [(cc/to-date (ct/date-time 2012 1 1))
+             (cc/to-date (ct/date-time 2012 2 3))
+             (cc/to-date (ct/date-time 2012 10 4))]
+   :f-times [(fu/parse-time "00:01")
+             (fu/parse-time "23:02")
+             (fu/parse-time "12:00")]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 true
@@ -147,10 +150,10 @@
    :f-ca-state "ON"
    :f-country "US"
    :f-us-tel "2345678901x123"
-   :f-date-select (java.util.Date. 112 11 25)
+   :f-date-select (cc/to-date (ct/date-time 2012 12 25))
    :f-year-select 2012
    :f-month-select 12
-   :f-time-select (java.sql.Time. 12 0 0)
+   :f-time-select (fu/parse-time "12:00")
    :f-currency 123.45M
    :foo {:bar {:baz 1}}})
 
@@ -163,7 +166,7 @@
                                           "f-date-select[month]" "12"
                                           "f-date-select[day]" "25"
                                           "f-checkboxes2[]" ["" "true" "false"]})
-                  {:f-date-select (java.util.Date. 112 11 25)
+                  {:f-date-select (cc/to-date (ct/date-time 2012 12 25))
                    :f-checkboxes2 [true false]})))
   (testing "Failed parsing"
            (let [values (fp/parse-params form1 {:f-int "xxx"}

@@ -2,7 +2,8 @@
   (:require [hiccup.core :refer [h]]
             [formative.data :as data]
             [formative.util :as fu]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [clj-time.core :as ct]))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any
@@ -211,50 +212,26 @@
                        :type :select
                        :options (data/countries-by (or (:country-code field) :alpha2)))))
 
-(defn- normalize-date-val [d & [format]]
-  (when d
-    (cond
-      (instance? java.util.Date d) d
-      (integer? d) (java.util.Date. d)
-      (string? d) (try
-                    (.parse (java.text.SimpleDateFormat.
-                              (or format "yyyy-MM-dd"))
-                      d)
-                    (catch Exception _))
-      (map? d) (try
-                 (let [year (- (Integer/valueOf (:year d (get d "year"))) 1900)
-                       month (dec (Integer/valueOf (:month d (get d "month"))))
-                       day (Integer/valueOf (:month d (get d "day")))]
-                   (java.util.Date. year month day))
-                 (catch Exception _))
-      :else (throw (IllegalArgumentException. "Unrecognized date format")))))
-
 (defmethod render-field :date [field]
-  (let [date (normalize-date-val (:value field) (:date-format field))]
+  (let [date (fu/normalize-date (:value field) (:date-format field))]
     (render-default-input
       (assoc field :value
              (when date
-               (.format (java.text.SimpleDateFormat.
-                          (:date-format field "yyyy-MM-dd"))
-                 date))))))
+               (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
 
 (defmethod render-field :date-text [field]
-  (let [date (normalize-date-val (:value field) (:date-format field))]
+  (let [date (fu/normalize-date (:value field) (:date-format field))]
     (render-default-input
       (assoc field
              :type :text
              :value (when date
-                      (.format (java.text.SimpleDateFormat.
-                                 (:date-format field "yyyy-MM-dd"))
-                        date))))))
+                      (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
 
 (defmethod render-field :date-select [field]
-  (let [date (normalize-date-val (:value field))
+  (let [date (fu/normalize-date (:value field))
         [year month day] (when date
-                           [(+ 1900 (.getYear date))
-                            (inc (.getMonth date))
-                            (.getDate date)])
-        this-year (+ 1900 (.getYear (java.util.Date.)))
+                           (fu/get-year-month-day date))
+        this-year (ct/year (ct/now))
         year-start (:year-start field this-year)
         year-end (:year-end field (+ this-year 20))]
     [:span.date-select
@@ -283,7 +260,7 @@
                                       (range year-start (inc year-end))))})]))
 
 (defmethod render-field :year-select [field]
-  (let [this-year (+ 1900 (.getYear (java.util.Date.)))
+  (let [this-year (ct/year (ct/now))
         start (:start field this-year)
         end (:end field (+ this-year 20))]
     [:div.year-select
@@ -310,7 +287,7 @@
 (defmethod render-field :time-select [field]
   (let [step (:step field 5)
         ampm? (:ampm field true)
-        time (fu/normalize-time-val (:value field))
+        time (fu/normalize-time (:value field))
         [h m s] (when time
                   [(.getHours time)
                    (round (.getMinutes time) step)

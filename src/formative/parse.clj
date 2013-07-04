@@ -4,7 +4,9 @@
             [clojure.walk :refer [stringify-keys]]
             [formative.core :as f]
             [formative.validate :as fv]
-            [formative.util :as fu]))
+            [formative.util :as fu]
+            [clj-time.core :as ct]
+            [clj-time.coerce :as cc]))
 
 (defrecord ParseError [bad-value])
 
@@ -94,9 +96,7 @@
 (defn- parse-date [spec x]
   (when-not (string/blank? x)
     (try
-      (.parse (java.text.SimpleDateFormat.
-                (:date-format spec "yyyy-MM-dd"))
-        x)
+      (fu/parse-date x (:date-format spec))
       (catch Exception e
         (->ParseError x)))))
 
@@ -116,9 +116,7 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])
     (try
-      (java.util.Date. (- (Integer/valueOf (get v "year")) 1900)
-                       (dec (Integer/valueOf (get v "month")))
-                       (Integer/valueOf (get v "day")))
+      (fu/normalize-date v)
       (catch Exception e
         (->ParseError v)))))
 
@@ -131,7 +129,7 @@
 (defn- parse-time [spec x]
   (when-not (string/blank? x)
     (try
-      (fu/normalize-time-val x)
+      (fu/normalize-time x)
       (catch Exception e
         (->ParseError x)))))
 
@@ -145,7 +143,7 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["h" "m"])
     (try
-      (fu/normalize-time-val v)
+      (fu/normalize-time v)
       (catch Exception e
         (->ParseError v)))))
 
@@ -153,17 +151,16 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])
     (try
-      (when-let [date (java.util.Date. (- (Integer/valueOf (get v "year")) 1900)
-                                       (dec (Integer/valueOf (get v "month")))
-                                       (Integer/valueOf (get v "day")))]
+      (when-let [date (cc/to-date-time (fu/normalize-date v))]
         (when (every? (comp (complement string/blank?) #(get v %))
                       ["h" "m"])
           (try
-            (when-let [time (fu/normalize-time-val v)]
-              (doto date
-                (.setHours (.getHours time))
-                (.setMinutes (.getMinutes time))
-                (.setSeconds (.getSeconds time))))
+            (when-let [time (cc/to-date-time (fu/normalize-time v))]
+              (cc/to-date
+                (fu/with-time date
+                  (ct/hour time)
+                  (ct/minute time)
+                  (ct/sec time))))
             (catch Exception e
               (->ParseError v)))))
       (catch Exception e

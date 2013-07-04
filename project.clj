@@ -6,4 +6,5 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [hiccup "1.0.2"]
                  [ring/ring-core "1.2.0-RC1"]
-                 [jkkramer/verily "0.4.4"]])
+                 [jkkramer/verily "0.4.4"]
+                 [clj-time "0.5.1"]])

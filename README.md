@@ -246,6 +246,8 @@ The following special keys are also supported:
                         renderers typically add a class and style to highlight
                         problem fields and, if problem maps are provided,
                         show descriptive messages.
+      :timezone       - String of timezone with which to localize the display of
+                       :datetime-select fields. The default is UTC.
                       
 New form renderers can be implemented using the `formative.render/render-form` multimethod.
 
@@ -335,7 +337,9 @@ Built-in field types:
                         :step - step between minutes/seconds; default 5
                         :seconds - whether to include a seconds field
       :datetime-select - Combined date/time dropdown. See :date-select and
-                      :time-select for special keys.
+                      :time-select for special keys, plus:
+                        :timezone - String of timezone with which to localize the
+                                    display. The default is UTC.
       :currency     - Text input for money. Parses as a :decimal datatype
       :file         - File upload input. Special keys:
                         :upload-handler - optional handler called when a file is

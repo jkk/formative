@@ -170,10 +170,12 @@
           (try
             (when-let [time (fu/normalize-time v)]
               (cc/to-date
-                (fu/with-time date
-                  (ct/hour time)
-                  (ct/minute time)
-                  (ct/sec time))))
+                (fu/from-timezone
+                  (fu/with-time date
+                    (ct/hour time)
+                    (ct/minute time)
+                    (ct/sec time))
+                  (:timezone spec))))
             (catch Exception e
               (->ParseError v)))))
       (catch Exception e

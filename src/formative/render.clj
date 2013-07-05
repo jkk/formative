@@ -237,7 +237,7 @@
                       (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
 
 (defmethod render-field :date-select [field]
-  (let [date (fu/normalize-date (:value field))
+  (let [date (fu/normalize-date (:value field) nil (:timezone field))
         [year month day] (when date
                            (fu/get-year-month-day date))
         this-year (ct/year (ct/now))

@@ -20,25 +20,39 @@
   (cf/parse (cf/formatter (or format "yyyy-MM-dd"))
             s))
 
-(defn normalize-date [d & [format]]
-  (when d
-    (cond
-      (instance? org.joda.time.DateTime d) d
-      (instance? java.util.Date d) (cc/from-date d)
-      (integer? d) (cc/from-long d)
-      (string? d) (try
-                    (parse-date d format)
-                    (catch Exception _))
-      (map? d) (try
-                 (let [year (Integer/valueOf (:year d (get d "year")))
-                       month (Integer/valueOf (:month d (get d "month")))
-                       day (Integer/valueOf (:day d (get d "day")))]
-                   (ct/date-time year month day))
-                 (catch Exception _))
-      :else (throw (ex-info "Unrecognized date format" {:date d})))))
+(defn to-timezone [d timezone]
+  (if timezone
+    (let [timezone (if (string? timezone)
+                      (ct/time-zone-for-id timezone)
+                      timezone)]
+      (ct/to-time-zone d timezone))
+    d))
 
-(defn format-date [d & [format]]
-  (cf/unparse (cf/formatter (or format "yyyy-MM-dd"))
+(defn from-timezone [d timezone]
+  (if timezone
+    (let [timezone (if (string? timezone)
+                      (ct/time-zone-for-id timezone)
+                      timezone)]
+      (ct/from-time-zone d timezone))
+    d))
+
+(defn normalize-date [d & [format timezone]]
+  (when d
+    (let [d (cond
+              (instance? org.joda.time.DateTime d) d
+              (instance? java.util.Date d) (cc/from-date d)
+              (integer? d) (cc/from-long d)
+              (string? d) (try
+                            (parse-date d format)
+                            (catch Exception _))
+              (map? d) (try
+                         (let [year (Integer/valueOf (:year d (get d "year")))
+                               month (Integer/valueOf (:month d (get d "month")))
+                               day (Integer/valueOf (:day d (get d "day")))]
+                           (ct/date-time year month day))
+                         (catch Exception _))
+              :else (throw (ex-info "Unrecognized date format" {:date d})))]
+      (to-timezone d timezone))))
               d))
 
 (defn get-year-month-day [date]

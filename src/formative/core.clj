@@ -36,6 +36,12 @@
 (defmethod prep-field :default [field values & [form]]
   (prep-field-default field values form))
 
+(defmethod prep-field :datetime-select [field values & [form]]
+  (let [field* (prep-field-default field values form)]
+    (if-let [timezone (:timezone field (:timezone form))]
+      (assoc field* :timezone timezone)
+      field*)))
+
 (defmethod prep-field :checkbox [field values & [form]]
   (let [field (if (and (not (contains? field :value))
                        (not (contains? field :unchecked-value)))
@@ -221,6 +227,8 @@
                       renderers typically add a class and style to highlight
                       problem fields and, if problem maps are provided,
                       show descriptive messages.
+      :timezone     - String of timezone with which to localize the display of
+                      :datetime-select fields. The default is UTC.
 
   A field specification is a map with the following keys:
 
@@ -300,7 +308,9 @@
                       :step - step between minutes/seconds; default 5
                       :seconds - whether to include a seconds field
     :datetime-select - Combined date/time dropdown. See :date-select and
-                    :time-select for special keys.
+                    :time-select for special keys, plus:
+                      :timezone - String of timezone with which to localize the
+                                  display. The default is UTC.
     :currency     - Text input for money. Parses as a :decimal datatype
     :file         - File upload input. Special keys:
                       :upload-handler - optional handler called when a file is

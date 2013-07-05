@@ -80,6 +80,12 @@
                    (cc/to-long (with-time (ct/epoch) h m s))))
       :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
+(defn get-hours-minutes-seconds [date]
+  (let [date* (cc/to-date-time date)]
+    [(ct/hour date*)
+     (ct/minute date*)
+     (ct/sec date*)]))
+
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"
   [name]

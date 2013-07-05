@@ -289,9 +289,9 @@
         ampm? (:ampm field true)
         time (fu/normalize-time (:value field))
         [h m s] (when time
-                  [(.getHours time)
-                   (round (.getMinutes time) step)
-                   (round (.getSeconds time) step)])
+                  (fu/get-hours-minutes-seconds time))
+        m (when m (round m step))
+        s (when s (round s step))
         [h ampm] (when h
                    (if ampm?
                      (cond

@@ -3,7 +3,9 @@
             [clj-time.core :as ct]
             [clj-time.coerce :as cc]
             [clj-time.format :as cf])
-  (:import org.joda.time.DateTime))
+  (:import org.joda.time.DateTime
+           org.joda.time.LocalDate
+           org.joda.time.LocalTime))
 
 (defn normalize-options [opts]
   (let [opts (cond
@@ -39,7 +41,8 @@
 (defn normalize-date [d & [format timezone]]
   (when d
     (let [d (cond
-              (instance? org.joda.time.DateTime d) d
+              (instance? LocalDate d) (cc/to-date-time d)
+              (instance? DateTime d) d
               (instance? java.util.Date d) (cc/from-date d)
               (integer? d) (cc/from-long d)
               (string? d) (try
@@ -75,7 +78,8 @@
 (defn normalize-time [t]
   (when t
     (cond
-      (instance? org.joda.time.DateTime t) t
+      (instance? LocalTime t) (.toDateTime ^LocalTime t (ct/epoch))
+      (instance? DateTime t) t
       (instance? java.util.Date t) (cc/from-date t)
       (string? t) (try
                     (parse-time t)

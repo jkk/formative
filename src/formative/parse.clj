@@ -96,7 +96,7 @@
 (defn- parse-date [spec x]
   (when-not (string/blank? x)
     (try
-      (fu/parse-date x (:date-format spec))
+      (cc/to-date (fu/parse-date x (:date-format spec)))
       (catch Exception e
         (->ParseError x)))))
 
@@ -116,7 +116,7 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])
     (try
-      (fu/normalize-date v)
+      (cc/to-date (fu/normalize-date v))
       (catch Exception e
         (->ParseError v)))))
 
@@ -129,7 +129,7 @@
 (defn- parse-time [spec x]
   (when-not (string/blank? x)
     (try
-      (fu/normalize-time x)
+      (java.sql.Time. (cc/to-long (fu/normalize-time x)))
       (catch Exception e
         (->ParseError x)))))
 
@@ -143,7 +143,7 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["h" "m"])
     (try
-      (fu/normalize-time v)
+      (java.sql.Time. (cc/to-long (fu/normalize-time v)))
       (catch Exception e
         (->ParseError v)))))
 
@@ -151,11 +151,11 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])
     (try
-      (when-let [date (cc/to-date-time (fu/normalize-date v))]
+      (when-let [date (fu/normalize-date v)]
         (when (every? (comp (complement string/blank?) #(get v %))
                       ["h" "m"])
           (try
-            (when-let [time (cc/to-date-time (fu/normalize-time v))]
+            (when-let [time (fu/normalize-time v)]
               (cc/to-date
                 (fu/with-time date
                   (ct/hour time)

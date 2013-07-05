@@ -17,16 +17,15 @@
       (map #(vector % %) opts))))
 
 (defn parse-date [s & [format]]
-  (cc/to-date
-    (cf/parse (cf/formatter (or format "yyyy-MM-dd"))
-              s)))
+  (cf/parse (cf/formatter (or format "yyyy-MM-dd"))
+            s))
 
 (defn normalize-date [d & [format]]
   (when d
     (cond
-      (instance? org.joda.time.DateTime d) (cc/to-date d)
-      (instance? java.util.Date d) d
-      (integer? d) (java.util.Date. d)
+      (instance? org.joda.time.DateTime d) d
+      (instance? java.util.Date d) (cc/from-date d)
+      (integer? d) (cc/from-long d)
       (string? d) (try
                     (parse-date d format)
                     (catch Exception _))
@@ -34,25 +33,24 @@
                  (let [year (Integer/valueOf (:year d (get d "year")))
                        month (Integer/valueOf (:month d (get d "month")))
                        day (Integer/valueOf (:day d (get d "day")))]
-                   (cc/to-date (ct/date-time year month day)))
+                   (ct/date-time year month day))
                  (catch Exception _))
       :else (throw (ex-info "Unrecognized date format" {:date d})))))
 
 (defn format-date [d & [format]]
   (cf/unparse (cf/formatter (or format "yyyy-MM-dd"))
-              (cc/to-date-time d)))
+              d))
 
 (defn get-year-month-day [date]
-  (let [date* (cc/to-date-time date)]
-    [(ct/year date*)
-     (ct/month date*)
-     (ct/day date*)]))
+  [(ct/year date)
+   (ct/month date)
+   (ct/day date)])
 
 (defn parse-time [s]
   (try
-    (cc/to-date (cf/parse (cf/formatter "H:m") s))
+    (cf/parse (cf/formatter "H:m") s)
     (catch Exception _
-      (cc/to-date (cf/parse (cf/formatter "H:m:s") s)))))
+      (cf/parse (cf/formatter "H:m:s") s))))
 
 (defn with-time [^DateTime datetime h m s]
   (.withTime datetime h m s 0))
@@ -60,9 +58,8 @@
 (defn normalize-time [t]
   (when t
     (cond
-      (instance? org.joda.time.DateTime t) (cc/to-date t)
-      (instance? java.sql.Time t) t
-      (instance? java.util.Date t) t
+      (instance? org.joda.time.DateTime t) t
+      (instance? java.util.Date t) (cc/from-date t)
       (string? t) (try
                     (parse-time t)
                     (catch Exception _))

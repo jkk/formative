@@ -121,7 +121,7 @@
    :f-decimal 123.45M
    :f-bigint 13918723981723918723987129387198273198273918273N
    :f-date (cc/to-date (ct/date-time 2012 12 25))
-   :f-time (fu/parse-time "23:06")
+   :f-time (java.sql.Time. (cc/to-long (fu/parse-time "23:06")))
    :f-ints [123 456 789]
    :f-longs [123 456 789]
    :f-booleans [true true false]
@@ -133,9 +133,9 @@
    :f-dates [(cc/to-date (ct/date-time 2012 1 1))
              (cc/to-date (ct/date-time 2012 2 3))
              (cc/to-date (ct/date-time 2012 10 4))]
-   :f-times [(fu/parse-time "00:01")
-             (fu/parse-time "23:02")
-             (fu/parse-time "12:00")]
+   :f-times [(java.sql.Time. (cc/to-long (fu/parse-time "00:01")))
+             (java.sql.Time. (cc/to-long (fu/parse-time "23:02")))
+             (java.sql.Time. (cc/to-long (fu/parse-time "12:00")))]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 true
@@ -153,7 +153,7 @@
    :f-date-select (cc/to-date (ct/date-time 2012 12 25))
    :f-year-select 2012
    :f-month-select 12
-   :f-time-select (fu/parse-time "12:00")
+   :f-time-select (java.sql.Time. (cc/to-long (fu/parse-time "12:00")))
    :f-currency 123.45M
    :foo {:bar {:baz 1}}})
 

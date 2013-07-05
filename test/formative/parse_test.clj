@@ -61,6 +61,8 @@
             {:name :f-year-select :type :year-select}
             {:name :f-month-select :type :month-select}
             {:name :f-time-select :type :time-select}
+            {:name :f-datetime-select :type :datetime-select
+             :timezone "America/New_York"}
             {:name :f-currency :type :currency}
             
             {:name :f-heading :type :heading}
@@ -109,6 +111,7 @@
    :f-year-select "2012"
    :f-month-select "12"
    :f-time-select {:h "12" :m "0" :ampm "pm"}
+   :f-datetime-select {:year "2012" :month "12" :day "25" :h "6" :m "0" :ampm "pm"}
    :f-currency "123.45"
    :f-heading "foo"
    :f-labeled-html "foo"
@@ -162,6 +165,7 @@
    :f-year-select 2012
    :f-month-select 12
    :f-time-select (java.sql.Time. (cc/to-long (fu/parse-time "12:00")))
+   :f-datetime-select (cc/to-date (ct/date-time 2012 12 25 23 0))
    :f-currency 123.45M
    :foo {:bar {:baz 1}}})
 

@@ -147,6 +147,19 @@
       (catch Exception e
         (->ParseError v)))))
 
+(defn- parse-instant [spec x]
+  (when-not (string/blank? x)
+    (try
+      (clojure.instant/read-instant-date x)
+      (catch Exception e
+        (->ParseError x)))))
+
+(defmethod parse-input :instant [spec v]
+  (parse-instant spec v))
+
+(defmethod parse-input :instants [spec v]
+  (map #(parse-instant spec %) v))
+
 (defmethod parse-input :datetime-select [spec v]
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])

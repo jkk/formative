@@ -17,6 +17,7 @@
             {:name :f-bigint :datatype :bigint}
             {:name :f-date :datatype :date}
             {:name :f-time :datatype :time}
+            {:name :f-instant :datatype :instant}
             
             {:name :f-ints :datatype :ints}
             {:name :f-longs :datatype :longs}
@@ -27,6 +28,7 @@
             {:name :f-bigints :datatype :bigints}
             {:name :f-dates :datatype :dates}
             {:name :f-times :datatype :times}
+            {:name :f-instants :datatype :instants}
             
             {:name :f-textarea :type :textarea}
             {:name :f-select1 :type :select :options ["foo" "bar" "baz"]}
@@ -77,6 +79,7 @@
    :f-bigint "13918723981723918723987129387198273198273918273"
    :f-date "2012-12-25"
    :f-time "23:06"
+   :f-instant "2012-12-25T23:06:00"
    :f-ints ["123" "456" "789"]
    :f-longs ["123" "456" "789"]
    :f-booleans ["true" "true" "false"]
@@ -87,6 +90,7 @@
                "29038402938402938402983409283049203948209384209"]
    :f-dates ["2012-01-01" "2012-02-03" "2012-10-04"]
    :f-times ["0:01" "23:02" "12:00"]
+   :f-instants ["2012-01-01T00:01:00" "2012-02-03T23:02:00" "2012-10-04T12:00:00"]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 "true"
@@ -122,6 +126,7 @@
    :f-bigint 13918723981723918723987129387198273198273918273N
    :f-date (cc/to-date (ct/date-time 2012 12 25))
    :f-time (java.sql.Time. (cc/to-long (fu/parse-time "23:06")))
+   :f-instant (cc/to-date (ct/date-time 2012 12 25 23 6))
    :f-ints [123 456 789]
    :f-longs [123 456 789]
    :f-booleans [true true false]
@@ -136,6 +141,9 @@
    :f-times [(java.sql.Time. (cc/to-long (fu/parse-time "00:01")))
              (java.sql.Time. (cc/to-long (fu/parse-time "23:02")))
              (java.sql.Time. (cc/to-long (fu/parse-time "12:00")))]
+   :f-instants [(cc/to-date (ct/date-time 2012 1 1 0 1))
+                (cc/to-date (ct/date-time 2012 2 3 23 2))
+                (cc/to-date (ct/date-time 2012 10 4 12 0))]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 true

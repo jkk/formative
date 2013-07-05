@@ -84,12 +84,14 @@
     (if (string? v) v (str v))))
 
 (defmethod render-input-val :date [field]
-  (let [date (fu/normalize-date (:value field) (:date-format field))]
-    (fu/format-date (:value field) (:date-format field))))
+  (if-let [date (fu/normalize-date (:value field) (:date-format field))]
+    (fu/format-date (:value field) (:date-format field))
+    ""))
 
 (defmethod render-input-val :time [field]
-  (let [time (fu/normalize-time (:value field))]
-    (fu/format-time time)))
+  (if-let [time (fu/normalize-time (:value field))]
+    (fu/format-time time)
+    ""))
 
 (defn render-default-input [field & [opts]]
   (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus

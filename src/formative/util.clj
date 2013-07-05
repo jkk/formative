@@ -53,6 +53,9 @@
                          (catch Exception _))
               :else (throw (ex-info "Unrecognized date format" {:date d})))]
       (to-timezone d timezone))))
+
+(defn format-date [^DateTime d & [format]]
+  (cf/unparse (cf/with-zone (cf/formatter (or format "yyyy-MM-dd")) (.getZone d))
               d))
 
 (defn get-year-month-day [date]
@@ -89,6 +92,10 @@
                      s (Integer/valueOf (:s t (get t "s" 0)))]
                  (with-time (ct/epoch) h m s))
       :else (throw (ex-info "Unrecognized time format" {:time t})))))
+
+(defn format-time [^DateTime t]
+  (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone t))
+              t))
 
 (defn get-hours-minutes-seconds [date]
   [(ct/hour date)

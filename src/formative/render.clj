@@ -83,6 +83,14 @@
   (let [v (:value field)]
     (if (string? v) v (str v))))
 
+(defmethod render-input-val :date [field]
+  (let [date (fu/normalize-date (:value field) (:date-format field))]
+    (fu/format-date (:value field) (:date-format field))))
+
+(defmethod render-input-val :time [field]
+  (let [time (fu/normalize-time (:value field))]
+    (fu/format-time time)))
+
 (defn render-default-input [field & [opts]]
   (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
                                       :checked :disabled :href :style :src :size
@@ -292,6 +300,13 @@
 
 (defn- round [x step]
   (int (* (Math/floor (/ x (double step)) ) step)))
+
+(defmethod render-field :time [field]
+  (let [time (fu/normalize-time (:value field))]
+    (render-default-input
+      (assoc field :value
+             (when time
+               (fu/format-time time))))))
 
 (defmethod render-field :time-select [field]
   (let [step (:step field 5)

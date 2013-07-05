@@ -247,7 +247,7 @@ The following special keys are also supported:
                         problem fields and, if problem maps are provided,
                         show descriptive messages.
       :timezone       - String of timezone with which to localize the display of
-                       :datetime-select fields. The default is UTC.
+                        :datetime-select fields. The default is UTC.
                       
 New form renderers can be implemented using the `formative.render/render-form` multimethod.
 
@@ -283,7 +283,7 @@ the following special keys:
                       are in EDN instant (RFC-3339) format.
 
                       All date/time fields are parsed into java.util.Date
-                      or java.sql.Time objects created using the  UTC timezone.
+                      or java.sql.Time objects created using the UTC timezone.
       :datatype-error - Optional custom error message to use if datatype
                       validation fails.
       :note         - A bit of explanatory content to accompany the field
@@ -322,7 +322,8 @@ Built-in field types:
                       "x" + extension). Will be normalized and formatted
                       automatically.
       :date-select  - Date dropdown. Renders as multiple :select fields, parses
-                      as a java.util.Date. Special keys:
+                      as a UTC java.util.Date. Accepts Joda dates as values.
+                      Special keys:
                         :year-start
                         :year-end
       :year-select  - Year dropdown, parses to integer. Accepts :select special
@@ -334,13 +335,15 @@ Built-in field types:
                         :numbers - when true, shows numbers instead of month
                                    names
       :time-select  - Time dropdown. Renders as multiple :select fields, parses
-                      as a java.sql.Time. Special keys:
+                      as a UTC java.sql.Time. Accepts Joda times as values.
+                      Special keys:
                         :ampm - true to use am/pm (the default); false to use
                                 24-hour format
                         :step - step between minutes/seconds; default 5
                         :seconds - whether to include a seconds field
-      :datetime-select - Combined date/time dropdown. See :date-select and
-                      :time-select for special keys, plus:
+      :datetime-select - Combined date/time dropdown. Parses as a UTC
+                      java.util.Date. Accepts Joda date values. See :date-select
+                      and :time-select for special keys, plus:
                         :timezone - String of timezone with which to localize the
                                     display. The default is UTC.
       :currency     - Text input for money. Parses as a :decimal datatype

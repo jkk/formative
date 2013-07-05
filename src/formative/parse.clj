@@ -267,7 +267,7 @@
   (let [[form fields] (if (map? form-or-fields)
                         [form-or-fields (:fields form-or-fields)]
                         [nil form-or-fields])
-        fields (f/prep-fields fields {})
+        fields (f/prep-fields fields {} form)
         nested-params (normalize-params params)
         values (parse-nested-params fields nested-params)
         problems (when validate

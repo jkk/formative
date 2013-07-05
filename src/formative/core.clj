@@ -25,15 +25,18 @@
   preparation is to populate the :value key and add a label if not present.
   Each type may have its own particular preparation steps. For example, the
   :checkbox type adds a :checked key."
-  (fn [field values]
+  (fn [field values & [form]]
     (:type field)))
 
-(defmethod prep-field :default [field values]
+(defn- prep-field-default [field values & [form]]
   (assoc field
-    :value (get-in values (fu/expand-name (:name field)))
-    :label (r/get-field-label field)))
+         :value (get-in values (fu/expand-name (:name field)))
+         :label (r/get-field-label field)))
 
-(defmethod prep-field :checkbox [field values]
+(defmethod prep-field :default [field values & [form]]
+  (prep-field-default field values form))
+
+(defmethod prep-field :checkbox [field values & [form]]
   (let [field (if (and (not (contains? field :value))
                        (not (contains? field :unchecked-value)))
                 (assoc field :value "true" :unchecked-value "false"
@@ -45,23 +48,23 @@
       :checked (= (str val) (str (:value field "true")))
       :label (r/get-field-label field))))
 
-(defmethod prep-field :submit [field values]
+(defmethod prep-field :submit [field values & [form]]
   (assoc field
     :value (:value field "")))
 
-(defmethod prep-field :html [field values]
+(defmethod prep-field :html [field values & [form]]
   field)
 
-(defmethod prep-field :labeled-html [field values]
+(defmethod prep-field :labeled-html [field values & [form]]
   (assoc field :label (r/get-field-label field)))
 
 (defn prep-fields
   "Normalizes field specifications and populates them with values"
-  [fields values]
+  [fields values & [form]]
   (for [field fields]
     (-> field
         (normalize-field)
-        (prep-field values))))
+        (prep-field values form))))
 
 (defn merge-fields
   "Combines two sequences of field specifications into a single sequence,
@@ -159,7 +162,7 @@
                      :method (:method spec :post)
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))
-        fields (prep-fields (:fields spec) values)
+        fields (prep-fields (:fields spec) values spec)
         fields (if (:cancel-href spec)
                  (for [field fields]
                    (if (= :submit (:type field))

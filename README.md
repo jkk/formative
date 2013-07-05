@@ -280,7 +280,10 @@ the following special keys:
                       :date field values are expected to be in yyyy-MM-dd
                       format by default. Set :date-format to change that. :time
                       fields may be in H:m or H:m:s format. :instant fields
-                      are in EDN (RFC-3339) instant format.
+                      are in EDN instant (RFC-3339) format.
+
+                      All date/time fields are parsed into java.util.Date
+                      or java.sql.Time objects created using the  UTC timezone.
       :datatype-error - Optional custom error message to use if datatype
                       validation fails.
       :note         - A bit of explanatory content to accompany the field

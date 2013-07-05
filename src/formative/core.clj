@@ -233,7 +233,7 @@
                       one of:
 
                       :str, :int, :long, :boolean, :float, :double, :decimal,
-                      :bigint, :date, :time, :file.
+                      :bigint, :date, :time, :instant, :file.
 
                       Defaults to :str.
 
@@ -243,7 +243,9 @@
                       :checkboxes.
 
                       :date field values are expected to be in yyyy-MM-dd
-                      format by default. Set :date-format to change that.
+                      format by default. Set :date-format to change that. :time
+                      fields may be in H:m or H:m:s format. :instant fields
+                      are in EDN (RFC-3339) instant format.
       :datatype-error - Optional custom error message to use if datatype
                       validation fails.
       :note         - A bit of explanatory content to accompany the field
@@ -294,6 +296,8 @@
                               24-hour format
                       :step - step between minutes/seconds; default 5
                       :seconds - whether to include a seconds field
+    :datetime-select - Combined date/time dropdown. See :date-select and
+                    :time-select for special keys.
     :currency     - Text input for money. Parses as a :decimal datatype
     :file         - File upload input. Special keys:
                       :upload-handler - optional handler called when a file is

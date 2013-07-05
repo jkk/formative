@@ -74,6 +74,15 @@
                           (keys field))]
     (select-keys field (concat allowed-keys data-keys))))
 
+(defmulti render-input-val
+  "Renders the value of an input field as a string, if it's not already."
+  (fn [field]
+    (:datatype field (:type field))))
+
+(defmethod render-input-val :default [field]
+  (let [v (:value field)]
+    (if (string? v) v (str v))))
+
 (defn render-default-input [field & [opts]]
   (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
                                       :checked :disabled :href :style :src :size
@@ -86,7 +95,7 @@
         attrs (if (and (= :submit (:type attrs))
                        (empty? (:value attrs)))
                 (dissoc attrs :value)
-                (assoc attrs :value (str (:value attrs))))]
+                (assoc attrs :value (render-input-val field)))]
     (list
       (when-let [prefix (:prefix opts)]
         [:span.input-prefix prefix])
@@ -100,14 +109,14 @@
                                       :disabled :style :size :rows :cols :wrap
                                       :readonly :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder])]
-    [:textarea attrs (h (:value field))]))
+    [:textarea attrs (h (render-input-val field))]))
 
 (defmethod render-field :select [field]
   (let [attrs (get-input-attrs field [:name :id :class :autofocus
                                       :disabled :multiple :size :readonly
                                       :tabindex :onchange :onclick :onfocus
                                       :onblur])
-        val (str (:value field))
+        val (render-input-val field)
         opts (fu/normalize-options (:options field))
         opts (if (:first-option field)
                (concat (fu/normalize-options [(:first-option field)])
@@ -115,7 +124,7 @@
                opts)
         opt-tags (for [[v text] opts
                        :let [v (str v)]]
-                   [:option {:value (str v) :selected (= val (str v))} text])
+                   [:option {:value v :selected (= val v)} text])
         placeholder (if (true? (:placeholder field))
                       "Select one..."
                       (:placeholder field))

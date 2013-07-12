@@ -85,7 +85,7 @@
 
 (defmethod render-input-val :date [field]
   (if-let [date (fu/normalize-date (:value field) (:date-format field))]
-    (fu/format-date (:value field) (:date-format field))
+    (fu/format-date date (:date-format field))
     ""))
 
 (defmethod render-input-val :time [field]

@@ -1,4 +1,4 @@
-(defproject formative "0.5.2"
+(defproject formative "0.5.3-SNAPSHOT"
   :description "Web forms - rendering, parsing, and validating"
   :url "https://github.com/jkk/formative"
   :license {:name "Eclipse Public License"

@@ -1,13 +1,15 @@
 (ns formative.render.table
   (:require [formative.render :refer [render-form render-field
-                                      render-problems]]))
+                                      render-problems]]
+            [formative.util :as util]))
 
 (def ^:dynamic *field-prefix* "field-")
 
 (defn render-form-row [field]
-  (let [field-id (if (:id field)
-                   (name (:id field))
-                   (str *field-prefix* (:name field)))
+  (let [field-id (util/safe-element-id
+                   (if (:id field)
+                     (name (:id field))
+                     (str *field-prefix* (:name field))))
         field (assoc field :id field-id)
         label? (and (not (false? (:label field)))
                     (not= :html (:type field)))

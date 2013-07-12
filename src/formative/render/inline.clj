@@ -1,13 +1,15 @@
 (ns formative.render.inline
   (:require [formative.render :refer [render-form render-field
-                                      render-problems]]))
+                                      render-problems]]
+            [formative.util :as util]))
 
 (def ^:dynamic *field-prefix* "field-")
 
 (defn render-form-item [field]
-  (let [field-id (if (:id field)
-                   (name (:id field))
-                   (str *field-prefix* (:name field)))
+  (let [field-id (util/safe-element-id
+                   (if (:id field)
+                     (name (:id field))
+                     (str *field-prefix* (:name field))))
         field (assoc field :id field-id)]
     [:span {:class (str (name (:type field :text)) "-field"
                         (when (:problem field) " problem"))}

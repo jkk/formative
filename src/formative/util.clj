@@ -136,3 +136,7 @@
                (when ext (str " x" ext))))
         v))
     v))
+
+(defn safe-element-id [id]
+  (when id
+    (string/replace id #"[^a-zA-Z0-9\-\_\:\.]" "__")))

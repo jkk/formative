@@ -84,17 +84,19 @@
       (string? t) (try
                     (parse-time t)
                     (catch Exception _))
-      (map? t) (let [h (Integer/valueOf (:h t (get t "h")))
-                     ampm (:ampm t (get t "ampm"))
-                     h (if ampm
-                         (cond
-                           (= 12 h) (if (= "am" ampm) 0 12)
-                           (= "pm" ampm) (+ h 12)
-                           :else h)
-                         h)
-                     m (Integer/valueOf (:m t (get t "m" 0)))
-                     s (Integer/valueOf (:s t (get t "s" 0)))]
-                 (with-time (ct/epoch) h m s))
+      (map? t) (try
+                 (let [h (Integer/valueOf (:h t (get t "h")))
+                       ampm (:ampm t (get t "ampm"))
+                       h (if ampm
+                           (cond
+                             (= 12 h) (if (= "am" ampm) 0 12)
+                             (= "pm" ampm) (+ h 12)
+                             :else h)
+                           h)
+                       m (Integer/valueOf (:m t (get t "m" 0)))
+                       s (Integer/valueOf (:s t (get t "s" 0)))]
+                   (with-time (ct/epoch) h m s))
+                 (catch Exception _))
       :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
 (defn format-time [^DateTime t]

@@ -30,7 +30,8 @@
 
 (defn- prep-field-default [field values & [form]]
   (assoc field
-         :value (get-in values (fu/expand-name (:name field)))
+         :value (or (get-in values (fu/expand-name (:name field)))
+                    (get values (:name field)))
          :label (r/get-field-label field)))
 
 (defmethod prep-field :default [field values & [form]]

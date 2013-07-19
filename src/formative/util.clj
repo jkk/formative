@@ -142,3 +142,10 @@
 (defn safe-element-id [id]
   (when id
     (string/replace id #"[^a-zA-Z0-9\-\_\:\.]" "__")))
+
+(defn escape-html [s]
+  (-> s
+    (string/replace "&"  "&amp;")
+    (string/replace "<"  "&lt;")
+    (string/replace ">"  "&gt;")
+    (string/replace "\"" "&quot;")))

@@ -118,7 +118,7 @@
                                       :disabled :style :size :rows :cols :wrap
                                       :readonly :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder])]
-    [:textarea attrs (h (render-input-val field))]))
+    [:textarea attrs (fu/escape-html (render-input-val field))]))
 
 (defmethod render-field :select [field]
   (let [attrs (get-input-attrs field [:name :id :class :autofocus

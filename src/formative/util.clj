@@ -108,6 +108,9 @@
    (ct/minute date)
    (ct/sec date)])
 
+(defn get-this-year []
+  (ct/year (ct/now)))
+
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"
   [name]

@@ -1,8 +1,7 @@
 (ns formative.render
   (:require [formative.data :as data]
             [formative.util :as fu]
-            [clojure.string :as string]
-            [clj-time.core :as ct]))
+            [clojure.string :as string]))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any
@@ -249,7 +248,7 @@
   (let [date (fu/normalize-date (:value field) nil (:timezone field))
         [year month day] (when date
                            (fu/get-year-month-day date))
-        this-year (ct/year (ct/now))
+        this-year (fu/get-this-year)
         year-start (:year-start field this-year)
         year-end (:year-end field (+ this-year 20))]
     [:span.date-select
@@ -278,7 +277,7 @@
                                       (range year-start (inc year-end))))})]))
 
 (defmethod render-field :year-select [field]
-  (let [this-year (ct/year (ct/now))
+  (let [this-year (fu/get-this-year)
         start (:start field this-year)
         end (:end field (+ this-year 20))]
     [:div.year-select

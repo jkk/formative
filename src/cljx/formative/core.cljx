@@ -229,7 +229,7 @@
                       problem fields and, if problem maps are provided,
                       show descriptive messages.
       :timezone     - String of timezone with which to localize the display of
-                      :datetime-select fields. The default is UTC.
+                      :datetime-select fields. The default is UTC. JVM only.
 
   A field specification is a map with the following keys:
 
@@ -260,7 +260,8 @@
                       are in EDN instant (RFC-3339) format.
 
                       All date/time fields are parsed into java.util.Date
-                      or java.sql.Time objects created using the UTC timezone.
+                      or java.sql.Time (or Date for ClojureScript) objects
+                      created using the UTC timezone.
       :datatype-error - Optional custom error message to use if datatype
                       validation fails.
       :note         - A bit of explanatory content to accompany the field
@@ -294,7 +295,8 @@
     :ca-state     - Canadian province
     :country      - Country dropdown. Accepts :select special keys.
     :date-select  - Date dropdown. Renders as multiple :select fields, parses
-                    as a UTC java.util.Date. Accepts Joda dates as values.
+                    as a UTC java.util.Date (or Date for ClojureScript).
+                    Accepts Joda dates as values.
                     Special keys:
                       :year-start
                       :year-end
@@ -307,17 +309,19 @@
                       :numbers - when true, shows numbers instead of month
                                  names
     :time-select  - Time dropdown. Renders as multiple :select fields, parses
-                    as a UTC java.sql.Time. Accepts Joda times as values.
+                    as a UTC java.sql.Time (or Date for ClojureScript).
+                    Accepts Joda times as values.
                     Special keys:
                       :ampm - true to use am/pm (the default); false to use
                               24-hour format
                       :step - step between minutes/seconds; default 5
                       :seconds - whether to include a seconds field
     :datetime-select - Combined date/time dropdown. Parses as a UTC
-                    java.util.Date. Accepts Joda date values. See :date-select
-                    and :time-select for special keys, plus:
+                    java.util.Date (or Date for ClojureScript). Accepts Joda
+                    date values. See :date-select and :time-select for special
+                    keys, plus:
                       :timezone - String of timezone with which to localize the
-                                  display. The default is UTC.
+                                  display. The default is UTC. JVM only.
     :currency     - Text input for money. Parses as a :decimal datatype
     :file         - File upload input. Special keys:
                       :upload-handler - optional handler called when a file is
@@ -366,6 +370,7 @@
       (r/render-field
         (prep-field norm-field {(:name norm-field) value})))))
 
+#+clj
 (defmacro with-renderer [renderer & body]
   `(binding [*renderer* ~renderer]
      (do ~@body)))

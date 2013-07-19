@@ -1,11 +1,11 @@
 (ns formative.util
   (:require [clojure.string :as string]
-            [clj-time.core :as ct]
-            [clj-time.coerce :as cc]
-            [clj-time.format :as cf])
-  (:import org.joda.time.DateTime
-           org.joda.time.LocalDate
-           org.joda.time.LocalTime))
+            #+clj [clj-time.core :as ct]
+            #+clj [clj-time.coerce :as cc]
+            #+clj [clj-time.format :as cf])
+  (:import #+clj org.joda.time.DateTime
+           #+clj org.joda.time.LocalDate
+           #+clj org.joda.time.LocalTime))
 
 (defn normalize-options [opts]
   (let [opts (cond
@@ -18,25 +18,47 @@
         opts)
       (map #(vector % %) opts))))
 
+(def default-date-format "yyyy-MM-dd")
+
+#+clj
 (defn parse-date [s & [format]]
-  (cf/parse (cf/formatter (or format "yyyy-MM-dd"))
+  (cf/parse (cf/formatter (or format default-date-format))
             s))
 
+(defn parse-int [x]
+  #+clj (Integer/valueOf x)
+  #+cljs (js/parseInt x 10))
+
+#+cljs
+(defn utc-date [& [y m d h mm s]]
+  (js/Date. (.UTC js/Date y (dec m) d (or h 0) (or mm 0) (or s 0))))
+
+#+cljs
+(defn parse-date [s & [format]]
+  (let [format (or format default-date-format)]
+    (if (not= default-date-format format)
+      (throw (ex-info (str "Only " default-date-format " format supported")
+                      {:format format}))
+      (let [[y m d] (map parse-int (string/split s #"-"))]
+        (utc-date y m d)))))
+
 (defn to-timezone [d timezone]
-  (if timezone
-    (let [timezone (if (string? timezone)
-                      (ct/time-zone-for-id timezone)
-                      timezone)]
-      (ct/to-time-zone d timezone))
-    d))
+  #+clj (if timezone
+          (let [timezone (if (string? timezone)
+                           (ct/time-zone-for-id timezone)
+                           timezone)]
+            (ct/to-time-zone d timezone))
+          d)
+  #+cljs d)
 
 (defn from-timezone [d timezone]
-  (if timezone
-    (let [timezone (if (string? timezone)
-                      (ct/time-zone-for-id timezone)
-                      timezone)]
-      (ct/from-time-zone d timezone))
-    d))
+  #+clj (if timezone
+          (let [timezone (if (string? timezone)
+                           (ct/time-zone-for-id timezone)
+                           timezone)]
+            (ct/from-time-zone d timezone))
+          d)
+  #+cljs d)
 
 #+clj
 (defn normalize-date [d & [format timezone]]
@@ -50,46 +72,88 @@
                             (parse-date d format)
                             (catch Exception _))
               (map? d) (try
-                         (let [year (Integer/valueOf (:year d (get d "year")))
-                               month (Integer/valueOf (:month d (get d "month")))
-                               day (Integer/valueOf (:day d (get d "day")))]
+                         (let [year (parse-int (:year d (get d "year")))
+                               month (parse-int (:month d (get d "month")))
+                               day (parse-int (:day d (get d "day")))]
                            (ct/date-time year month day))
                          (catch Exception _))
               :else (throw (ex-info "Unrecognized date format" {:date d})))]
       (to-timezone d timezone))))
 
-(defn to-date [d]
-  (cc/to-date d))
+#+cljs
+(defn normalize-date [d & [format timezone]]
+  (when d
+    (cond
+      (instance? js/Date d) d
+      (integer? d) (js/Date. d)
+      (string? d) (try
+                    (parse-date d format)
+                    (catch js/Error _))
+      (map? d) (try
+                 (let [year (parse-int (:year d (get d "year")))
+                       month (parse-int (:month d (get d "month")))
+                       day (parse-int (:day d (get d "day")))]
+                   (utc-date year month day))
+                 (catch js/Error _))
+      :else (throw (ex-info "Unrecognized date format" {:date d})))))
 
-(defn format-date [^DateTime d & [format]]
-  (cf/unparse (cf/with-zone (cf/formatter (or format "yyyy-MM-dd")) (.getZone d))
-              d))
+(defn to-date [d]
+  #+clj (cc/to-date d)
+  #+cljs d)
 
 (defn get-year-month-day [date]
-  [(ct/year date)
-   (ct/month date)
-   (ct/day date)])
+  #+clj [(ct/year date)
+         (ct/month date)
+         (ct/day date)]
+  #+cljs [(.getUTCFullYear date)
+          (inc (.getUTCMonth date))
+          (.getUTCDate date)])
 
+(defn format-date [dt & [format]]
+  (let [format (or format default-date-format)]
+    #+clj (cf/unparse (cf/with-zone (cf/formatter format) (.getZone ^DateTime dt))
+                      dt)
+    #+cljs (if (not= format default-date-format)
+             (throw (ex-info (str "Only " default-date-format " format supported")
+                             {:format format}))
+             (let [[y m d] (get-year-month-day dt)]
+               (cljs.core/format "%d-%02d-%02d" y m d)))))
+
+(defn epoch []
+  #+clj (ct/epoch)
+  #+cljs (js/Date. 0))
+
+#+clj
 (defn parse-time [s]
   (try
     (cf/parse (cf/formatter "H:m") s)
     (catch Exception _
       (cf/parse (cf/formatter "H:m:s") s))))
 
-(defn with-time [^DateTime datetime h m s]
-  (.withTime datetime h m s 0))
+(defn with-time [datetime h mm s]
+  #+clj (.withTime ^DateTime datetime h mm s 0)
+  #+cljs (let [[y m d] (get-year-month-day datetime)]
+           (utc-date y m d h mm s)))
 
+#+cljs
+(defn parse-time [s]
+  (when-not (string/blank? s)
+    (let [[h mm s] (map parse-int (string/split s #":"))]
+      (when (integer? h)
+        (with-time (epoch) h mm s)))))
+
+#+clj
 (defn normalize-time [t]
   (when t
     (cond
-      (instance? LocalTime t) (.toDateTime ^LocalTime t (ct/epoch))
+      (instance? LocalTime t) (.toDateTime ^LocalTime t (epoch))
       (instance? DateTime t) t
       (instance? java.util.Date t) (cc/from-date t)
       (string? t) (try
                     (parse-time t)
                     (catch Exception _))
       (map? t) (try
-                 (let [h (Integer/valueOf (:h t (get t "h")))
+                 (let [h (parse-int (:h t (get t "h")))
                        ampm (:ampm t (get t "ampm"))
                        h (if ampm
                            (cond
@@ -97,36 +161,65 @@
                              (= "pm" ampm) (+ h 12)
                              :else h)
                            h)
-                       m (Integer/valueOf (:m t (get t "m" 0)))
-                       s (Integer/valueOf (:s t (get t "s" 0)))]
-                   (with-time (ct/epoch) h m s))
+                       m (parse-int (:m t (get t "m" 0)))
+                       s (parse-int (:s t (get t "s" 0)))]
+                   (with-time (epoch) h m s))
                  (catch Exception _))
       :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
-(defn format-time [^DateTime t]
-  (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone t))
-              t))
-
-(defn to-time [date]
-  #+clj (java.sql.Time. (cc/to-long date))
-  #+cljs date)
+#+cljs
+(defn normalize-time [t]
+  (when t
+    (cond
+      (instance? js/Date t) t
+      (integer? t) (js/Date. t)
+      (string? t) (try
+                    (parse-time t format)
+                    (catch js/Error _))
+      (map? t) (try
+                 (let [h (parse-int (:h t (get t "h")))
+                       ampm (:ampm t (get t "ampm"))
+                       h (if ampm
+                           (cond
+                             (= 12 h) (if (= "am" ampm) 0 12)
+                             (= "pm" ampm) (+ h 12)
+                             :else h)
+                           h)
+                       m (parse-int (:m t (get t "m" 0)))
+                       s (parse-int (:s t (get t "s" 0)))]
+                   (with-time (epoch) h m s))
+                 (catch js/Error _))
+      :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
 (defn hour [date]
-  (ct/hour date))
+  #+clj (ct/hour date)
+  #+cljs (.getUTCHours date))
 
 (defn minute [date]
-  (ct/minute date))
+  #+clj (ct/minute date)
+  #+cljs (.getUTCMinutes date))
 
 (defn sec [date]
-  (ct/sec date))
+  #+clj (ct/sec date)
+  #+cljs (.getUTCSeconds date))
 
 (defn get-hours-minutes-seconds [date]
   [(hour date)
    (minute date)
    (sec date)])
 
+(defn format-time [t]
+  #+clj (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone ^DateTime t))
+                    t)
+  #+cljs (format "%02d:%02d" (hour t) (minute t)))
+
+(defn to-time [date]
+  #+clj (java.sql.Time. (cc/to-long date))
+  #+cljs date)
+
 (defn get-this-year []
-  (ct/year (ct/now)))
+  #+clj (ct/year (ct/now))
+  #+cljs (.getUTCFullYear (js/Date.)))
 
 (defn expand-name
   "Expands a name like \"foo[bar][baz]\" into [\"foo\" \"bar\" \"baz\"]"

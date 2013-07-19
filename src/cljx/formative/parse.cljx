@@ -23,8 +23,8 @@
 (defn- parse-long [spec x]
   (when-not (string/blank? x)
     (try
-      (Long/valueOf x)
-      (catch Exception _
+      #+clj (Long/valueOf x) #+cljs (js/parseInt x 10)
+      (catch #+clj Exception #+cljs js/Error _
         (->ParseError x)))))
 
 (defmethod parse-input :int [spec v]
@@ -40,16 +40,17 @@
   (map #(parse-long spec %) v))
 
 (defmethod parse-input :boolean [_ v]
-  (Boolean/valueOf v))
+  #+clj (Boolean/valueOf v)
+  #+cljs (= "true" v))
 
 (defmethod parse-input :booleans [_ v]
-  (map #(Boolean/valueOf %) v))
+  (map #+clj #(Boolean/valueOf %) #+cljs #(= "true" %) v))
 
 (defn- parse-double [spec x]
   (when-not (string/blank? x)
     (try
-      (Double/valueOf x)
-      (catch Exception _
+      #+clj (Double/valueOf x) #+cljs (js/parseFloat x)
+      (catch #+clj Exception #+cljs js/Error _
         (->ParseError x)))))
 
 (defmethod parse-input :float [spec v]
@@ -67,8 +68,8 @@
 (defn- parse-bigdec [spec x]
   (when-not (string/blank? x)
     (try
-      (BigDecimal. x)
-      (catch Exception _
+      #+clj (BigDecimal. x) #+cljs x
+      (catch #+clj Exception #+cljs js/Error _
         (->ParseError x)))))
 
 (defmethod parse-input :decimal [spec v]
@@ -80,8 +81,8 @@
 (defn- parse-bigint [spec x]
   (when-not (string/blank? x)
     (try
-      (bigint (BigInteger. x))
-      (catch Exception _
+      #+clj (bigint (BigInteger. x)) #+cljs x
+      (catch #+clj Exception #+cljs js/Error _
         (->ParseError x)))))
 
 (defmethod parse-input :bigint [spec v]
@@ -94,7 +95,7 @@
   (when-not (string/blank? x)
     (try
       (fu/to-date (fu/parse-date x (:date-format spec)))
-      (catch Exception e
+      (catch #+clj Exception #+cljs js/Error e
         (->ParseError x)))))
 
 (defmethod parse-input :date [spec v]
@@ -114,7 +115,7 @@
                 ["year" "month" "day"])
     (try
       (fu/to-date (fu/normalize-date v))
-      (catch Exception e
+      (catch #+clj Exception #+cljs js/Error e
         (->ParseError v)))))
 
 (defmethod parse-input :year-select [spec v]
@@ -127,7 +128,7 @@
   (when-not (string/blank? x)
     (try
       (fu/to-time (fu/normalize-time x))
-      (catch Exception e
+      (catch #+clj Exception #+cljs js/Error e
         (->ParseError x)))))
 
 (defmethod parse-input :time [spec v]
@@ -141,14 +142,14 @@
                 ["h" "m"])
     (try
       (fu/to-time (fu/normalize-time v))
-      (catch Exception e
+      (catch #+clj Exception #+cljs js/Error e
         (->ParseError v)))))
 
 (defn- parse-instant [spec x]
   (when-not (string/blank? x)
     (try
       (clojure.instant/read-instant-date x)
-      (catch Exception e
+      (catch #+clj Exception #+cljs js/Error e
         (->ParseError x)))))
 
 (defmethod parse-input :instant [spec v]
@@ -173,9 +174,9 @@
                     (fu/minute time)
                     (fu/sec time))
                   (:timezone spec))))
-            (catch Exception e
+            (catch #+clj Exception #+cljs js/Error e
               (->ParseError v)))))
-      (catch Exception e
+      (catch #+clj Exception #+cljs js/Error e
         (->ParseError v)))))
 
 (defmethod parse-input :currency [spec v]
@@ -290,6 +291,7 @@
 
 ;;;;
 
+#+clj
 (defmacro with-fallback
   "Attempts to run body; if an ExceptionInfo with a :problems key is caught,
   calls fallback-fn with the problems as the argument."

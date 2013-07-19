@@ -10,3 +10,4 @@ pom.xml
 .lein-plugins
 .settings
 .lein-env
+.lein-repl-history

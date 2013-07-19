@@ -177,7 +177,7 @@
       (instance? js/Date t) t
       (integer? t) (js/Date. t)
       (string? t) (try
-                    (parse-time t format)
+                    (parse-time t)
                     (catch js/Error _))
       (map? t) (try
                  (let [h (parse-int (:h t (get t "h")))

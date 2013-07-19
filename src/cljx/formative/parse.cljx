@@ -4,9 +4,7 @@
             [clojure.walk :refer [stringify-keys]]
             [formative.core :as f]
             [formative.validate :as fv]
-            [formative.util :as fu]
-            [clj-time.core :as ct]
-            [clj-time.coerce :as cc]))
+            [formative.util :as fu]))
 
 (defrecord ParseError [bad-value])
 
@@ -96,7 +94,7 @@
 (defn- parse-date [spec x]
   (when-not (string/blank? x)
     (try
-      (cc/to-date (fu/parse-date x (:date-format spec)))
+      (fu/to-date (fu/parse-date x (:date-format spec)))
       (catch Exception e
         (->ParseError x)))))
 
@@ -116,7 +114,7 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["year" "month" "day"])
     (try
-      (cc/to-date (fu/normalize-date v))
+      (fu/to-date (fu/normalize-date v))
       (catch Exception e
         (->ParseError v)))))
 
@@ -129,7 +127,7 @@
 (defn- parse-time [spec x]
   (when-not (string/blank? x)
     (try
-      (java.sql.Time. (cc/to-long (fu/normalize-time x)))
+      (fu/to-time (fu/normalize-time x))
       (catch Exception e
         (->ParseError x)))))
 
@@ -143,7 +141,7 @@
   (when (every? (comp (complement string/blank?) #(get v %))
                 ["h" "m"])
     (try
-      (java.sql.Time. (cc/to-long (fu/normalize-time v)))
+      (fu/to-time (fu/normalize-time v))
       (catch Exception e
         (->ParseError v)))))
 
@@ -169,12 +167,12 @@
                       ["h" "m"])
           (try
             (when-let [time (fu/normalize-time v)]
-              (cc/to-date
+              (fu/to-date
                 (fu/from-timezone
                   (fu/with-time date
-                    (ct/hour time)
-                    (ct/minute time)
-                    (ct/sec time))
+                    (fu/hour time)
+                    (fu/minute time)
+                    (fu/sec time))
                   (:timezone spec))))
             (catch Exception e
               (->ParseError v)))))

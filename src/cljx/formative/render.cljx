@@ -19,8 +19,9 @@
   (fn [form-attrs fields opts]
     (:renderer form-attrs)))
 
-(defn- ucfirst [^String s]
-  (str (Character/toUpperCase (.charAt s 0)) (subs s 1)))
+(defn- ucfirst [s]
+  #+clj (str (Character/toUpperCase (.charAt ^String s 0)) (subs ^String s 1))
+  #+cljs (str (.toUpperCase (.charAt s 0)) (subs s 1)))
 
 (defn get-field-label
   "Determines what to use for a field's label. Uses the :label key if set,
@@ -259,7 +260,7 @@
                     :options (cons ["" "Month"]
                                    (map vector
                                         (range 1 13)
-                                        (.getMonths (java.text.DateFormatSymbols.))))})
+                                        (fu/get-month-names)))})
      " "
      (render-field {:type :select
                     :name (str (:name field) "[day]")
@@ -291,7 +292,7 @@
                (range 1 13)
                (map vector
                     (range 1 13)
-                    (.getMonths (java.text.DateFormatSymbols.))))]
+                    (fu/get-month-names)))]
     [:div.month-select
      (render-field (assoc field
                           :class (str (:class field) " input-medium")

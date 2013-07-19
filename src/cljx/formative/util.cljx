@@ -38,6 +38,7 @@
       (ct/from-time-zone d timezone))
     d))
 
+#+clj
 (defn normalize-date [d & [format timezone]]
   (when d
     (let [d (cond
@@ -56,6 +57,9 @@
                          (catch Exception _))
               :else (throw (ex-info "Unrecognized date format" {:date d})))]
       (to-timezone d timezone))))
+
+(defn to-date [d]
+  (cc/to-date d))
 
 (defn format-date [^DateTime d & [format]]
   (cf/unparse (cf/with-zone (cf/formatter (or format "yyyy-MM-dd")) (.getZone d))
@@ -103,10 +107,23 @@
   (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone t))
               t))
 
+(defn to-time [date]
+  #+clj (java.sql.Time. (cc/to-long date))
+  #+cljs date)
+
+(defn hour [date]
+  (ct/hour date))
+
+(defn minute [date]
+  (ct/minute date))
+
+(defn sec [date]
+  (ct/sec date))
+
 (defn get-hours-minutes-seconds [date]
-  [(ct/hour date)
-   (ct/minute date)
-   (ct/sec date)])
+  [(hour date)
+   (minute date)
+   (sec date)])
 
 (defn get-this-year []
   (ct/year (ct/now)))
@@ -152,3 +169,10 @@
     (string/replace "<"  "&lt;")
     (string/replace ">"  "&gt;")
     (string/replace "\"" "&quot;")))
+
+(defn get-month-names []
+  #+clj (.getMonths (java.text.DateFormatSymbols.))
+  ;; TODO: i18n??
+  #+cljs ["January" "February" "March" "April" "May" "June" "July"
+          "August" "September" "October" "November" "December"])
+

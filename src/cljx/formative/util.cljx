@@ -176,3 +176,59 @@
   #+cljs ["January" "February" "March" "April" "May" "June" "July"
           "August" "September" "October" "November" "December"])
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; Copied wholesale from ring.middleware.nested-params, for the sake of
+;; ClojureScript support
+;;
+
+(defn parse-nested-keys
+  "Parse a parameter name into a list of keys using a 'C'-like index
+  notation. e.g.
+    \"foo[bar][][baz]\"
+    => [\"foo\" \"bar\" \"\" \"baz\"]"
+  [param-name]
+  (let [[_ k ks] (re-matches #"(.*?)((?:\[.*?\])*)" (name param-name))
+        keys     (if ks (map second (re-seq #"\[(.*?)\]" ks)))]
+    (cons k keys)))
+
+(defn- assoc-nested
+  "Similar to assoc-in, but treats values of blank keys as elements in a
+  list."
+  [m [k & ks] v]
+  (conj m
+        (if k
+          (if-let [[j & js] ks]
+            (if (= j "")
+              {k (assoc-nested (get m k []) js v)}
+              {k (assoc-nested (get m k {}) ks v)})
+            {k v})
+          v)))
+
+(defn- param-pairs
+  "Return a list of name-value pairs for a parameter map."
+  [params]
+  (mapcat
+    (fn [[name value]]
+      (if (sequential? value)
+        (for [v value] [name v])
+        [[name value]]))
+    params))
+
+(defn- nest-params
+  "Takes a flat map of parameters and turns it into a nested map of
+  parameters, using the function parse to split the parameter names
+  into keys."
+  [params parse]
+  (reduce
+    (fn [m [k v]]
+      (assoc-nested m (parse k) v))
+    {}
+    (param-pairs params)))
+
+(defn nested-params-request
+  "Converts a request with a flat map of parameters to a nested map."
+  [request & [opts]]
+  (let [parse (:key-parser opts parse-nested-keys)]
+    (update-in request [:params] nest-params parse)))

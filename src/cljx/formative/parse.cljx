@@ -1,6 +1,5 @@
 (ns formative.parse
-  (:require [ring.middleware.nested-params :as np]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
             [clojure.walk :refer [stringify-keys]]
             [formative.core :as f]
             [formative.validate :as fv]
@@ -247,7 +246,7 @@
   (when (seq params)
     (if (keyword? (key (first params)))
       (stringify-keys params)
-      (:params (np/nested-params-request {:params params})))))
+      (:params (fu/nested-params-request {:params params})))))
 
 (defn parse-params
   "Given a form specification or sequence of field specifications and a Ring

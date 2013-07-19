@@ -1,9 +1,9 @@
 (ns formative.parse-test
-  (:require [clojure.test :refer [run-tests deftest testing is are]]
-            [formative.parse :as fp]
+  #+cljs (:require-macros [cemerick.cljs.test :refer [is are deftest testing run-tests]])
+  (:require [formative.parse :as fp]
             [formative.util :as fu]
-            [clj-time.core :as ct]
-            [clj-time.coerce :as cc]))
+            #+cljs [cemerick.cljs.test :as t]
+            #+clj [clojure.test :refer [is are deftest testing run-tests]]))
 
 (def form1
   {:fields [{:name :f-default}
@@ -125,28 +125,31 @@
    :f-boolean true
    :f-float 123.45
    :f-double 123.45
-   :f-decimal 123.45M
-   :f-bigint 13918723981723918723987129387198273198273918273N
-   :f-date (cc/to-date (ct/date-time 2012 12 25))
-   :f-time (java.sql.Time. (cc/to-long (fu/parse-time "23:06")))
-   :f-instant (cc/to-date (ct/date-time 2012 12 25 23 6))
+   :f-decimal #+clj 123.45M #+cljs "123.45"
+   :f-bigint #+clj 13918723981723918723987129387198273198273918273N
+             #+cljs "13918723981723918723987129387198273198273918273"
+   :f-date (fu/to-date (fu/utc-date 2012 12 25))
+   :f-time (fu/to-time (fu/parse-time "23:06"))
+   :f-instant (fu/to-date (fu/utc-date 2012 12 25 23 6))
    :f-ints [123 456 789]
    :f-longs [123 456 789]
    :f-booleans [true true false]
    :f-floats [123.45 678.90]
    :f-doubles [123.45 678.90]
-   :f-decimals [123.45M 678.90M]
-   :f-bigints [13918723981723918723987129387198273198273918273N
-               29038402938402938402983409283049203948209384209N]
-   :f-dates [(cc/to-date (ct/date-time 2012 1 1))
-             (cc/to-date (ct/date-time 2012 2 3))
-             (cc/to-date (ct/date-time 2012 10 4))]
-   :f-times [(java.sql.Time. (cc/to-long (fu/parse-time "00:01")))
-             (java.sql.Time. (cc/to-long (fu/parse-time "23:02")))
-             (java.sql.Time. (cc/to-long (fu/parse-time "12:00")))]
-   :f-instants [(cc/to-date (ct/date-time 2012 1 1 0 1))
-                (cc/to-date (ct/date-time 2012 2 3 23 2))
-                (cc/to-date (ct/date-time 2012 10 4 12 0))]
+   :f-decimals #+clj [123.45M 678.90M] #+cljs ["123.45" "678.90"]
+   :f-bigints #+clj [13918723981723918723987129387198273198273918273N
+                     29038402938402938402983409283049203948209384209N]
+              #+cljs ["13918723981723918723987129387198273198273918273"
+                      "29038402938402938402983409283049203948209384209"]
+   :f-dates [(fu/to-date (fu/utc-date 2012 1 1))
+             (fu/to-date (fu/utc-date 2012 2 3))
+             (fu/to-date (fu/utc-date 2012 10 4))]
+   :f-times [(fu/to-time (fu/parse-time "00:01"))
+             (fu/to-time (fu/parse-time "23:02"))
+             (fu/to-time (fu/parse-time "12:00"))]
+   :f-instants [(fu/to-date (fu/utc-date 2012 1 1 0 1))
+                (fu/to-date (fu/utc-date 2012 2 3 23 2))
+                (fu/to-date (fu/utc-date 2012 10 4 12 0))]
    :f-textarea "foo"
    :f-select1 "bar"
    :f-select2 true
@@ -161,12 +164,12 @@
    :f-ca-state "ON"
    :f-country "US"
    :f-us-tel "2345678901x123"
-   :f-date-select (cc/to-date (ct/date-time 2012 12 25))
+   :f-date-select (fu/to-date (fu/utc-date 2012 12 25))
    :f-year-select 2012
    :f-month-select 12
-   :f-time-select (java.sql.Time. (cc/to-long (fu/parse-time "12:00")))
-   :f-datetime-select (cc/to-date (ct/date-time 2012 12 25 23 0))
-   :f-currency 123.45M
+   :f-time-select (fu/to-time (fu/parse-time "12:00"))
+   :f-datetime-select (fu/to-date (fu/utc-date 2012 12 25 #+clj 23 #+cljs 18 0))
+   :f-currency #+clj 123.45M #+cljs "123.45"
    :foo {:bar {:baz 1}}})
 
 (deftest parse-test
@@ -178,7 +181,7 @@
                                           "f-date-select[month]" "12"
                                           "f-date-select[day]" "25"
                                           "f-checkboxes2[]" ["" "true" "false"]})
-                  {:f-date-select (cc/to-date (ct/date-time 2012 12 25))
+                  {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
                    :f-checkboxes2 [true false]})))
   (testing "Failed parsing"
            (let [values (fp/parse-params form1 {:f-int "xxx"}
@@ -186,7 +189,7 @@
              (is (instance? formative.parse.ParseError (:f-int values))))
            (let [ex (try
                       (fp/parse-params form1 {:f-int "xxx"})
-                      (catch Exception ex
+                      (catch #+clj Exception #+cljs js/Error ex
                         ex))]
              (is (= [{:keys [:f-int] :msg "must be a number"}]
                     (:problems (ex-data ex)))))
@@ -197,7 +200,7 @@
                                                            :f-ca-state
                                                            :f-country]]])
                                        {:f-int "123"})
-                      (catch Exception ex
+                      (catch #+clj Exception #+cljs js/Error ex
                         ex))]
              (is (= [{:keys [:f-us-state :f-ca-state :f-country]
                       :msg "must not be blank"}]
@@ -211,7 +214,7 @@
   (testing ":validate-types true (default)"
            (let [ex (try
                       (fp/parse-params form2 {:a "x"})
-                      (catch Exception ex
+                      (catch #+clj Exception #+cljs js/Error ex
                         ex))]
              (is (= '({:keys (:a), :msg "foobar"}
                        {:keys (:a), :msg "nope"})
@@ -220,7 +223,7 @@
            (let [ex (try
                       (fp/parse-params (assoc form2 :validate-types false)
                                        {:a "x"})
-                      (catch Exception ex
+                      (catch #+clj Exception #+cljs js/Error ex
                         ex))]
              (is (= '({:keys (:a), :msg "nope"})
                     (:problems (ex-data ex))))))

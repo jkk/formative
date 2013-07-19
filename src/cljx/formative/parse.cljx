@@ -3,7 +3,8 @@
             [clojure.walk :refer [stringify-keys]]
             [formative.core :as f]
             [formative.validate :as fv]
-            [formative.util :as fu]))
+            [formative.util :as fu]
+            #+cljs [cljs.reader :as reader]))
 
 (defrecord ParseError [bad-value])
 
@@ -23,7 +24,7 @@
 (defn- parse-long [spec x]
   (when-not (string/blank? x)
     (try
-      #+clj (Long/valueOf x) #+cljs (js/parseInt x 10)
+      (fu/parse-int x)
       (catch #+clj Exception #+cljs js/Error _
         (->ParseError x)))))
 
@@ -148,7 +149,15 @@
 (defn- parse-instant [spec x]
   (when-not (string/blank? x)
     (try
-      (clojure.instant/read-instant-date x)
+      #+clj (clojure.instant/read-instant-date x)
+      #+cljs (let [[years months days hours minutes seconds ms offset]
+                   (reader/parse-and-validate-timestamp x)
+                   offset (if (or (js/isNaN offset)
+                                  (not (number? offset)))
+                            0 offset)]
+               (js/Date.
+                 (- (.UTC js/Date years (dec months) days hours minutes seconds ms)
+                    (* offset 60 1000))))
       (catch #+clj Exception #+cljs js/Error e
         (->ParseError x)))))
 

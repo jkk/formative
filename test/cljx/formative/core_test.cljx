@@ -1,6 +1,8 @@
 (ns formative.core-test
-  (:require [clojure.test :refer [run-tests deftest testing is are]]
-            [formative.core :as f]))
+  #+cljs (:require-macros [cemerick.cljs.test :refer [is are deftest run-tests]])
+  (:require [formative.core :as f]
+            #+cljs [cemerick.cljs.test :as t]
+            #+clj [clojure.test :refer [is are deftest run-tests]]))
 
 (def form1
   {:method :post

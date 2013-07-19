@@ -26,12 +26,15 @@
             s))
 
 (defn parse-int [x]
-  #+clj (Integer/valueOf x)
-  #+cljs (js/parseInt x 10))
+  #+clj (Long/valueOf x)
+  #+cljs (let [x (js/parseInt x 10)]
+           (when-not (integer? x)
+             (throw (ex-info "Bad integer value" {:value x})))
+           x))
 
-#+cljs
 (defn utc-date [& [y m d h mm s]]
-  (js/Date. (.UTC js/Date y (dec m) d (or h 0) (or mm 0) (or s 0))))
+  #+clj (ct/date-time y m d (or h 0) (or mm 0) (or s 0))
+  #+cljs (js/Date. (.UTC js/Date y (dec m) d (or h 0) (or mm 0) (or s 0))))
 
 #+cljs
 (defn parse-date [s & [format]]
@@ -75,7 +78,7 @@
                          (let [year (parse-int (:year d (get d "year")))
                                month (parse-int (:month d (get d "month")))
                                day (parse-int (:day d (get d "day")))]
-                           (ct/date-time year month day))
+                           (utc-date year month day))
                          (catch Exception _))
               :else (throw (ex-info "Unrecognized date format" {:date d})))]
       (to-timezone d timezone))))
@@ -282,7 +285,7 @@
     \"foo[bar][][baz]\"
     => [\"foo\" \"bar\" \"\" \"baz\"]"
   [param-name]
-  (let [[_ k ks] (re-matches #"(.*?)((?:\[.*?\])*)" (name param-name))
+  (let [[_ k ks] (re-matches #"([^\[]*)((?:\[.*?\])*)" (name param-name))
         keys     (if ks (map second (re-seq #"\[(.*?)\]" ks)))]
     (cons k keys)))
 

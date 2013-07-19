@@ -63,10 +63,10 @@
    :booleans v/bools
    :int v/integer
    :long v/integer
-   :bigint v/integer
+   :bigint #+clj v/integer #+cljs v/decimal
    :ints v/integers
    :longs v/integers
-   :bigints v/integers
+   :bigints #+clj v/integers #+cljs v/decimals
    :float v/floating-point
    :double v/floating-point
    :floats v/floating-points

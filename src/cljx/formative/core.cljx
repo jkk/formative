@@ -166,7 +166,7 @@
                            :onsubmit :onreset :accept-charset :autofill
                            :novalidate :autocomplete])
         form-attrs (assoc form-attrs
-                     :method (:method spec :post)
+                     :method (name (or (:method spec) :post))
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys (:values spec))
         fields (prep-fields (:fields spec) values spec)

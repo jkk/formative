@@ -98,13 +98,11 @@
                                       :readonly :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder :autofill
                                       :multiple :title])
-        attrs (if (:type attrs)
-                attrs
-                (assoc attrs :type :text))
         attrs (if (and (= :submit (:type attrs))
                        (empty? (:value attrs)))
                 (dissoc attrs :value)
-                (assoc attrs :value (render-input-val field)))]
+                (assoc attrs :value (render-input-val field)))
+        attrs (assoc attrs :type (name (or (:type attrs) :text)))]
     (list
       (when-let [prefix (:prefix opts)]
         [:span.input-prefix prefix])

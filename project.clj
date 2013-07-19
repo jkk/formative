@@ -5,5 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [ring/ring-core "1.2.0-RC1"]
-                 [jkkramer/verily "0.4.4"]
+                 [jkkramer/verily "0.5.0"]
                  [clj-time "0.5.1"]])

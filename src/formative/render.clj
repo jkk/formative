@@ -1,6 +1,5 @@
 (ns formative.render
-  (:require [hiccup.core :refer [h]]
-            [formative.data :as data]
+  (:require [formative.data :as data]
             [formative.util :as fu]
             [clojure.string :as string]
             [clj-time.core :as ct]))

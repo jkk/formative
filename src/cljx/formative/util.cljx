@@ -272,6 +272,26 @@
   #+cljs ["January" "February" "March" "April" "May" "June" "July"
           "August" "September" "October" "November" "December"])
 
+(defn decode-uri-component [str]
+  (if str
+    #+clj (java.net.URLDecoder/decode ^String str "UTF-8")
+    #+cljs (js/decodeURIComponent str)
+    ""))
+
+(defn decode-form-data [data]
+  (reduce
+    (fn [m pair]
+      (if-let [[k v] (string/split pair #"=")]
+        (update-in m [(decode-uri-component k)]
+                   (fn [oldv]
+                     (if oldv
+                       (if (vector? oldv)
+                         (conj oldv (decode-uri-component v))
+                         [oldv (decode-uri-component v)])
+                       (decode-uri-component v))))
+        m))
+    {}
+    (string/split data #"&")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

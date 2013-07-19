@@ -183,6 +183,15 @@
                                           "f-checkboxes2[]" ["" "true" "false"]})
                   {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
                    :f-checkboxes2 [true false]})))
+  (testing "Unparsed form data"
+           (is (= (fp/parse-params form1 (str "f-date-select[year]=2012"
+                                              "&f-date-select[month]=12"
+                                              "&f-date-select[day]=25"
+                                              "&f-checkboxes2[]="
+                                              "&f-checkboxes2[]=true"
+                                              "&f-checkboxes2[]=false"))
+                  {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
+                   :f-checkboxes2 [true false]})))
   (testing "Failed parsing"
            (let [values (fp/parse-params form1 {:f-int "xxx"}
                                          :validate false)]

@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-1843"]
-                 [jkkramer/verily "0.5.0"]
+                 [jkkramer/verily "0.5.1"]
                  [clj-time "0.5.1"]]
   :source-paths ["src/cljx"]
   :test-paths ["target/test-classes"]

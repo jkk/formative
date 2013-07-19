@@ -1,9 +1,9 @@
 # Formative
 
-A Clojure library for dealing with web forms. In particular, it can:
+A __Clojure__ and __ClojureScript__ library for dealing with web forms. In particular, it can:
 
 * Render a form via pluggable renderers (comes with Bootstrap and other renderers built in)
-* Parse form data from Ring params
+* Parse form data from Ring-style param maps
 * Validate parsed data using [Verily](https://github.com/jkk/verily)
 
 See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuapp.com/) ([demo source](https://github.com/jkk/formative-demo))
@@ -13,7 +13,7 @@ See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuap
 Leiningen coordinate:
 
 ```clj
-[formative "0.5.5"]
+[formative "0.6.0"]
 ```
 
 ## Usage
@@ -393,6 +393,6 @@ See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuap
 
 ## License
 
-Copyright © 2012 Justin Kramer
+Copyright © 2012-2013 Justin Kramer
 
 Distributed under the Eclipse Public License, the same as Clojure.

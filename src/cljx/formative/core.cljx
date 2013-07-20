@@ -168,7 +168,10 @@
         form-attrs (assoc form-attrs
                      :method (name (or (:method spec) :post))
                      :renderer (:renderer spec *renderer*))
-        values (stringify-keys (:values spec))
+        values (stringify-keys
+                 (if (string? (:values spec))
+                   (fu/decode-form-data (:values spec))
+                   (:values spec)))
         fields (prep-fields (:fields spec) values spec)
         fields (if (:cancel-href spec)
                  (for [field fields]
@@ -213,7 +216,8 @@
                       Custom renderers can be created by implementing the
                       formative.render/render-form multimethod. 
       :fields       - Sequence of form field specifications. See below.
-      :values       - Map of values used to populate the form fields
+      :values       - Map of values used to populate the form fields, or a
+                      form-data-encoded string
       :submit-label - Label to use on the submit button. Defaults to \"Submit\"
       :cancel-href  - When provided, shows a \"Cancel\" hyperlink next to the
                       submit button

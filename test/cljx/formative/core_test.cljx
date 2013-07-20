@@ -18,15 +18,18 @@
             {:name :g :type :text}
             {:name :h :type :select :options ["foo" "bar" "baz"]}
             {:name :foo-bar-baz}
-            {:name "Foo_Bar[]"}]
-   :values {:a 1234
-            :d true
-            :e "foobar"}})
+            {:name "Foo_Bar[]"}
+            {:name "nested[foo]"}]
+   :values {:a "1234"
+            :d "true"
+            :e "foobar"
+            :nested {:foo "bar"}}})
 
 (deftest prep-form-test
-  (let [[form-attrs fields specs] (f/prep-form form1)]
-    (is (= fields
-           '({:name "a", :datatype :int, :type :hidden, :label "A", :value 1234}
+  (let [[_ fields1 _] (f/prep-form form1)
+        [_ fields2 _] (f/prep-form (assoc form1 :values "a=1234&d=true&e=foobar&nested[foo]=bar"))]
+    (is (= fields1 fields2
+           '({:name "a", :datatype :int, :type :hidden, :label "A", :value "1234"}
               {:name "b", :type :email, :label "B", :value nil}
               {:name "c", :type :password, :label "C", :value nil}
               {:name "d",
@@ -46,6 +49,7 @@
                :value nil}
               {:name "foo-bar-baz", :type :text, :label "Foo bar baz", :value nil}
               {:name "Foo_Bar[]", :type :text, :label "Foo Bar", :value nil}
+              {:name "nested[foo]" :type :text :label "Foo" :value "bar"}
               {:type :submit,
                :name "submit",
                :cancel-href "/example",
@@ -79,6 +83,7 @@
             {:name :h, :type :select, :options ["foo" "bar" "baz"]}
             {:name :foo-bar-baz}
             {:name "Foo_Bar[]"}
+            {:name "nested[foo]"}
             {:name :appended, :type :text}
             {:name :appended2}
             {:name :appended3}

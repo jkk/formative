@@ -1,7 +1,9 @@
 (ns formative.parse-test
-  #+cljs (:require-macros [cemerick.cljs.test :refer [is are deftest testing run-tests]])
+  #+cljs (:require-macros [cemerick.cljs.test :refer [is are deftest testing run-tests]]
+                          [formative.macros :refer [with-fallback]])
   (:require [formative.parse :as fp]
             [formative.util :as fu]
+            #+clj [formative.parse :refer [with-fallback]]
             #+cljs [cemerick.cljs.test :as t]
             #+clj [clojure.test :refer [is are deftest testing run-tests]]))
 
@@ -242,5 +244,10 @@
                                      (assoc :validate-types false))
                                    {:a "x"})
                   {:a (fp/->ParseError "x")}))))
+
+(deftest with-fallback-test
+  (= [{:msg "hi"}]
+     (with-fallback identity
+       (throw (ex-info "Boo" {:problems [{:msg "hi"}]})))))
 
 ;(run-tests)

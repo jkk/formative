@@ -283,6 +283,15 @@
   #+cljs ["January" "February" "March" "April" "May" "June" "July"
           "August" "September" "October" "November" "December"])
 
+(defn encode-uri-component [str]
+  (if str
+    #+clj (java.net.URLEncoder/encode ^String str "UTF-8")
+    #+cljs (js/encodeURIComponent str)
+    ""))
+
+(defn encode-uri-kv [k v]
+  (str (encode-uri-component k) "=" (encode-uri-component v)))
+
 (defn decode-uri-component [str]
   (if str
     #+clj (java.net.URLDecoder/decode ^String str "UTF-8")
@@ -291,8 +300,8 @@
 
 (defn decode-form-data [data]
   (reduce
-    (fn [m pair]
-      (if-let [[k v] (string/split pair #"=")]
+    (fn [m kv]
+      (if-let [[k v] (string/split kv #"=")]
         (update-in m [(decode-uri-component k)]
                    (fn [oldv]
                      (if oldv

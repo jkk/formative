@@ -6,7 +6,7 @@ A __Clojure__ and __ClojureScript__ library for dealing with web forms. In parti
 * Parse form data from Ring-style param maps or strings
 * Validate parsed data using [Verily](https://github.com/jkk/verily)
 
-See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuapp.com/) ([demo source](https://github.com/jkk/formative-demo))
+See a __live demo__ at [formative-demo.herokuapp.com](http://formative-demo.herokuapp.com/) ([demo source](https://github.com/jkk/formative-demo))
 
 ## Installation
 
@@ -421,6 +421,16 @@ Field types are extensible with the `formative.render/render-field` and `formati
 ## Demo
 
 See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuapp.com) or [view the demo source](https://github.com/jkk/formative-demo).
+
+## Developing
+
+This project uses [Cljx](https://github.com/lynaghk/cljx) to share and emit Clojure and ClojureScript code. To start a REPL, run:
+
+```
+$ lein repl :headless
+```
+
+Then connect via nREPL in your preferred editor.
 
 ## License
 

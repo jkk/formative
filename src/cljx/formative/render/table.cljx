@@ -3,13 +3,8 @@
                                       render-problems]]
             [formative.util :as util]))
 
-(def ^:dynamic *field-prefix* "field-")
-
 (defn render-form-row [field]
-  (let [field-id (util/safe-element-id
-                   (if (:id field)
-                     (name (:id field))
-                     (str *field-prefix* (:name field))))
+  (let [field-id (util/get-field-id field)
         field (assoc field :id field-id)
         label? (and (not (false? (:label field)))
                     (not= :html (:type field)))
@@ -31,7 +26,7 @@
                     (:label-prefix field)
                     [:label {:for field-id} (:label field)]
                     (:label-suffix field)])]
-    [:tr {:id (str "row-" field-id)
+    [:tr {:id (util/get-field-container-id field)
           :class (str (name (:type field :text)) "-row"
                       (when (:problem field) " problem")
                       (when stacked? " stacked"))}

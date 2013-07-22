@@ -259,6 +259,17 @@
   (when id
     (string/replace id #"[^a-zA-Z0-9\-\_\:\.]" "__")))
 
+(def ^:dynamic *field-prefix* "field-")
+
+(defn get-field-id [field]
+  (safe-element-id
+    (if (:id field)
+      (name (:id field))
+      (str *field-prefix* (:name field)))))
+
+(defn get-field-container-id [field]
+  (str "row-" (:id field)))
+
 (defn escape-html [s]
   (-> s
     (string/replace "&"  "&amp;")

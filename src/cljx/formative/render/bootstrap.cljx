@@ -3,19 +3,14 @@
                                       render-problems]]
             [formative.util :as util]))
 
-(def ^:dynamic *field-prefix* "field-")
-
 (defn render-bootstrap-row [field]
-  (let [field-id (util/safe-element-id
-                   (if (:id field)
-                     (name (:id field))
-                     (str *field-prefix* (:name field))))
+  (let [field-id (util/get-field-id field)
         field (assoc field :id field-id)
         field (if (= :submit (:type field))
                 (assoc field :class (str (:class field)
                                          " btn btn-primary"))
                 field)]
-    [:div {:id (str "row-" field-id)
+    [:div {:id (util/get-field-container-id field)
            :class (str (if (= :submit (:type field))
                          "form-actions submit-group "
                          "field-group ")

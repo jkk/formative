@@ -27,6 +27,8 @@ The important namespaces are `formative.core` and `formative.parse`.
             [formative.parse :as fp]))
 ```
 
+For the ClojureScript version, there's also `formative.dom` (see [Dom Helpers](#dom-helpers)).
+
 ### Building a Form
 
 To build a form, you need a form specification, which is a map that looks like this:
@@ -93,14 +95,21 @@ All of the built-in form renderers make use of `render-field`, but not all rende
 
 ### Parsing Form Data
 
-`formative.parse/parse-params` will turn a form specification and a [Ring](https://github.com/ring-clojure/ring) params map into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
+`formative.parse/parse-params` will turn a form specification and form data into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
 
 ```clj
+;; From Ring param map
 (fp/parse-params example-form
                  {:secret-code "1234"
                   :email "foobar@gmail.com"
                   :password "barbazquux"
                   :remember "false"})
+;; Returns:
+{:remember false, :secret-code 1234, :password "barbazquux", :email "foobar@gmail.com"}
+
+;; From form data string
+(fp/parse-params example-form
+                 "secret-code=1234&email=foobar@gmail.com&password=bzrbazquux&remember=false")
 ;; Returns:
 {:remember false, :secret-code 1234, :password "barbazquux", :email "foobar@gmail.com"}
 ```
@@ -210,6 +219,28 @@ You are of course free to tweak the form map yourself to make the appropriate ru
 ```
 
 As shown above, `merge-fields` will look for `:before` and `:after` keys in the given fields to decide whether to insert the field or append it.
+
+## DOM Helpers
+
+For the ClojureScript version of Formative, several DOM helpers are provided in the `formative.dom` namespace. For the most common use case, there's `formative.dom/handle-submit`, which attaches an event handler to a form's "submit" browser event, validates submitted data, then:
+
+* If validation fails, shows the problems (or, if provided, calls a custom failure function with the problems data as the argument)
+* If validation succeeds, calls a success function with parsed params as the argument
+
+Example:
+
+```clj
+(formative.dom/handle-submit
+  example-form container-el
+  (fn [params]
+    (js/alert (pr-str params))))
+```
+
+Other useful functions in `formative.dom`:
+
+* `serialize [form-el]` - given a form element, returns a form data string
+* `clear-problems [container-or-form-el]` - clears problems from a form
+* `show-problems [form-spec container-or-form-el problems]` - shows problems for a form
 
 ## Quick Reference
 

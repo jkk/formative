@@ -8,18 +8,17 @@
                  [jkkramer/verily "0.5.4"]
                  [clj-time "0.5.1"]
                  [prismatic/dommy "0.1.1"]]
-  :source-paths ["src/cljx"]
   :test-paths ["target/test-classes"]
-  :cljx {:builds [{:source-paths ["src/cljx"]
+  :cljx {:builds [{:source-paths ["src"]
                    :output-path "target/classes"
                    :rules :clj}
-                  {:source-paths ["src/cljx"]
+                  {:source-paths ["src"]
                    :output-path "target/classes"
                    :rules :cljs}
-                  {:source-paths ["test/cljx"]
+                  {:source-paths ["test"]
                    :output-path "target/test-classes"
                    :rules :clj}
-                  {:source-paths ["test/cljx"]
+                  {:source-paths ["test"]
                    :output-path "target/test-classes"
                    :rules :cljs}]}
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]

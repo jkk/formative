@@ -189,14 +189,14 @@
      (for [[oval olabel] opts]
        (let [id (str (:id field) "__" (opt-slug oval))]
          [:div.radio-shell
-          [:span.radio-input-shell
-           (render-default-input {:name (:name field) :id id
-                                  :type :radio
-                                  :checked (= val (str oval))
-                                  :value oval})]
-          " "
-          [:label {:for id}
-           [:nobr olabel]]]))]))
+          [:label.radio {:for id}
+           [:span.radio-input-shell
+            (render-default-input {:name (:name field) :id id
+                                   :type :radio
+                                   :checked (= val (str oval))
+                                   :value oval})]
+           " "
+           [:span.radio-label [:nobr olabel]]]]))]))
 
 (defmethod render-field :radio [field]
   (render-radios field))

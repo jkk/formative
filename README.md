@@ -1,6 +1,6 @@
 # Formative
 
-A __Clojure__ and __ClojureScript__ library for dealing with web forms. In particular, it can:
+Web forms for __Clojure__ and __ClojureScript__:
 
 * Render a form via pluggable renderers (comes with Bootstrap and other renderers built in)
 * Parse form data from Ring-style param maps or strings

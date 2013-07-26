@@ -176,6 +176,7 @@ Built in validations:
 * `:matches <regex> <keys> [msg]` - must match a regular expression
 * `:min-length <len> <keys> [msg]` - must be a certain length (for strings or collections)
 * `:max-length <len> <keys> [msg]` - must not exceed a certain length (for strings or collections)
+* `:complete <keys> [msg]` - must be a collection with no blank or nil values
 * `:min-val <min> <keys> [msg]` - must be at least a certain value
 * `:max-val <max> <keys> [msg]` - must be at most a certain value
 * `:within <min> <max> <keys> [msg]` - must be within a certain range (inclusive)

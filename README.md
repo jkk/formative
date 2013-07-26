@@ -262,7 +262,8 @@ The following special keys are also supported:
                           :table
                           :inline
       :fields         - Sequence of form field specifications. See below.
-      :values         - Map of values used to populate the form fields
+      :values         - Map of values used to populate the form fields, or a
+                        form-data-encoded string
       :submit-label   - Label to use on the submit button. Defaults to "Submit"
       :cancel-href    - When provided, shows a "Cancel" link or button next to the
                         submit button

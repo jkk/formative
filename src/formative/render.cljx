@@ -307,6 +307,87 @@
              (when time
                (fu/format-time time))))))
 
+(defn- get-hour+ampm [h ampm?]
+  (when h
+    (if ampm?
+      (cond
+        (zero? h) [12 "am"]
+        (= 12 h) [12 "pm"]
+        (< 12 h) [(- h 12) "pm"]
+        :else [h "am"])
+      [h])))
+
+(defn- render-time-select-multi [fname h m s step ampm? seconds?]
+  (let [[h ampm] (get-hour+ampm h ampm?)]
+    (list
+      (render-field {:type :select
+                     :name (str fname "[h]")
+                     :class "input-small"
+                     :value h
+                     :first-option ["" "--"]
+                     :options (if ampm? (range 1 13) (range 0 24))})
+      " "
+      (render-field {:type :select
+                     :name (str fname "[m]")
+                     :class "input-small"
+                     :value m
+                     :first-option ["" "--"]
+                     :options (map (juxt identity #(format "%02d" %))
+                                   (range 0 60 step))})
+      (when seconds?
+        (list
+          " "
+          (render-field {:type :select
+                         :name (str fname "[s]")
+                         :class "input-small"
+                         :value s
+                         :first-option ["" "--"]
+                         :options (map (juxt identity #(format "%02d" %))
+                                       (range 0 60 step))})))
+      (when ampm?
+        (list
+          " "
+          (render-field {:type :select
+                         :name (str fname "[ampm]")
+                         :class "input-small"
+                         :value ampm
+                         :first-option ["" "--"]
+                         :options ["am" "pm"]}))))))
+
+(defn- add-minutes [h m mx]
+  (let [m* (+ m mx)]
+    (if (< 59 m*)
+      [(inc h) (- m* 60)] ;assumes never adding more than 60
+      [h m*])))
+
+(defn- time-range [start [eh em] step]
+  (take-while (fn [[h m]]
+                (or (< h eh)
+                    (and (= h eh) (<= m em))))
+    (iterate (fn [[h m]] (add-minutes h m step))
+             start)))
+
+(defn- format-time [h m ampm?]
+  (let [[h ampm] (get-hour+ampm h ampm?)]
+    (str h ":"
+         (format "%02d" m)
+         (when ampm? (str " " ampm)))))
+
+(defn- render-time-select-single [field h m step ampm? start end]
+  (let [start (or (fu/normalize-time start)
+                  (fu/normalize-time {:h 0 :m 0}))
+        end (or (fu/normalize-time end)
+                (fu/normalize-time {:h 23 :m 59}))
+        opts (for [[h m] (time-range (fu/get-hours-minutes-seconds start)
+                                     (fu/get-hours-minutes-seconds end)
+                                     step)]
+               [(str h ":" (format "%02d" m))
+                (format-time h m ampm?)])]
+    (render-field (assoc field
+                         :type :select
+                         :value (str h ":" (format "%02d" m))
+                         :options opts))))
+
 (defmethod render-field :time-select [field]
   (let [step (:step field 5)
         ampm? (:ampm field true)
@@ -315,55 +396,17 @@
                   (fu/get-hours-minutes-seconds time))
         m (when m (round m step))
         s (when s (round s step))
-        [h ampm] (when h
-                   (if ampm?
-                     (cond
-                       (zero? h) [12 "am"]
-                       (= 12 h) [12 "pm"]
-                       (< 12 h) [(- h 12) "pm"]
-                       :else [h "am"])
-                     [h]))
         seconds? (:seconds field false)]
     [:span.time-select
-     (render-field {:type :select
-                    :name (str (:name field) "[h]")
-                    :class "input-small"
-                    :value h
-                    :first-option ["" "--"]
-                    :options (if ampm? (range 1 13) (range 0 24))})
-     " "
-     (render-field {:type :select
-                    :name (str (:name field) "[m]")
-                    :class "input-small"
-                    :value m
-                    :first-option ["" "--"]
-                    :options (map (juxt identity #(format "%02d" %))
-                                  (range 0 60 step))})
-     (when seconds?
-       (list
-         " "
-         (render-field {:type :select
-                        :name (str (:name field) "[s]")
-                        :class "input-small"
-                        :value s
-                        :first-option ["" "--"]
-                        :options (map (juxt identity #(format "%02d" %))
-                                      (range 0 60 step))})))
-     (when ampm?
-       (list
-         " "
-         (render-field {:type :select
-                        :name (str (:name field) "[ampm]")
-                        :class "input-small"
-                        :value ampm
-                        :first-option ["" "--"]
-                        :options ["am" "pm"]})))]))
+     (if (:compact field)
+       (render-time-select-single field h m step ampm? (:start field) (:end field))
+       (render-time-select-multi (:name field) h m s step ampm? seconds?))]))
 
 (defmethod render-field :datetime-select [field]
   [:span.datetime-select
    (render-field (assoc field :type :date-select))
    " "
-   (render-field (assoc field :type :time-select))])
+   (render-field (assoc field :type :time-select :compact false))])
 
 (defmethod render-field :currency [field]
   (render-default-input

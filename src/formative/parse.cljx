@@ -139,12 +139,14 @@
   (map #(parse-time spec %) v))
 
 (defmethod parse-input :time-select [spec v]
-  (when (every? (comp (complement string/blank?) #(get v %))
-                ["h" "m"])
-    (try
-      (fu/to-time (fu/normalize-time v))
-      (catch #+clj Exception #+cljs js/Error e
-        (->ParseError v)))))
+  (if (:compact spec)
+    (parse-time spec v)
+    (when (every? (comp (complement string/blank?) #(get v %))
+                  ["h" "m"])
+      (try
+        (fu/to-time (fu/normalize-time v))
+        (catch #+clj Exception #+cljs js/Error e
+          (->ParseError v))))))
 
 (defn- parse-instant [spec x]
   (when-not (string/blank? x)

@@ -145,6 +145,9 @@
       (when (integer? h)
         (with-time (epoch) h mm s)))))
 
+(defn mktime [h m s]
+  (with-time (epoch) h m s))
+
 #+clj
 (defn normalize-time [t]
   (when t
@@ -166,8 +169,9 @@
                            h)
                        m (parse-int (:m t (get t "m" 0)))
                        s (parse-int (:s t (get t "s" 0)))]
-                   (with-time (epoch) h m s))
+                   (mktime h m s))
                  (catch Exception _))
+      (number? t) (mktime t 0 0)
       :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
 #+cljs
@@ -190,8 +194,9 @@
                            h)
                        m (parse-int (:m t (get t "m" 0)))
                        s (parse-int (:s t (get t "s" 0)))]
-                   (with-time (epoch) h m s))
+                   (mktime h m s))
                  (catch js/Error _))
+      (number? t) (mktime t 0 0)
       :else (throw (ex-info "Unrecognized time format" {:time t})))))
 
 (defn hour [date]

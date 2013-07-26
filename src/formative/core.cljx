@@ -316,10 +316,13 @@
                     as a UTC java.sql.Time (or Date for ClojureScript).
                     Accepts Joda times as values.
                     Special keys:
+                      :compact - true to use a single dropdown (default false)
                       :ampm - true to use am/pm (the default); false to use
                               24-hour format
                       :step - step between minutes/seconds; default 5
                       :seconds - whether to include a seconds field
+                      :start - when :compact is true, start time
+                      :end - when :compact is true, end time (inclusive)
     :datetime-select - Combined date/time dropdown. Parses as a UTC
                     java.util.Date (or Date for ClojureScript). Accepts Joda
                     date values. See :date-select and :time-select for special

@@ -73,6 +73,10 @@
         (normalize-field)
         (prep-field values form))))
 
+(defmethod prep-field :compound [field values & [form]]
+  (let [field (prep-field-default field values form)]
+    (update-in field [:fields] prep-fields (:value field) form)))
+
 (defn merge-fields
   "Combines two sequences of field specifications into a single sequence,
   using the following rules for each fields2 spec:
@@ -336,6 +340,14 @@
                         value are passed as arguments to the handler. The
                         handler can return whatever value is appropriate
                         (e.g., a String or a File).
+    :compound     - Multiple fields displayed and parsed as one field. Special
+                    keys:
+                      :separator - string or Hiccup data; defaults to a space
+                      :combiner - a function which takes a collection of the
+                                  rendered fields and returns Hiccup data
+                                  that represents the combined field; by
+                                  default, fields are combined by interposing
+                                  the separator
     :submit       - Submit button. Included by default, but can be added
                     explicitly if you prefer. Unlike with a default submit
                     button, its value will be parsed.

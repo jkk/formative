@@ -243,6 +243,18 @@
              :value (when date
                       (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
 
+(defmethod render-field :compound [field]
+  (let [subfields (for [subfield (:fields field)]
+                    (let [sfname (str (:name field) "[" (:name subfield) "]")]
+                      (assoc subfield
+                             :name sfname
+                             :id (fu/get-field-id {:name sfname}))))
+        combiner (or (:combiner field)
+                     (fn [subfields]
+                       [:span.compound
+                        (interpose (:separator field " ") subfields)]))]
+    (combiner (map render-field subfields))))
+
 (defmethod render-field :date-select [field]
   (let [date (fu/normalize-date (:value field) nil (:timezone field))
         [year month day] (when date
@@ -251,29 +263,30 @@
         year-start (:year-start field this-year)
         year-end (:year-end field (+ this-year 20))]
     [:span.date-select
-     (render-field {:type :select
-                    :name (str (:name field) "[month]")
-                    :class "input-medium"
-                    :value month
-                    :options (cons ["" "Month"]
-                                   (map vector
-                                        (range 1 13)
-                                        (fu/get-month-names)))})
-     " "
-     (render-field {:type :select
-                    :name (str (:name field) "[day]")
-                    :class "input-small"
-                    :value day
-                    :options (cons ["" "Day"]
-                                   (map #(vector % %) (range 1 32)))})
-     " "
-     (render-field {:type :select
-                    :name (str (:name field) "[year]")
-                    :class "input-small"
-                    :value year
-                    :options (cons ["" "Year"]
-                                 (map #(vector % %)
-                                      (range year-start (inc year-end))))})]))
+     (render-field {:name (:name field)
+                    :type :compound
+                    :separator " "
+                    :fields [{:type :select
+                              :name "month"
+                              :class "input-medium"
+                              :value month
+                              :options (cons ["" "Month"]
+                                             (map vector
+                                                  (range 1 13)
+                                                  (fu/get-month-names)))}
+                             {:type :select
+                              :name "day"
+                              :class "input-small"
+                              :value day
+                              :options (cons ["" "Day"]
+                                             (map #(vector % %) (range 1 32)))}
+                             {:type :select
+                              :name "year"
+                              :class "input-small"
+                              :value year
+                              :options (cons ["" "Year"]
+                                             (map #(vector % %)
+                                                  (range year-start (inc year-end))))}]})]))
 
 (defmethod render-field :year-select [field]
   (let [this-year (fu/get-this-year)

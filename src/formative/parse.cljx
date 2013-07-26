@@ -237,7 +237,7 @@
     (rest input)
     input))
 
-(defn- parse-nested-params [fields np]
+(defn- parse-nested-params [fields np & [absent-nil?]]
   (reduce
     (fn [vals spec]
       (let [sname (fu/expand-name (:name spec))
@@ -248,11 +248,19 @@
                           (get-param np sname) spec)
                 val (parse-input spec raw-val)]
             (if (= val ::absent)
-              vals
+              (if absent-nil? (assoc-in vals kname nil) vals)
               (assoc-in vals kname val)))
-          vals)))
+          (if absent-nil?
+            (assoc-in vals kname nil)
+            vals))))
     {}
     fields))
+
+(defmethod parse-input :compound [spec v]
+  (try
+    (parse-nested-params (:fields spec) v true)
+    (catch #+clj Exception #+cljs js/Error e
+      (->ParseError v))))
 
 (defn- normalize-params [params]
   (when (seq params)

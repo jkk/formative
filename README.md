@@ -60,7 +60,7 @@ Render a form using `formative.core/render-form`:
   ]]
 ```
 
-Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this:
+Using the default `:bootstrap-horizontal` renderer and a [Bootstrap](http://twitter.github.com/bootstrap/) theme, the form will look something like this when passed through [Hiccup](https://github.com/weavejester/hiccup) or [Dommy](https://github.com/Prismatic/dommy):
 
 ![form](https://github.com/jkk/formative/raw/master/doc/bootstrap-horizontal.png)
 

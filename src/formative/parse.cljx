@@ -273,7 +273,7 @@
 
 (defn parse-params
   "Given a form specification or sequence of field specifications and a Ring
-  params map, returns a map of field names to parsed values.
+  params map or form data string, returns a map of field names to parsed values.
 
   The Ring params map must be either 1) an untouched :query-params,
   :form-params, or :multipart-params map; or 2) a params map with the following

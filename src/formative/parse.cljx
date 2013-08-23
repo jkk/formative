@@ -18,8 +18,9 @@
   (fn [spec v]
     (:datatype spec (:type spec))))
 
-(defmethod parse-input :default [_ v]
-  v)
+(defmethod parse-input :default [spec v]
+  (when-not (and (string? v) (:blank-nil spec) (string/blank? v))
+    v))
 
 (defn- parse-long [spec x]
   (when-not (string/blank? x)

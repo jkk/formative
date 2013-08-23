@@ -29,10 +29,11 @@
     (:type field)))
 
 (defn- prep-field-default [field values & [form]]
-  (assoc field
-         :value (or (get-in values (fu/expand-name (:name field)))
-                    (get values (:name field)))
-         :label (r/get-field-label field)))
+  (cond-> (assoc field
+                 :value (or (get-in values (fu/expand-name (:name field)))
+                            (get values (:name field)))
+                 :label (r/get-field-label field))
+          (:blank-nil form) (assoc :blank-nil true)))
 
 (defmethod prep-field :default [field values & [form]]
   (prep-field-default field values form))
@@ -232,6 +233,7 @@
                       validate. The problem map should contain the keys :keys
                       and :msg.
       :validate-types - Whether to validate datatypes; true by default.
+      :blank-nil    - When values are parsed, replace blank strings with nil
       :problems     - Sequence of field names or problem maps. Form
                       renderers typically add a class and style to highlight
                       problem fields and, if problem maps are provided,
@@ -272,6 +274,7 @@
                       created using the UTC timezone.
       :datatype-error - Optional custom error message to use if datatype
                       validation fails.
+      :blank-nil    - When the value is parsed, replace a blank string with nil
       :note         - A bit of explanatory content to accompany the field
       :prefix       - Content to insert before a field
       :suffix       - Content to insert after a field

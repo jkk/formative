@@ -253,7 +253,7 @@ Valid keys for a form specification include the following HTML form attributes:
       :onsubmit :onreset :accept-charset :autofill :novalidate
       :autocomplete
 
-Unlike an HTML form, :method defaults to :post.
+Unlike an HTML form, :method defaults to :post. If method is something other than :get or :post, a hidden field with name "_method" will be added, and the form method set to :post. If you are using Compojure for routing, it will recognize the "_method" field.
 
 The following special keys are also supported:
 

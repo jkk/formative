@@ -170,14 +170,21 @@
                      spec [:action :method :enctype :accept :name :id :class
                            :onsubmit :onreset :accept-charset :autofill
                            :novalidate :autocomplete])
+        method (string/upper-case
+                 (name (or (:method spec) :post)))
         form-attrs (assoc form-attrs
-                     :method (name (or (:method spec) :post))
+                     :method (if (= "GET" method) method "POST")
                      :renderer (:renderer spec *renderer*))
         values (stringify-keys
                  (if (string? (:values spec))
                    (fu/decode-form-data (:values spec))
                    (:values spec)))
-        fields (prep-fields (:fields spec) values spec)
+        fields (:fields spec)
+        [fields values] (if-not (#{"PUT" "DELETE" "PATCH"} method)
+                          [fields values]
+                          [(cons {:type :hidden :name "_method"} fields)
+                           (assoc values "_method" method)])
+        fields (prep-fields fields values spec)
         fields (if (:cancel-href spec)
                  (for [field fields]
                    (if (= :submit (:type field))
@@ -209,7 +216,10 @@
       :onsubmit :onreset :accept-charset :autofill :novalidate
       :autocomplete
 
-  Unlike an HTML form, :method defaults to :post.
+  Unlike an HTML form, :method defaults to :post. If method is something other
+  than :get or :post, a hidden field with name \"_method\" will be added, and
+  the form method set to :post. If you are using Compojure for routing, it will
+  recognize the \"_method\" field.
 
   The following special keys are also supported:
 

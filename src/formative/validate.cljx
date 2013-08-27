@@ -88,8 +88,11 @@
         opt-validators (for [field fields
                              :when (and (:options field)
                                         (not (false? (:validate-options field))))]
-                         (let [opts (map first (fu/normalize-options
-                                                 (:options field)))
+                         (let [nopts (fu/normalize-options (:options field))
+                               nopts (concat nopts (mapcat fu/normalize-options
+                                                           (keep #(nth % 2 nil)
+                                                                 nopts)))
+                               opts (map first nopts)
                                opts (if (:first-option field)
                                       (cons (ffirst (fu/normalize-options
                                                       [(:first-option field)]))

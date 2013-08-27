@@ -193,7 +193,7 @@
                                               [nil (cons group-label colopts)])]]
             [:div.cb-group
              (when group-label
-               [:h4.cb-group-heading (second group-label)])
+               [:h5.cb-group-heading (second group-label)])
              (for [[oval olabel] colopts]
                (let [id (str (:id field) "__" (opt-slug oval))]
                  [:div.cb-shell

@@ -186,14 +186,22 @@
                               (range 1 (inc cols))
                               (partition-all cb-per-col opts))]
        [:div {:class (str "cb-col cb-col-" col)}
-        (for [[oval olabel] colopts]
-          (let [id (str (:id field) "__" (opt-slug oval))]
-            [:div.cb-shell
-             [:label.checkbox {:for id} " "
-              [:span.cb-input-shell
-               (render-field {:name fname :id id :checked (contains? vals (str oval))
-                              :type :checkbox :value (str oval)})] " "
-              [:span.cb-label [:nobr olabel]]]]))])]))
+        (let [groups (fu/partition-between #(nth %2 2 false) colopts)]
+          (for [[group-label & colopts] groups
+                :let [[group-label colopts] (if (nth group-label 2 false)
+                                              [group-label colopts]
+                                              [nil (cons group-label colopts)])]]
+            [:div.cb-group
+             (when group-label
+               [:h4.cb-group-heading (second group-label)])
+             (for [[oval olabel] colopts]
+               (let [id (str (:id field) "__" (opt-slug oval))]
+                 [:div.cb-shell
+                  [:label.checkbox {:for id} " "
+                   [:span.cb-input-shell
+                    (render-field {:name fname :id id :checked (contains? vals (str oval))
+                                   :type :checkbox :value (str oval)})] " "
+                   [:span.cb-label [:nobr olabel]]]]))]))])]))
 
 (defn- render-radios [field]
   (let [val (str (:value field))

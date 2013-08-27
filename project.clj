@@ -1,4 +1,4 @@
-(defproject formative "0.7.4"
+(defproject formative "0.7.5-SNAPSHOT"
   :description "Web forms - rendering, parsing, and validating"
   :url "https://github.com/jkk/formative"
   :license {:name "Eclipse Public License"
@@ -7,7 +7,8 @@
                  [org.clojure/clojurescript "0.0-1843"]
                  [jkkramer/verily "0.5.5"]
                  [clj-time "0.5.1"]
-                 [prismatic/dommy "0.1.1"]]
+                 [prismatic/dommy "0.1.1"]
+                 [ring-anti-forgery "0.2.1"]]
   :test-paths ["target/test-classes"]
   :cljx {:builds [{:source-paths ["src"]
                    :output-path "target/classes"

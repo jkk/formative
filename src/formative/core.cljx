@@ -6,7 +6,8 @@
             formative.render.inline
             [formative.util :as fu]
             [clojure.walk :refer [stringify-keys]]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            #+clj [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]))
 
 (def ^:dynamic *renderer* :bootstrap-horizontal)
 
@@ -166,7 +167,8 @@
   a submit button field, etc. See render-form for a description of the form
   specification."
   [spec]
-  (let [form-attrs (select-keys
+  (let [;; HTML attrs
+        form-attrs (select-keys
                      spec [:action :method :enctype :accept :name :id :class
                            :onsubmit :onreset :accept-charset :autofill
                            :novalidate :autocomplete])
@@ -175,22 +177,32 @@
         form-attrs (assoc form-attrs
                      :method (if (= "GET" method) method "POST")
                      :renderer (:renderer spec *renderer*))
+        ;; Field values
         values (stringify-keys
                  (if (string? (:values spec))
                    (fu/decode-form-data (:values spec))
                    (:values spec)))
         fields (:fields spec)
+        ;; Emulate HTTP methods
         [fields values] (if-not (#{"PUT" "DELETE" "PATCH"} method)
                           [fields values]
                           [(cons {:type :hidden :name "_method"} fields)
                            (assoc values "_method" method)])
+        ;; CSRF protection
+        #+clj [fields values] #+clj (if (and (not= "GET" method) (bound? #'*anti-forgery-token*)
+                                             *anti-forgery-token*)
+                                      [(cons {:type :hidden :name "__anti-forgery-token"} fields)
+                                       (assoc values "__anti-forgery-token" *anti-forgery-token*)]
+                                      [fields values])
         fields (prep-fields fields values spec)
+        ;; Attach :cancel-href to submit button
         fields (if (:cancel-href spec)
                  (for [field fields]
                    (if (= :submit (:type field))
                      (assoc field :cancel-href (:cancel-href spec))
                      field))
                  fields)
+        ;; Add submit if not already present
         fields (if (or (some #(= :submit (:type %)) fields)
                        (nil? (:submit-label spec ::absent)))
                  fields
@@ -199,6 +211,7 @@
                            :name "submit"
                            :cancel-href (:cancel-href spec)
                            :value (:submit-label spec "Submit")}]))
+        ;; Problems
         problems (prep-problems (:problems spec))
         fields (for [field fields]
                  (if (problems (:name field))

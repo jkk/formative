@@ -243,6 +243,10 @@ Other useful functions in `formative.dom`:
 * `clear-problems [container-or-form-el]` - clears problems from a form
 * `show-problems [form-spec container-or-form-el problems]` - shows problems for a form
 
+## CSRF Protection
+
+If you include the [ring-anti-forgery](https://github.com/weavejester/ring-anti-forgery) middleware in your app, Formative will automatically include its CSRF token in forms with method :post (the default).
+
 ## Quick Reference
 
 ### Form Specification

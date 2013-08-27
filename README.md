@@ -409,8 +409,8 @@ Built-in field types:
 
 The :options key for :select and other types accepts a collection of any of the following formats:
 
-      ["value" "label"]
-      {:value "value" :label "label"}
+      ["value" "label" optgroup?]
+      {:value "value" :label "label" :optgroup false}
       "value and label"
 
 The :options value can also be a function of no arguments or a Delay object -- either of which must yield a collection in one of the above formats.

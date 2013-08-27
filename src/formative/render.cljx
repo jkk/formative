@@ -118,6 +118,11 @@
                                       :onfocus :onblur :placeholder])]
     [:textarea attrs (fu/escape-html (render-input-val field))]))
 
+(defn ^:private build-opt-tags [opts val]
+  (for [[v text] opts
+        :let [v (str v)]]
+    [:option {:value v :selected (= val v)} text]))
+
 (defmethod render-field :select [field]
   (let [attrs (get-input-attrs field [:name :id :class :autofocus
                                       :disabled :multiple :size :readonly
@@ -129,9 +134,17 @@
                (concat (fu/normalize-options [(:first-option field)])
                        opts)
                opts)
-        opt-tags (for [[v text] opts
-                       :let [v (str v)]]
-                   [:option {:value v :selected (= val v)} text])
+        group-labels (distinct (map #(nth % 2 nil) opts))
+        opt-tags (if (or (< 1 (count group-labels))
+                         (and (= 1 (count group-labels))
+                              (not= nil (first group-labels))))
+                   (let [groups (fu/partition-between #(nth %2 2 false) opts)]
+                     (for [[group-label & group-opts] groups]
+                       (if (nth group-label 2 false)
+                         [:optgroup {:label (second group-label)}
+                          (build-opt-tags group-opts val)]
+                         (build-opt-tags (cons group-label group-opts) val))))
+                   (build-opt-tags opts val))
         placeholder (if (true? (:placeholder field))
                       "Select one..."
                       (:placeholder field))

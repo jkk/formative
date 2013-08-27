@@ -118,9 +118,8 @@
                                       :onfocus :onblur :placeholder])]
     [:textarea attrs (fu/escape-html (render-input-val field))]))
 
-(defn ^:private build-opt-tags [opts val]
-  (for [[v text] opts
-        :let [v (str v)]]
+(defn ^:private build-opt-tag [v text val]
+  (let [v (str v)]
     [:option {:value v :selected (= val v)} text]))
 
 (defmethod render-field :select [field]
@@ -134,17 +133,12 @@
                (concat (fu/normalize-options [(:first-option field)])
                        opts)
                opts)
-        group-labels (distinct (map #(nth % 2 nil) opts))
-        opt-tags (if (or (< 1 (count group-labels))
-                         (and (= 1 (count group-labels))
-                              (not= nil (first group-labels))))
-                   (let [groups (fu/partition-between #(nth %2 2 false) opts)]
-                     (for [[group-label & group-opts] groups]
-                       (if (nth group-label 2 false)
-                         [:optgroup {:label (second group-label)}
-                          (build-opt-tags group-opts val)]
-                         (build-opt-tags (cons group-label group-opts) val))))
-                   (build-opt-tags opts val))
+        opt-tags (for [[v text subopts] opts]
+                   (if (empty? subopts)
+                     (build-opt-tag v text val)
+                     [:optgroup {:label text}
+                      (for [[v text] (fu/normalize-options subopts)]
+                        (build-opt-tag v text val))]))
         placeholder (if (true? (:placeholder field))
                       "Select one..."
                       (:placeholder field))
@@ -175,7 +169,15 @@
         cols (:cols field 1)
         cb-per-col (+ (quot (count opts) cols)
                       (if (zero? (rem (count opts) cols))
-                        0 1))]
+                        0 1))
+        build-cb (fn [oval olabel]
+                   (let [id (str (:id field) "__" (opt-slug oval))]
+                     [:div.cb-shell
+                      [:label.checkbox {:for id} " "
+                       [:span.cb-input-shell
+                        (render-field {:name fname :id id :checked (contains? vals (str oval))
+                                       :type :checkbox :value (str oval)})] " "
+                       [:span.cb-label [:nobr olabel]]]]))]
     [:div.checkboxes
      ;; FIXME: this prevents checkbox values from being absent in the submitted
      ;; request, but at the cost of including an empty value which must be
@@ -186,22 +188,13 @@
                               (range 1 (inc cols))
                               (partition-all cb-per-col opts))]
        [:div {:class (str "cb-col cb-col-" col)}
-        (let [groups (fu/partition-between #(nth %2 2 false) colopts)]
-          (for [[group-label & colopts] groups
-                :let [[group-label colopts] (if (nth group-label 2 false)
-                                              [group-label colopts]
-                                              [nil (cons group-label colopts)])]]
-            [:div.cb-group
-             (when group-label
-               [:h5.cb-group-heading (second group-label)])
-             (for [[oval olabel] colopts]
-               (let [id (str (:id field) "__" (opt-slug oval))]
-                 [:div.cb-shell
-                  [:label.checkbox {:for id} " "
-                   [:span.cb-input-shell
-                    (render-field {:name fname :id id :checked (contains? vals (str oval))
-                                   :type :checkbox :value (str oval)})] " "
-                   [:span.cb-label [:nobr olabel]]]]))]))])]))
+        (for [[oval olabel subopts] colopts]
+           (if (empty? subopts)
+             (build-cb oval olabel)
+             [:div.cb-group
+              [:h5.cb-group-heading olabel]
+              (for [[oval olabel] (fu/normalize-options subopts)]
+                (build-cb oval olabel))]))])]))
 
 (defn- render-radios [field]
   (let [val (str (:value field))

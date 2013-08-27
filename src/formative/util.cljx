@@ -14,7 +14,7 @@
                :else opts)]
     (if (coll? (first opts))
       (if (map? (first opts))
-        (map (juxt :value :label :optgroup) opts)
+        (map (juxt :value :label :options) opts)
         opts)
       (map #(vector % %) opts))))
 
@@ -317,17 +317,6 @@
         m))
     {}
     (string/split data #"&")))
-
-(defn partition-between [f coll]
-  (lazy-seq
-    (when-let [s (seq coll)]
-      (let [fst (first s)]
-        (if-let [rs (next s)]
-          (if (f fst (first rs))
-            (cons (list fst) (partition-between f rs))
-            (let [rest-part (partition-between f rs)]
-              (cons (cons fst (first rest-part)) (rest rest-part))))
-          (list (list fst)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

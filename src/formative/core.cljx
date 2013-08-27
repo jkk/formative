@@ -381,9 +381,12 @@
   The :options key for :select and other types accepts a collection of any
   of the following formats:
 
-    [\"value\" \"label\" optgroup?]
-    {:value \"value\" :label \"label\" :optgroup false}
+    [\"value\" \"label\" sub-options]
+    {:value \"value\" :label \"label\" :options sub-options}
     \"value and label\"
+
+  If sub-options are provided, the element is rendered as a group (e.g.,
+  optgroup for :select fields).
 
   The :options value can also be a function of no arguments or a Delay object --
   either of which must yield a collection in one of the above formats.

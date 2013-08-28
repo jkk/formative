@@ -242,7 +242,7 @@
   (reduce
     (fn [vals spec]
       (let [sname (fu/expand-name (:name spec))
-            kname (map keyword sname)]
+            kname (mapv keyword sname)]
         (if (or (contains-in? np sname)
                 (contains-in? np kname))
           (let [raw-val (fix-input
@@ -250,7 +250,14 @@
                 val (parse-input spec raw-val)]
             (if (= val ::absent)
               (if absent-nil? (assoc-in vals kname nil) vals)
-              (assoc-in vals kname val)))
+              (if (and (map? val) (:flatten spec))
+                (let [ktip (name (peek kname))
+                      kbase (pop kname)]
+                  (reduce-kv 
+                    (fn [vals k v]
+                      (assoc-in vals (conj kbase (keyword (str ktip "-" (name k)))) v))
+                    vals val))
+                (assoc-in vals kname val))))
           (if absent-nil?
             (assoc-in vals kname nil)
             vals))))

@@ -298,6 +298,9 @@
       :datatype-error - Optional custom error message to use if datatype
                       validation fails.
       :blank-nil    - When the value is parsed, replace a blank string with nil
+      :flatten      - If a value parses to a map (e.g. for :compound fields),
+                      adds each key of the map to the top level values map,
+                      prefixed with the field name and a dash.
       :note         - A bit of explanatory content to accompany the field
       :prefix       - Content to insert before a field
       :suffix       - Content to insert after a field

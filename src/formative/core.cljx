@@ -29,10 +29,22 @@
   (fn [field values & [form]]
     (:type field)))
 
+(defn- begins-with [s sub]
+  (when (< (count sub) (count s)) ;must be longer in this case
+    (= sub (subs s 0 (count sub)))))
+
 (defn- prep-field-default [field values & [form]]
   (cond-> (assoc field
                  :value (or (get-in values (fu/expand-name (:name field)))
-                            (get values (:name field)))
+                            (get values (:name field))
+                            (when (:flatten field)
+                              (let [name-prefix (str (:name field) "-")]
+                                (reduce-kv
+                                  (fn [val k v]
+                                    (if (begins-with k name-prefix)
+                                      (assoc val (subs k (count name-prefix)) v)
+                                      val))
+                                  nil values))))
                  :label (r/get-field-label field))
           (:blank-nil form) (assoc :blank-nil true)))
 

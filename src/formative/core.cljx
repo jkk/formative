@@ -33,18 +33,21 @@
   (when (< (count sub) (count s)) ;must be longer in this case
     (= sub (subs s 0 (count sub)))))
 
+(defn- get-value [values field]
+  (or (get-in values (fu/expand-name (:name field)))
+      (get values (:name field))
+      (when (:flatten field)
+        (let [name-prefix (str (:name field) "-")]
+          (reduce-kv
+            (fn [val k v]
+              (if (begins-with k name-prefix)
+                (assoc val (subs k (count name-prefix)) v)
+                val))
+            nil values)))))
+
 (defn- prep-field-default [field values & [form]]
   (cond-> (assoc field
-                 :value (or (get-in values (fu/expand-name (:name field)))
-                            (get values (:name field))
-                            (when (:flatten field)
-                              (let [name-prefix (str (:name field) "-")]
-                                (reduce-kv
-                                  (fn [val k v]
-                                    (if (begins-with k name-prefix)
-                                      (assoc val (subs k (count name-prefix)) v)
-                                      val))
-                                  nil values))))
+                 :value (get-value values field)
                  :label (r/get-field-label field))
           (:blank-nil form) (assoc :blank-nil true)))
 
@@ -63,7 +66,7 @@
                 (assoc field :value "true" :unchecked-value "false"
                        :datatype :boolean)
                 field)
-        val (get-in values (fu/expand-name (:name field)))]
+        val (get-value values field)]
     (assoc field
       :value (:value field "true")
       :checked (= (str val) (str (:value field "true")))

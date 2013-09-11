@@ -208,10 +208,10 @@
                                       [fields values])
         fields (prep-fields fields values spec)
         ;; Attach :cancel-href to submit button
-        fields (if (:cancel-href spec)
+        fields (if (or (:cancel-label spec) (:cancel-href spec))
                  (for [field fields]
                    (if (= :submit (:type field))
-                     (assoc field :cancel-href (:cancel-href spec))
+                     (merge field (select-keys spec [:cancel-label :cancel-href]))
                      field))
                  fields)
         ;; Add submit if not already present
@@ -221,6 +221,7 @@
                  (concat fields
                          [{:type :submit
                            :name "submit"
+                           :cancel-label (:cancel-label spec "Cancel")
                            :cancel-href (:cancel-href spec)
                            :value (:submit-label spec "Submit")}]))
         ;; Problems
@@ -259,6 +260,7 @@
       :values       - Map of values used to populate the form fields, or a
                       form-data-encoded string
       :submit-label - Label to use on the submit button. Defaults to \"Submit\"
+      :cancel-label - Label to use on the cancel button. Defaults to \"Cancel\"
       :cancel-href  - When provided, shows a \"Cancel\" hyperlink next to the
                       submit button
       :validations  - A sequence of validation specifications

@@ -41,7 +41,7 @@
           (when (and (= :submit (:type field))
                      (:cancel-href field))
             [:span.cancel-link " " [:a.btn {:href (:cancel-href field)}
-                                    "Cancel"]])
+                                    (:cancel-label field)]])
           (when (:note field)
             [:div.note.help-inline (:note field)])]))]))
 

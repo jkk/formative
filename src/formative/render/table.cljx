@@ -18,7 +18,7 @@
                   (when (:suffix field)
                     [:span.suffix (:suffix field)])
                   (when (and (= :submit (:type field)) (:cancel-href field))
-                    [:span.cancel-link " " [:a {:href (:cancel-href field)} "Cancel"]])
+                    [:span.cancel-link " " [:a {:href (:cancel-href field)} (:cancel-label field)]])
                   (when (:note field)
                     [:div.note (:note field)])]
         label-el (when (and (not (#{:checkbox} (:type field))) (:label field))

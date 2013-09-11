@@ -20,7 +20,7 @@
         (when (:suffix field)
           [:span.suffix (:suffix field)])
         (when (and (= :submit (:type field)) (:cancel-href field))
-          [:span.cancel-link " " [:a {:href (:cancel-href field)} "Cancel"]])
+          [:span.cancel-link " " [:a {:href (:cancel-href field)} (:cancel-label field)]])
         (when (:note field)
           [:span.note (:note field)])])]))
 

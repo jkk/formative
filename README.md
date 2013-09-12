@@ -270,6 +270,7 @@ The following special keys are also supported:
       :values         - Map of values used to populate the form fields, or a
                         form-data-encoded string
       :submit-label   - Label to use on the submit button. Defaults to "Submit"
+      :cancel-label   - Label to use on the cancel button. Defaults to "Cancel"
       :cancel-href    - When provided, shows a "Cancel" link or button next to the
                         submit button
       :validations    - A sequence of validation specifications

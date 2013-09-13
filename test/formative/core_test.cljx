@@ -53,6 +53,7 @@
               {:type :submit,
                :name "submit",
                :cancel-href "/example",
+               :cancel-label "Cancel"
                :value "Do It"})))))
 
 (deftest merge-fields-test

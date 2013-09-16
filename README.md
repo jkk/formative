@@ -13,7 +13,7 @@ See a __live demo__ at [formative-demo.herokuapp.com](http://formative-demo.hero
 Leiningen coordinate:
 
 ```clj
-[formative "0.8.5"]
+[formative "0.8.6"]
 ```
 
 ## Usage

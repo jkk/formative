@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-1843"]
-                 [jkkramer/verily "0.5.5"]
+                 [jkkramer/verily "0.6.0"]
                  [clj-time "0.5.1"]
                  [prismatic/dommy "0.1.1"]
                  [ring-anti-forgery "0.2.1"]]

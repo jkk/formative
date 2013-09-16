@@ -294,7 +294,9 @@ New form renderers can be implemented using the `formative.render/render-form` m
 A field specification is a map with keys corresponding to HTML attributes and
 the following special keys:
 
-      :name         - Required name of the field, a keyword or string
+      :name         - Required name of the field, a keyword or string. Use
+                      dotted keywords like :foo.bar to represent fields that
+                      will parse as nested map values.
       :label        - Optional display name. Auto-generated from :name if not
                       provided
       :type         - Type of the field. Defaults to :text. See below for

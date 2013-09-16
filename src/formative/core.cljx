@@ -11,12 +11,21 @@
 
 (def ^:dynamic *renderer* :bootstrap-horizontal)
 
+(defn- normalize-name [fname]
+  (if (keyword? fname)
+    (let [fname (name fname)
+          parts (string/split fname #"\.")]
+      (if (next parts)
+        (apply str (first parts) (map #(str "[" % "]") (rest parts)))
+        fname))
+    fname))
+
 (defn normalize-field
   "Ensures :name and :type keys are in the right format"
   [field]
   {:pre [(:name field)]}
   (assoc field
-    :name (name (:name field))
+    :name (normalize-name (:name field))
     :type (if (:type field)
             (keyword (name (:type field)))
             :text)))
@@ -283,7 +292,9 @@
 
   A field specification is a map with the following keys:
 
-      :name         - Required name of the field, a keyword or string
+      :name         - Required name of the field, a keyword or string. Use
+                      dotted keywords like :foo.bar to represent fields that
+                      will parse as nested map values.
       :label        - Optional display name. Auto-generated from :name if not
                       provided
       :type         - Type of the field. Defaults to :text. See below for

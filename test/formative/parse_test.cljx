@@ -70,7 +70,8 @@
             {:name :f-heading :type :heading}
             {:name :f-labeled-html :type :labeled-html}
             {:name :f-html :type :html}
-            {:name "foo[bar][baz]" :datatype :int}]})
+            {:name "foo[bar][baz]" :datatype :int}
+            {:name :foo2.bar.baz :datatype :int}]})
 
 (def good-params
   {:f-default "foo"
@@ -118,7 +119,8 @@
    :f-heading "foo"
    :f-labeled-html "foo"
    :f-html "foo"
-   :foo {:bar {:baz "1"}}})
+   :foo {:bar {:baz "1"}}
+   :foo2 {:bar {:baz "1"}}})
 
 (def good-values
   {:f-default "foo"
@@ -172,7 +174,8 @@
    :f-time-select (fu/to-time (fu/parse-time "12:00"))
    :f-datetime-select (fu/to-date (fu/utc-date 2012 12 25 #+clj 23 #+cljs 18 0))
    :f-currency #+clj 123.45M #+cljs "123.45"
-   :foo {:bar {:baz 1}}})
+   :foo {:bar {:baz 1}}
+   :foo2 {:bar {:baz 1}}})
 
 (deftest parse-test
   (testing "Known-good params"

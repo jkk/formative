@@ -35,7 +35,7 @@
       name
       (string/replace #"[_-]" " ")
       (string/replace #"^[^\[]+\[([^\]])" "$1")
-      (string/replace #"[\[\]]" " ")
+      (string/replace #"[\[\]\.]" " ")
       (string/replace #"\bid\b" "ID")
       ucfirst
       string/trim)))

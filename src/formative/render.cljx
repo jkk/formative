@@ -1,7 +1,8 @@
 (ns formative.render
   (:require [formative.data :as data]
             [formative.util :as fu]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            #+cljs [goog.string :as gstring]))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any
@@ -344,6 +345,9 @@
         :else [h "am"])
       [h])))
 
+(defn- format-minutes [m]
+  (#+clj format #+cljs gstring/format "%02d" m))
+
 (defn- render-time-select-multi [fname h m s step ampm? seconds?]
   (let [[h ampm] (get-hour+ampm h ampm?)]
     (list
@@ -359,7 +363,7 @@
                      :class "input-small"
                      :value m
                      :first-option ["" "--"]
-                     :options (map (juxt identity #(format "%02d" %))
+                     :options (map (juxt identity format-minutes)
                                    (range 0 60 step))})
       (when seconds?
         (list
@@ -369,7 +373,7 @@
                          :class "input-small"
                          :value s
                          :first-option ["" "--"]
-                         :options (map (juxt identity #(format "%02d" %))
+                         :options (map (juxt identity format-minutes)
                                        (range 0 60 step))})))
       (when ampm?
         (list
@@ -397,7 +401,7 @@
 (defn- format-time [h m ampm?]
   (let [[h ampm] (get-hour+ampm h ampm?)]
     (str h ":"
-         (format "%02d" m)
+         (format-minutes m)
          (when ampm? (str " " ampm)))))
 
 (defn- render-time-select-single [field h m step ampm? start end]
@@ -408,11 +412,11 @@
         opts (for [[h m] (time-range (fu/get-hours-minutes-seconds start)
                                      (fu/get-hours-minutes-seconds end)
                                      step)]
-               [(str h ":" (format "%02d" m))
+               [(str h ":" (format-minutes m))
                 (format-time h m ampm?)])]
     (render-field (assoc field
                          :type :select
-                         :value (str h ":" (format "%02d" m))
+                         :value (str h ":" (format-minutes m))
                          :options opts))))
 
 (defmethod render-field :time-select [field]

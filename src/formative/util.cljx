@@ -2,7 +2,8 @@
   (:require [clojure.string :as string]
             #+clj [clj-time.core :as ct]
             #+clj [clj-time.coerce :as cc]
-            #+clj [clj-time.format :as cf])
+            #+clj [clj-time.format :as cf]
+            #+cljs [goog.string :as gstring])
   (:import #+clj org.joda.time.DateTime
            #+clj org.joda.time.LocalDate
            #+clj org.joda.time.LocalTime))
@@ -219,7 +220,7 @@
 (defn format-time [t]
   #+clj (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone ^DateTime t))
                     t)
-  #+cljs (format "%02d:%02d" (hour t) (minute t)))
+  #+cljs (gstring/format "%02d:%02d" (hour t) (minute t)))
 
 (defn to-time [date]
   #+clj (java.sql.Time. (cc/to-long date))

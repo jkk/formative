@@ -199,19 +199,26 @@
 
 (defn- render-radios [field]
   (let [val (str (:value field))
-        opts (fu/normalize-options (:options field))]
+        opts (fu/normalize-options (:options field))
+        build-radio (fn [oval olabel]
+                      (let [id (str (:id field) "__" (opt-slug oval))]
+                        [:div.radio-shell
+                         [:label.radio {:for id}
+                          [:span.radio-input-shell
+                           (render-default-input {:name (:name field) :id id
+                                                  :type :radio
+                                                  :checked (= val (str oval))
+                                                  :value oval})]
+                          " "
+                          [:span.radio-label [:nobr olabel]]]]))]
     [:div.radios
-     (for [[oval olabel] opts]
-       (let [id (str (:id field) "__" (opt-slug oval))]
-         [:div.radio-shell
-          [:label.radio {:for id}
-           [:span.radio-input-shell
-            (render-default-input {:name (:name field) :id id
-                                   :type :radio
-                                   :checked (= val (str oval))
-                                   :value oval})]
-           " "
-           [:span.radio-label [:nobr olabel]]]]))]))
+     (for [[oval olabel subopts] opts]
+       (if (empty? subopts)
+         (build-radio oval olabel)
+         [:div.radio-group
+          [:h5.radio-group-heading olabel]
+          (for [[oval olabel] (fu/normalize-options subopts)]
+            (build-radio oval olabel))]))]))
 
 (defmethod render-field :radio [field]
   (render-radios field))

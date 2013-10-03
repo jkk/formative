@@ -33,20 +33,21 @@
   (parse-long spec v))
 
 (defmethod parse-input :ints [spec v]
-  (map #(parse-long spec %) v))
+  (map #(parse-long spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :long [spec v]
   (parse-long spec v))
 
 (defmethod parse-input :longs [spec v]
-  (map #(parse-long spec %) v))
+  (map #(parse-long spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :boolean [_ v]
   #+clj (Boolean/valueOf v)
   #+cljs (contains? #{"true" "on"} v))
 
 (defmethod parse-input :booleans [_ v]
-  (map #+clj #(Boolean/valueOf %) #+cljs #(contains? #{"true" "on"} %) v))
+  (map #+clj #(Boolean/valueOf %) #+cljs #(contains? #{"true" "on"} %)
+       (fu/seqify-value v)))
 
 (defn- parse-double [spec x]
   (when-not (string/blank? x)
@@ -59,13 +60,13 @@
   (parse-double spec v))
 
 (defmethod parse-input :floats [spec v]
-  (map #(parse-double spec %) v))
+  (map #(parse-double spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :double [spec v]
   (parse-double spec v))
 
 (defmethod parse-input :doubles [spec v]
-  (map #(parse-double spec %) v))
+  (map #(parse-double spec %) (fu/seqify-value v)))
 
 (defn- parse-bigdec [spec x]
   (when-not (string/blank? x)
@@ -78,7 +79,7 @@
   (parse-bigdec spec v))
 
 (defmethod parse-input :decimals [spec v]
-  (map #(parse-bigdec spec %) v))
+  (map #(parse-bigdec spec %) (fu/seqify-value v)))
 
 (defn- parse-bigint [spec x]
   (when-not (string/blank? x)
@@ -91,7 +92,7 @@
   (parse-bigint spec v))
 
 (defmethod parse-input :bigints [spec v]
-  (map #(parse-bigint spec %) v))
+  (map #(parse-bigint spec %) (fu/seqify-value v)))
 
 (defn- parse-date [spec x]
   (when-not (string/blank? x)
@@ -104,13 +105,13 @@
   (parse-date spec v))
 
 (defmethod parse-input :dates [spec v]
-  (map #(parse-date spec %) v))
+  (map #(parse-date spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :date-text [spec v]
   (parse-date spec v))
 
 (defmethod parse-input :date-texts [spec v]
-  (map #(parse-date spec %) v))
+  (map #(parse-date spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :date-select [spec v]
   (when (every? (comp (complement string/blank?) #(get v %))
@@ -137,7 +138,7 @@
   (parse-time spec v))
 
 (defmethod parse-input :times [spec v]
-  (map #(parse-time spec %) v))
+  (map #(parse-time spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :time-select [spec v]
   (if (:compact spec)
@@ -168,7 +169,7 @@
   (parse-instant spec v))
 
 (defmethod parse-input :instants [spec v]
-  (map #(parse-instant spec %) v))
+  (map #(parse-instant spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :datetime-select [spec v]
   (when (every? (comp (complement string/blank?) #(get v %))

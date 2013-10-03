@@ -19,6 +19,13 @@
         opts)
       (map #(vector % %) opts))))
 
+(defn seqify-value [s & [split-re]]
+  (cond
+    (sequential? s) s
+    (and (string? s) (not (string/blank? s))) (string/split
+                                                s (or split-re #"\s*,\s*"))
+    :else [s]))
+
 (def default-date-format "yyyy-MM-dd")
 
 #+clj

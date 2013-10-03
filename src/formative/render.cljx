@@ -81,17 +81,33 @@
 
 (defmethod render-input-val :default [field]
   (let [v (:value field)]
-    (if (string? v) v (str v))))
+    (if (string? v)
+      v
+      (if (sequential? v)
+        (string/join ", " (map str v))
+        (str v)))))
 
 (defmethod render-input-val :date [field]
   (if-let [date (fu/normalize-date (:value field) (:date-format field))]
     (fu/format-date date (:date-format field))
     ""))
 
+(defmethod render-input-val :dates [field]
+  (let [vs (fu/seqify-value (:value field))]
+    (string/join ", " (for [v vs]
+                        (when-let [date (fu/normalize-date v (:date-format field))]
+                          (fu/format-date date (:date-format field)))))))
+
 (defmethod render-input-val :time [field]
   (if-let [time (fu/normalize-time (:value field))]
     (fu/format-time time)
     ""))
+
+(defmethod render-input-val :times [field]
+  (let [vs (fu/seqify-value (:value field))]
+    (string/join ", " (for [v vs]
+                        (when-let [time (fu/normalize-time v)]
+                          (fu/format-time time))))))
 
 (defn render-default-input [field & [opts]]
   (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus

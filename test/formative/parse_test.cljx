@@ -86,7 +86,7 @@
    :f-time "23:06"
    :f-instant "2012-12-25T23:06:00"
    :f-ints ["123" "456" "789"]
-   :f-longs ["123" "456" "789"]
+   :f-longs "123,456, 789"
    :f-booleans ["true" "true" "false"]
    :f-floats ["123.45" "678.90"]
    :f-doubles ["123.45" "678.90"]

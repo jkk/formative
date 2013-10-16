@@ -21,9 +21,11 @@
 
 (defn seqify-value [s & [split-re]]
   (cond
-    (sequential? s) s
-    (and (string? s) (not (string/blank? s))) (string/split
-                                                s (or split-re #"\s*,\s*"))
+    (or (sequential? s) (nil? s)) s
+    (string? s) (if (string/blank? s)
+                  []
+                  (string/split s (or split-re #"\s*,\s*")))
+    (nil? s) s
     :else [s]))
 
 (def default-date-format "yyyy-MM-dd")

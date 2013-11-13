@@ -70,6 +70,7 @@ Renderers are pluggable and can return any kind of format -- e.g., Hiccup or str
 
 * `:bootstrap-horizontal` (the default)
 * `:bootstrap-stacked`
+* `:bootstrap3-stacked`
 * `:table`
 * `:inline`
 
@@ -192,7 +193,7 @@ Built in validations:
 
 #### `:validator`
 
-A function that takes a map of parsed values and returns a problem map or sequence of problem maps. A problem map has the keys `:keys`, indicating which keys were problems (optional), and `:msg`, a description of what's wrong. If `nil` or an empty sequence is returned, validation succeeds. 
+A function that takes a map of parsed values and returns a problem map or sequence of problem maps. A problem map has the keys `:keys`, indicating which keys were problems (optional), and `:msg`, a description of what's wrong. If `nil` or an empty sequence is returned, validation succeeds.
 
 ```clj
 (defn validate-password [values]
@@ -286,7 +287,7 @@ The following special keys are also supported:
                         show descriptive messages.
       :timezone       - String of timezone with which to localize the display of
                         :datetime-select fields. The default is UTC. JVM only.
-                      
+
 New form renderers can be implemented using the `formative.render/render-form` multimethod.
 
 ### Field Specification

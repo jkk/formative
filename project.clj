@@ -4,7 +4,6 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-1843"]
                  [jkkramer/verily "0.6.0"]
                  [clj-time "0.5.1"]
                  [prismatic/dommy "0.1.1"]
@@ -23,6 +22,7 @@
                    :output-path "target/test-classes"
                    :rules :cljs}]}
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]
+                                  [org.clojure/clojurescript "0.0-1843"]
                                   [com.cemerick/piggieback "0.0.5"]
                                   [com.keminglabs/cljx "0.3.0"]]
                    :plugins [[com.keminglabs/cljx "0.3.0"]]

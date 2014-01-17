@@ -3,6 +3,7 @@
             formative.render.table
             formative.render.div
             formative.render.bootstrap
+            formative.render.bootstrap3
             formative.render.inline
             [formative.util :as fu]
             [clojure.walk :refer [stringify-keys]]
@@ -246,8 +247,8 @@
 
 (defn render-form
   "Given a form specification, returns a rendering of the form - e.g., Hiccup
-  data, an HTML string, etc. 
-  
+  data, an HTML string, etc.
+
   Valid keys for spec include the following HTML form attributes:
 
       :action :method :enctype :accept :name :id :class
@@ -264,10 +265,11 @@
       :renderer     - Determines renderer to use. Built-in options:
                         :bootstrap-horizontal (the default)
                         :bootstrap-stacked
+                        :bootstrap3-stacked
                         :table
                         :inline
                       Custom renderers can be created by implementing the
-                      formative.render/render-form multimethod. 
+                      formative.render/render-form multimethod.
       :fields       - Sequence of form field specifications. See below.
       :values       - Map of values used to populate the form fields, or a
                       form-data-encoded string

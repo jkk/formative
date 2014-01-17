@@ -6,24 +6,28 @@
 
 (defn render-bootstrap-row [field]
   (let [field-id (util/get-field-id field)
-        field (assoc field :id field-id :class "form-control")
+        checkbox? (= :checkbox (:type field))
+        field (assoc field
+                     :id field-id
+                     :class (if checkbox? "" "form-control"))
         field (if (= :submit (:type field))
                 (assoc field :class (str (:class field)
                                          " btn btn-primary"))
                 field)]
 
     [:div {:id (util/get-field-container-id field)
-           :class (str (:div-class field)
+           :class (str (if checkbox? "checkbox " "form-group ")
+                       (:div-class field)
                        (when (:problem field) " has-error problem " ))}
      (if (= :heading (:type field))
        (when (:text field) [:legend (render-field field)])
        (list
-         (when (and (not (#{:checkbox} (:type field))) (:label field))
-                 [:label.control-label {:for field-id} (:label field)])
+         (when (and (not checkbox?) (:label field))
+           [:label.control-label {:for field-id} (:label field)])
          (when (:prefix field)
             [:span.prefix (:prefix field)])
-          (if (= :checkbox (:type field))
-            [:label.checkbox {:for field-id} " "
+          (if checkbox?
+            [:label {:for field-id} " "
              (render-field field) " "
              [:span.cb-label (:label field)]]
             (render-field field))
@@ -91,8 +95,12 @@
       (list
        (map render-field hidden-fields)
        (for [fieldset (group-fieldsets visible-fields)]
-         [:fieldset {:class (str "row form-group fieldset-" (name (:name (first fieldset))))}
+         [:fieldset {:class (str "fieldset-" (name (:name (first fieldset))))}
           (map render-bootstrap-row fieldset)]))]))
 
 (defmethod render-form :bootstrap3-stacked [form-attrs fields opts]
-  (render-bootstrap-form form-attrs fields "" opts))
+  (render-bootstrap-form form-attrs fields "form-shell" opts))
+
+;; Broken
+#_(defmethod render-form :bootstrap3-horizontal [form-attrs fields opts]
+   (render-bootstrap-form form-attrs fields "form-shell form-horizontal" opts))

@@ -2,7 +2,8 @@
   (:require [formative.data :as data]
             [formative.util :as fu]
             [clojure.string :as string]
-            #+cljs [goog.string :as gstring]))
+            #+cljs [goog.string :as gstring]
+            #+cljs goog.string.format))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any

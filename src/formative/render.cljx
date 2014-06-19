@@ -137,8 +137,12 @@
     [:textarea attrs (fu/escape-html (render-input-val field))]))
 
 (defn ^:private build-opt-tag [v text val]
-  (let [v (str v)]
-    [:option {:value v :selected (= val v)} text]))
+  (let [v (str v)
+        attrs {:value v}
+        attrs (if (= val v)
+                (assoc attrs :selected "true")
+                attrs)]
+    [:option attrs text]))
 
 (defmethod render-field :select [field]
   (let [attrs (get-input-attrs field [:name :id :class :autofocus

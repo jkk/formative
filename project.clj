@@ -5,7 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [jkkramer/verily "0.6.0"]
-                 [clj-time "0.5.1"]
+                 [clj-time "0.6.0"]
                  [prismatic/dommy "0.1.1"]
                  [ring-anti-forgery "0.2.1"]]
   :test-paths ["target/test-classes"]

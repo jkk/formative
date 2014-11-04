@@ -218,7 +218,7 @@
   #+cljs (.getUTCMinutes date))
 
 (defn sec [date]
-  #+clj (ct/sec date)
+  #+clj (ct/second date)
   #+cljs (.getUTCSeconds date))
 
 (defn get-hours-minutes-seconds [date]
@@ -292,8 +292,17 @@
     (string/replace ">"  "&gt;")
     (string/replace "\"" "&quot;")))
 
-(defn get-month-names []
-  #+clj (.getMonths (java.text.DateFormatSymbols.))
+(defn get-date-format-symbols [locale-string]
+  "Returns an instance of java.text.DateFormatSymbols.
+
+   If a locale string is not supplied, the JVM default locale will be
+   used."
+  (if (nil? locale-string)
+    (java.text.DateFormatSymbols.)
+    (java.text.DateFormatSymbols/getInstance (java.util.Locale. locale-string))))
+
+(defn get-month-names [& [locale-string]]
+  #+clj (.getMonths (get-date-format-symbols locale-string))
   ;; TODO: i18n??
   #+cljs ["January" "February" "March" "April" "May" "June" "July"
           "August" "September" "October" "November" "December"])

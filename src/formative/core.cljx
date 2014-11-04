@@ -64,11 +64,29 @@
 (defmethod prep-field :default [field values & [form]]
   (prep-field-default field values form))
 
+(defmethod prep-field :date-select [field values & [form]]
+  (let [field (prep-field-default field values form)
+        field (if-let [locale (:locale field (:locale form))]
+                (assoc field :locale locale)
+                field)]
+    field))
+
 (defmethod prep-field :datetime-select [field values & [form]]
-  (let [field* (prep-field-default field values form)]
-    (if-let [timezone (:timezone field (:timezone form))]
-      (assoc field* :timezone timezone)
-      field*)))
+  (let [field (prep-field-default field values form)
+        field (if-let [timezone (:timezone field (:timezone form))]
+                 (assoc field :timezone timezone)
+                 field)
+        field (if-let [locale (:locale field (:locale form))]
+                 (assoc field :locale locale)
+                 field)]
+    field))
+
+(defmethod prep-field :month-select [field values & [form]]
+  (let [field (prep-field-default field values form)
+        field (if-let [locale (:locale field (:locale form))]
+                (assoc field :locale locale)
+                field)]
+    field))
 
 (defmethod prep-field :checkbox [field values & [form]]
   (let [field (if (and (not (contains? field :value))

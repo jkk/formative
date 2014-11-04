@@ -295,7 +295,8 @@
     (combiner (map render-field subfields))))
 
 (defmethod render-field :date-select [field]
-  (let [date (fu/normalize-date (:value field) nil (:timezone field))
+  (let [locale-string (:locale field)
+        date (fu/normalize-date (:value field) nil (:timezone field))
         [year month day] (when date
                            (fu/get-year-month-day date))
         this-year (fu/get-this-year)
@@ -312,7 +313,7 @@
                               :options (cons ["" "Month"]
                                              (map vector
                                                   (range 1 13)
-                                                  (fu/get-month-names)))}
+                                                  (fu/get-month-names locale-string)))}
                              {:type :select
                               :name "day"
                               :class "input-small"
@@ -338,11 +339,12 @@
                           :options (range start (inc end))))]))
 
 (defmethod render-field :month-select [field]
-  (let [opts (if (:numbers field)
+  (let [locale-string (:locale field)
+        opts (if (:numbers field)
                (range 1 13)
                (map vector
                     (range 1 13)
-                    (fu/get-month-names)))]
+                    (fu/get-month-names locale-string)))]
     [:div.month-select
      (render-field (assoc field
                           :class (str (:class field) " input-medium")

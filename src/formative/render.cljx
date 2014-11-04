@@ -111,9 +111,9 @@
                           (fu/format-time time))))))
 
 (defn render-default-input [field & [opts]]
-  (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
+  (let [attrs (get-input-attrs field [:type :name :id :class :value :autocomplete :autofocus
                                       :checked :disabled :href :style :src :size
-                                      :readonly :tabindex :onchange :onclick
+                                      :readonly :required :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder :autofill
                                       :multiple :title])
         attrs (if (and (= :submit (:type attrs))

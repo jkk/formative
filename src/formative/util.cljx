@@ -5,6 +5,7 @@
             #+clj [clj-time.format :as cf]
             #+cljs [goog.string :as gstring])
   (:import #+clj org.joda.time.DateTime
+           #+clj org.joda.time.format.DateTimeFormat
            #+clj org.joda.time.LocalDate
            #+clj org.joda.time.LocalTime))
 
@@ -299,7 +300,16 @@
    used."
   (if (nil? locale-string)
     (java.text.DateFormatSymbols.)
-    (java.text.DateFormatSymbols/getInstance (java.util.Locale. locale-string))))
+    (java.text.DateFormatSymbols/getInstance (java.util.Locale/forLanguageTag locale-string))))
+
+(defn get-date-field-order [locale-string]
+  (let [locale (when-not (string/blank? locale-string) (java.util.Locale/forLanguageTag locale-string))
+        locale-date-format (DateTimeFormat/patternForStyle "F-" locale)
+        year-position (.indexOf locale-date-format "y")
+        month-position (.indexOf locale-date-format "M")
+        date-position (.indexOf locale-date-format "d")
+        field-order {year-position :year month-position :month date-position :day}]
+    (vals (sort field-order))))
 
 (defn get-month-names [& [locale-string]]
   #+clj (.getMonths (get-date-format-symbols locale-string))

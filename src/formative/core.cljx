@@ -68,6 +68,9 @@
   (let [field (prep-field-default field values form)
         field (if-let [locale (:locale field (:locale form))]
                 (assoc field :locale locale)
+                field)
+        field (if-let [label-dictionary (:label-dictionary field (:label-dictionary form))]
+                (assoc field :label-dictionary label-dictionary)
                 field)]
     field))
 
@@ -78,7 +81,10 @@
                  field)
         field (if-let [locale (:locale field (:locale form))]
                  (assoc field :locale locale)
-                 field)]
+                 field)
+        field (if-let [label-dictionary (:label-dictionary field (:label-dictionary form))]
+                (assoc field :label-dictionary label-dictionary)
+                field)]
     field))
 
 (defmethod prep-field :month-select [field values & [form]]

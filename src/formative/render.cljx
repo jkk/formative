@@ -301,32 +301,33 @@
                            (fu/get-year-month-day date))
         this-year (fu/get-this-year)
         year-start (:year-start field this-year)
-        year-end (:year-end field (+ this-year 20))]
+        year-end (:year-end field (+ this-year 20))
+        components {:month {:type :select
+                            :name "month"
+                            :class "input-medium"
+                            :value month
+                            :options (cons ["" (:month (:label-dictionary field) "Month")]
+                                           (map vector
+                                                (range 1 13)
+                                                (fu/get-month-names locale-string)))}
+                    :day {:type :select
+                          :name "day"
+                          :class "input-small"
+                          :value day
+                          :options (cons ["" (:day (:label-dictionary field) "Day")]
+                                         (map #(vector % %) (range 1 32)))}
+                    :year {:type :select
+                           :name "year"
+                           :class "input-small"
+                           :value year
+                           :options (cons ["" (:year (:label-dictionary field) "Year")]
+                                          (map #(vector % %)
+                                               (range year-start (inc year-end))))}}]
     [:span.date-select
      (render-field {:name (:name field)
                     :type :compound
                     :separator " "
-                    :fields [{:type :select
-                              :name "month"
-                              :class "input-medium"
-                              :value month
-                              :options (cons ["" "Month"]
-                                             (map vector
-                                                  (range 1 13)
-                                                  (fu/get-month-names locale-string)))}
-                             {:type :select
-                              :name "day"
-                              :class "input-small"
-                              :value day
-                              :options (cons ["" "Day"]
-                                             (map #(vector % %) (range 1 32)))}
-                             {:type :select
-                              :name "year"
-                              :class "input-small"
-                              :value year
-                              :options (cons ["" "Year"]
-                                             (map #(vector % %)
-                                                  (range year-start (inc year-end))))}]})]))
+                    :fields (vec (for [component (fu/get-date-field-order locale-string)] (component components)))})]))
 
 (defmethod render-field :year-select [field]
   (let [this-year (fu/get-this-year)

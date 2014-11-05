@@ -291,6 +291,13 @@ The following special keys are also supported:
                         :datetime-select and :month-select fields. If not supplied,
                         the JVM default locale will be used. JVM only.
 
+      :label-dictionary - A map of label keys to translations. Currently used for
+                          date widgets, so you can customize the labels "Day",
+                          "Month", and "Year" with a map like:
+
+                          {:day "Tag" :month "Monat" :year "Jahr"}
+
+
 New form renderers can be implemented using the `formative.render/render-form` multimethod.
 
 ### Field Specification
@@ -378,6 +385,7 @@ Built-in field types:
                         :year-end
                         :locale - String of locale with which to localize the
                                   display. The default is that of the JVM. JVM only.
+                        :label-dictionary (See form special keys, above.)
       :year-select  - Year dropdown, parses to integer. Accepts :select special
                       keys plus:
                         :start
@@ -388,6 +396,7 @@ Built-in field types:
                                    names
                         :locale - String of locale with which to localize the
                                   display. The default is that of the JVM. JVM only.
+                        :label-dictionary (See form special keys, above.)
       :time-select  - Time dropdown. Renders as one or more :select fields, parses
                       as a UTC java.sql.Time (or Date for ClojureScript).
                       Accepts Joda times as values.
@@ -407,6 +416,7 @@ Built-in field types:
                                     display. The default is UTC. JVM only.
                         :locale - String of locale with which to localize the
                                   display. The default is that of the JVM. JVM only.
+                        :label-dictionary (See form special keys, above.)
       :currency     - Text input for money. Parses as a :decimal datatype
       :file         - File upload input. Special keys:
                         :upload-handler - optional handler called when a file is

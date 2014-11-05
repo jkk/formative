@@ -5,6 +5,7 @@
 pom.xml
 *.jar
 *.class
+.emacs.desktop*
 .lein-deps-sum
 .lein-failures
 .lein-plugins

@@ -26,10 +26,10 @@
   [field]
   {:pre [(:name field)]}
   (assoc field
-    :name (normalize-name (:name field))
-    :type (if (:type field)
-            (keyword (name (:type field)))
-            :text)))
+         :name (normalize-name (:name field))
+         :type (if (:type field)
+                 (keyword (name (:type field)))
+                 :text)))
 
 (defmulti prep-field
   "Prepares a field for rendering, dispatching on :type. The default
@@ -44,22 +44,22 @@
     (= sub (subs s 0 (count sub)))))
 
 (defn- get-value [values field]
-  (or (get-in values (fu/expand-name (:name field)))
-      (get values (:name field))
-      (when (:flatten field)
-        (let [name-prefix (str (:name field) "-")]
-          (reduce-kv
-            (fn [val k v]
-              (if (begins-with k name-prefix)
-                (assoc val (subs k (count name-prefix)) v)
-                val))
-            nil values)))))
+  (first (remove nil? [(get-in values (fu/expand-name (:name field)))
+                       (get values (:name field))
+                       (when (:flatten field)
+                         (let [name-prefix (str (:name field) "-")]
+                           (reduce-kv
+                            (fn [val k v]
+                              (if (begins-with k name-prefix)
+                                (assoc val (subs k (count name-prefix)) v)
+                                val))
+                            nil values)))])))
 
 (defn- prep-field-default [field values & [form]]
   (cond-> (assoc field
                  :value (get-value values field)
                  :label (r/get-field-label field))
-          (:blank-nil form) (assoc :blank-nil true)))
+    (:blank-nil form) (assoc :blank-nil true)))
 
 (defmethod prep-field :default [field values & [form]]
   (prep-field-default field values form))
@@ -77,11 +77,11 @@
 (defmethod prep-field :datetime-select [field values & [form]]
   (let [field (prep-field-default field values form)
         field (if-let [timezone (:timezone field (:timezone form))]
-                 (assoc field :timezone timezone)
-                 field)
+                (assoc field :timezone timezone)
+                field)
         field (if-let [locale (:locale field (:locale form))]
-                 (assoc field :locale locale)
-                 field)
+                (assoc field :locale locale)
+                field)
         field (if-let [label-dictionary (:label-dictionary field (:label-dictionary form))]
                 (assoc field :label-dictionary label-dictionary)
                 field)]
@@ -102,13 +102,13 @@
                 field)
         val (get-value values field)]
     (assoc field
-      :value (:value field "true")
-      :checked (= (str val) (str (:value field "true")))
-      :label (r/get-field-label field))))
+           :value (:value field "true")
+           :checked (= (str val) (str (:value field "true")))
+           :label (r/get-field-label field))))
 
 (defmethod prep-field :submit [field values & [form]]
   (assoc field
-    :value (:value field "")))
+         :value (:value field "")))
 
 (defmethod prep-field :html [field values & [form]]
   field)
@@ -121,8 +121,8 @@
   [fields values & [form]]
   (for [field fields]
     (-> field
-        (normalize-field)
-        (prep-field values form))))
+      (normalize-field)
+      (prep-field values form))))
 
 (defmethod prep-field :compound [field values & [form]]
   (let [field (prep-field-default field values form)]
@@ -134,9 +134,9 @@
 
   - If the :name key matches an existing field, the spec is merged.
   - If an :after key is set, the spec will be inserted after the field whose
-    :name matches :after.
+  :name matches :after.
   - If a :before key is set, the spec will be inserted before the field whose
-    :name matches :before.
+  :name matches :before.
   - Otherwise, the spec will be appended.
 
   If a form is given, its fields will be used and the updated form will be
@@ -152,11 +152,11 @@
                       (into {} (map (juxt :name identity)
                                     fields2)))
         after-fields (reduce
-                       (fn [m spec]
-                         (update-in m [(:after spec)]
-                                    (fnil conj []) (dissoc spec :after)))
-                       {}
-                       (filter :after fields2))
+                      (fn [m spec]
+                        (update-in m [(:after spec)]
+                                   (fnil conj []) (dissoc spec :after)))
+                      {}
+                      (filter :after fields2))
         before-fields (reduce
                        (fn [m spec]
                          (update-in m [(:before spec)]
@@ -164,23 +164,23 @@
                        {}
                        (filter :before fields2))
         [ret leftovers] (reduce
-                          (fn [[ret f2m] spec]
-                            (let [fname (:name spec)
-                                  [spec* f2m*]
-                                  (if (contains? f2m fname)
-                                    [(merge spec (get f2m fname))
-                                     (dissoc f2m fname)]
-                                    [spec f2m])
-                                  ret* (if-let [bspecs (get before-fields fname)]
-                                         (into ret bspecs)
-                                         ret)
-                                  ret* (conj ret* spec*)
-                                  ret* (if-let [aspecs (get after-fields fname)]
-                                         (into ret* aspecs)
-                                         ret*)]
-                              [ret* f2m*]))
-                          [[] fields2-map]
-                          fields1)
+                         (fn [[ret f2m] spec]
+                           (let [fname (:name spec)
+                                 [spec* f2m*]
+                                 (if (contains? f2m fname)
+                                   [(merge spec (get f2m fname))
+                                    (dissoc f2m fname)]
+                                   [spec f2m])
+                                 ret* (if-let [bspecs (get before-fields fname)]
+                                        (into ret bspecs)
+                                        ret)
+                                 ret* (conj ret* spec*)
+                                 ret* (if-let [aspecs (get after-fields fname)]
+                                        (into ret* aspecs)
+                                        ret*)]
+                             [ret* f2m*]))
+                         [[] fields2-map]
+                         fields1)
         new-fields (concat ret (remove (some-fn :before :after)
                                        (filter (comp leftovers :name) fields2)))]
     (if form
@@ -202,14 +202,14 @@
 
 (defn- prep-problems [problems]
   (set
-    (if (map? (first problems))
-      (map name
-           (mapcat (fn [p]
-                     (or (:keys p)
-                         (when (:field-name p)
-                           [(:field-name p)])))
-                   problems))
-      (map name problems))))
+   (if (map? (first problems))
+     (map name
+          (mapcat (fn [p]
+                    (or (:keys p)
+                        (when (:field-name p)
+                          [(:field-name p)])))
+                  problems))
+     (map name problems))))
 
 (defn prep-form
   "Prepares a form for rendering by normalizing and populating fields, adding
@@ -218,19 +218,19 @@
   [spec]
   (let [;; HTML attrs
         form-attrs (select-keys
-                     spec [:action :method :enctype :accept :name :id :class
-                           :onsubmit :onreset :accept-charset :autofill
-                           :novalidate :autocomplete])
+                    spec [:action :method :enctype :accept :name :id :class
+                          :onsubmit :onreset :accept-charset :autofill
+                          :novalidate :autocomplete])
         method (string/upper-case
-                 (name (or (:method spec) :post)))
+                (name (or (:method spec) :post)))
         form-attrs (assoc form-attrs
-                     :method (if (= "GET" method) method "POST")
-                     :renderer (:renderer spec *renderer*))
+                          :method (if (= "GET" method) method "POST")
+                          :renderer (:renderer spec *renderer*))
         ;; Field values
         values (stringify-keys
-                 (if (string? (:values spec))
-                   (fu/decode-form-data (:values spec))
-                   (:values spec)))
+                (if (string? (:values spec))
+                  (fu/decode-form-data (:values spec))
+                  (:values spec)))
         fields (:fields spec)
         ;; Emulate HTTP methods
         [fields values] (if-not (#{"PUT" "DELETE" "PATCH"} method)
@@ -361,9 +361,9 @@
 
   Built-in field types:
 
-	  :text         - Single-line text input
-	  :textarea     - Multi-line text input
-	  :select       - Dropdown. Special keys:
+      :text         - Single-line text input
+      :textarea     - Multi-line text input
+      :select       - Dropdown. Special keys:
                         :options - options to display; see below for format
                         :placeholder - text for a first, disabled option
                         :first-option - option to prepend to the other options
@@ -468,12 +468,12 @@
   "Render an individual form field element as Hiccup data. See render-form
   for field specification format."
   ([field]
-    (r/render-field
-      (prep-field (normalize-field field) {})))
+   (r/render-field
+    (prep-field (normalize-field field) {})))
   ([field value]
-    (let [norm-field (normalize-field field)]
-      (r/render-field
-        (prep-field norm-field {(:name norm-field) value})))))
+   (let [norm-field (normalize-field field)]
+     (r/render-field
+      (prep-field norm-field {(:name norm-field) value})))))
 
 #+clj
 (defmacro with-renderer [renderer & body]

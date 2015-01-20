@@ -111,9 +111,9 @@
                           (fu/format-time time))))))
 
 (defn render-default-input [field & [opts]]
-  (let [attrs (get-input-attrs field [:type :name :id :class :value :autofocus
+  (let [attrs (get-input-attrs field [:type :name :id :class :value :autocomplete :autofocus
                                       :checked :disabled :href :style :src :size
-                                      :readonly :tabindex :onchange :onclick
+                                      :readonly :required :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder :autofill
                                       :multiple :title])
         attrs (if (and (= :submit (:type attrs))
@@ -295,37 +295,39 @@
     (combiner (map render-field subfields))))
 
 (defmethod render-field :date-select [field]
-  (let [date (fu/normalize-date (:value field) nil (:timezone field))
+  (let [locale-string (:locale field)
+        date (fu/normalize-date (:value field) nil (:timezone field))
         [year month day] (when date
                            (fu/get-year-month-day date))
         this-year (fu/get-this-year)
         year-start (:year-start field this-year)
-        year-end (:year-end field (+ this-year 20))]
+        year-end (:year-end field (+ this-year 20))
+        components {:month {:type :select
+                            :name "month"
+                            :class "input-medium"
+                            :value month
+                            :options (cons ["" (:month (:label-dictionary field) "Month")]
+                                           (map vector
+                                                (range 1 13)
+                                                (fu/get-month-names locale-string)))}
+                    :day {:type :select
+                          :name "day"
+                          :class "input-small"
+                          :value day
+                          :options (cons ["" (:day (:label-dictionary field) "Day")]
+                                         (map #(vector % %) (range 1 32)))}
+                    :year {:type :select
+                           :name "year"
+                           :class "input-small"
+                           :value year
+                           :options (cons ["" (:year (:label-dictionary field) "Year")]
+                                          (map #(vector % %)
+                                               (range year-start (inc year-end))))}}]
     [:span.date-select
      (render-field {:name (:name field)
                     :type :compound
                     :separator " "
-                    :fields [{:type :select
-                              :name "month"
-                              :class "input-medium"
-                              :value month
-                              :options (cons ["" "Month"]
-                                             (map vector
-                                                  (range 1 13)
-                                                  (fu/get-month-names)))}
-                             {:type :select
-                              :name "day"
-                              :class "input-small"
-                              :value day
-                              :options (cons ["" "Day"]
-                                             (map #(vector % %) (range 1 32)))}
-                             {:type :select
-                              :name "year"
-                              :class "input-small"
-                              :value year
-                              :options (cons ["" "Year"]
-                                             (map #(vector % %)
-                                                  (range year-start (inc year-end))))}]})]))
+                    :fields (vec (for [component (fu/get-date-field-order locale-string)] (component components)))})]))
 
 (defmethod render-field :year-select [field]
   (let [this-year (fu/get-this-year)
@@ -338,11 +340,12 @@
                           :options (range start (inc end))))]))
 
 (defmethod render-field :month-select [field]
-  (let [opts (if (:numbers field)
+  (let [locale-string (:locale field)
+        opts (if (:numbers field)
                (range 1 13)
                (map vector
                     (range 1 13)
-                    (fu/get-month-names)))]
+                    (fu/get-month-names locale-string)))]
     [:div.month-select
      (render-field (assoc field
                           :class (str (:class field) " input-medium")

@@ -1,5 +1,7 @@
 # Formative
 
+![CircleCI] (https://circleci.com/gh/jkk/formative/tree/master.png?circle-token=a5b99afcb3c404441a1fbd41f6c0911f19f1e31b)
+
 Web forms for __Clojure__ and __ClojureScript__:
 
 * Render a form via pluggable renderers (comes with Bootstrap and other renderers built in)

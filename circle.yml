@@ -1,0 +1,9 @@
+machine:
+  timezone:
+    Asia/Tokyo
+  java:
+    version: oraclejdk8
+
+test:
+  override:
+    - lein test

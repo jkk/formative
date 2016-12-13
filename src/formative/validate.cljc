@@ -63,10 +63,10 @@
    :booleans v/bools
    :int v/integer
    :long v/integer
-   :bigint #+clj v/integer #+cljs v/decimal
+   :bigint #?(:clj v/integer :cljs v/decimal)
    :ints v/integers
    :longs v/integers
-   :bigints #+clj v/integers #+cljs v/decimals
+   :bigints #?(:clj v/integers :cljs v/decimals)
    :float v/floating-point
    :double v/floating-point
    :floats v/floating-points
@@ -95,7 +95,7 @@
                                opts (map first nopts)
                                opts (if (:first-option field)
                                       (cons (ffirst (fu/normalize-options
-                                                      [(:first-option field)]))
+                                                     [(:first-option field)]))
                                             opts)
                                       opts)]
                            (if (or (= :checkboxes (:type field))

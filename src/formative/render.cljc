@@ -2,8 +2,8 @@
   (:require [formative.data :as data]
             [formative.util :as fu]
             [clojure.string :as string]
-            #+cljs [goog.string :as gstring]
-            #+cljs goog.string.format))
+            #?(:cljs [goog.string :as gstring]
+               :cljs goog.string.format)))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any
@@ -22,8 +22,8 @@
     (:renderer form-attrs)))
 
 (defn- ucfirst [s]
-  #+clj (str (Character/toUpperCase (.charAt ^String s 0)) (subs ^String s 1))
-  #+cljs (str (.toUpperCase (.charAt s 0)) (subs s 1)))
+  #?(:clj (str (Character/toUpperCase (.charAt ^String s 0)) (subs ^String s 1))
+     :cljs (str (.toUpperCase (.charAt s 0)) (subs s 1))))
 
 (defn get-field-label
   "Determines what to use for a field's label. Uses the :label key if set,
@@ -34,13 +34,13 @@
       (ucfirst (:label field))
       (:label field))
     (-> (:name field)
-      name
-      (string/replace #"[_-]" " ")
-      (string/replace #"^[^\[]+\[([^\]])" "$1")
-      (string/replace #"[\[\]\.]" " ")
-      (string/replace #"\bid\b" "ID")
-      ucfirst
-      string/trim)))
+        name
+        (string/replace #"[_-]" " ")
+        (string/replace #"^[^\[]+\[([^\]])" "$1")
+        (string/replace #"[\[\]\.]" " ")
+        (string/replace #"\bid\b" "ID")
+        ucfirst
+        string/trim)))
 
 (defn render-problems
   "Renders a form problems as Hiccup data. Lists the each set of keys with
@@ -56,9 +56,9 @@
       (for [{:keys [keys msg]} problems
             :when msg]
         (let [field-labels (map #(get-field-label
-                                   (or (fields-by-name %)
-                                       (fields-by-name (name %))
-                                       {:name %}))
+                                  (or (fields-by-name %)
+                                      (fields-by-name (name %))
+                                      {:name %}))
                                 keys)]
           [:li
            (when (seq field-labels)
@@ -122,9 +122,9 @@
                 (assoc attrs :value (render-input-val field)))
         attrs (assoc attrs :type (name (or (:type attrs) :text)))]
     (list
-      (when-let [prefix (:prefix opts)]
-        [:span.input-prefix prefix])
-      [:input attrs])))
+     (when-let [prefix (:prefix opts)]
+       [:span.input-prefix prefix])
+     [:input attrs])))
 
 (defmethod render-field :default [field]
   (render-default-input field))
@@ -177,8 +177,8 @@
 
 (defn- opt-slug [val]
   (-> (str val)
-    (string/replace #"[^a-zA-Z0-9\-]" "-")
-    (string/replace #"-{2,}" "-")))
+      (string/replace #"[^a-zA-Z0-9\-]" "-")
+      (string/replace #"-{2,}" "-")))
 
 (defmethod render-field :checkboxes [field]
   (let [vals (set (map str (:value field)))
@@ -207,12 +207,12 @@
                               (partition-all cb-per-col opts))]
        [:div {:class (str "cb-col cb-col-" col)}
         (for [[oval olabel subopts] colopts]
-           (if (empty? subopts)
-             (build-cb oval olabel)
-             [:div.cb-group
-              [:h5.cb-group-heading olabel]
-              (for [[oval olabel] (fu/normalize-options subopts)]
-                (build-cb oval olabel))]))])]))
+          (if (empty? subopts)
+            (build-cb oval olabel)
+            [:div.cb-group
+             [:h5.cb-group-heading olabel]
+             (for [[oval olabel] (fu/normalize-options subopts)]
+               (build-cb oval olabel))]))])]))
 
 (defn- render-radios [field]
   (let [val (str (:value field))
@@ -270,17 +270,17 @@
 (defmethod render-field :date [field]
   (let [date (fu/normalize-date (:value field) (:date-format field))]
     (render-default-input
-      (assoc field :value
-             (when date
-               (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
+     (assoc field :value
+            (when date
+              (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
 
 (defmethod render-field :date-text [field]
   (let [date (fu/normalize-date (:value field) (:date-format field))]
     (render-default-input
-      (assoc field
-             :type :text
-             :value (when date
-                      (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
+     (assoc field
+            :type :text
+            :value (when date
+                     (fu/format-date date (:date-format field "yyyy-MM-dd")))))))
 
 (defmethod render-field :compound [field]
   (let [subfields (for [subfield (:fields field)]
@@ -355,9 +355,9 @@
 (defmethod render-field :time [field]
   (let [time (fu/normalize-time (:value field))]
     (render-default-input
-      (assoc field :value
-             (when time
-               (fu/format-time time))))))
+     (assoc field :value
+            (when time
+              (fu/format-time time))))))
 
 (defn- get-hour+ampm [h ampm?]
   (when h
@@ -370,44 +370,44 @@
       [h])))
 
 (defn- format-minutes [m]
-  (#+clj format #+cljs gstring/format "%02d" m))
+  (#?(:clj format :cljs gstring/format) "%02d" m))
 
 (defn- render-time-select-multi [fname h m s step ampm? seconds?]
   (let [[h ampm] (get-hour+ampm h ampm?)]
     (list
-      (render-field {:type :select
-                     :name (str fname "[h]")
-                     :class "input-small"
-                     :value h
-                     :first-option ["" "--"]
-                     :options (if ampm? (range 1 13) (range 0 24))})
-      " "
-      (render-field {:type :select
-                     :name (str fname "[m]")
-                     :class "input-small"
-                     :value m
-                     :first-option ["" "--"]
-                     :options (map (juxt identity format-minutes)
-                                   (range 0 60 step))})
-      (when seconds?
-        (list
-          " "
-          (render-field {:type :select
-                         :name (str fname "[s]")
-                         :class "input-small"
-                         :value s
-                         :first-option ["" "--"]
-                         :options (map (juxt identity format-minutes)
-                                       (range 0 60 step))})))
-      (when ampm?
-        (list
-          " "
-          (render-field {:type :select
-                         :name (str fname "[ampm]")
-                         :class "input-small"
-                         :value ampm
-                         :first-option ["" "--"]
-                         :options ["am" "pm"]}))))))
+     (render-field {:type :select
+                    :name (str fname "[h]")
+                    :class "input-small"
+                    :value h
+                    :first-option ["" "--"]
+                    :options (if ampm? (range 1 13) (range 0 24))})
+     " "
+     (render-field {:type :select
+                    :name (str fname "[m]")
+                    :class "input-small"
+                    :value m
+                    :first-option ["" "--"]
+                    :options (map (juxt identity format-minutes)
+                                  (range 0 60 step))})
+     (when seconds?
+       (list
+        " "
+        (render-field {:type :select
+                       :name (str fname "[s]")
+                       :class "input-small"
+                       :value s
+                       :first-option ["" "--"]
+                       :options (map (juxt identity format-minutes)
+                                     (range 0 60 step))})))
+     (when ampm?
+       (list
+        " "
+        (render-field {:type :select
+                       :name (str fname "[ampm]")
+                       :class "input-small"
+                       :value ampm
+                       :first-option ["" "--"]
+                       :options ["am" "pm"]}))))))
 
 (defn- add-minutes [h m mx]
   (let [m* (+ m mx)]
@@ -419,8 +419,8 @@
   (take-while (fn [[h m]]
                 (or (< h eh)
                     (and (= h eh) (<= m em))))
-    (iterate (fn [[h m]] (add-minutes h m step))
-             start)))
+              (iterate (fn [[h m]] (add-minutes h m step))
+                       start)))
 
 (defn- format-time [h m ampm?]
   (let [[h ampm] (get-hour+ampm h ampm?)]
@@ -465,9 +465,9 @@
 
 (defmethod render-field :currency [field]
   (render-default-input
-    (assoc field :type :text)
-    {:prefix "$"}))
+   (assoc field :type :text)
+   {:prefix "$"}))
 
 (defmethod render-field :us-tel [field]
   (render-default-input
-    (assoc field :type :tel :value (fu/format-us-tel (:value field)))))
+   (assoc field :type :tel :value (fu/format-us-tel (:value field)))))

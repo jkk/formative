@@ -8,7 +8,7 @@
             [formative.util :as fu]
             [clojure.walk :refer [stringify-keys]]
             [clojure.string :as string]
-            #+clj [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]))
+            #?(:clj [ring.middleware.anti-forgery :refer [*anti-forgery-token*]])))
 
 (def ^:dynamic *renderer* :bootstrap-horizontal)
 
@@ -26,10 +26,10 @@
   [field]
   {:pre [(:name field)]}
   (assoc field
-    :name (normalize-name (:name field))
-    :type (if (:type field)
-            (keyword (name (:type field)))
-            :text)))
+         :name (normalize-name (:name field))
+         :type (if (:type field)
+                 (keyword (name (:type field)))
+                 :text)))
 
 (defmulti prep-field
   "Prepares a field for rendering, dispatching on :type. The default
@@ -49,17 +49,17 @@
       (when (:flatten field)
         (let [name-prefix (str (:name field) "-")]
           (reduce-kv
-            (fn [val k v]
-              (if (begins-with k name-prefix)
-                (assoc val (subs k (count name-prefix)) v)
-                val))
-            nil values)))))
+           (fn [val k v]
+             (if (begins-with k name-prefix)
+               (assoc val (subs k (count name-prefix)) v)
+               val))
+           nil values)))))
 
 (defn- prep-field-default [field values & [form]]
   (cond-> (assoc field
                  :value (get-value values field)
                  :label (r/get-field-label field))
-          (:blank-nil form) (assoc :blank-nil true)))
+    (:blank-nil form) (assoc :blank-nil true)))
 
 (defmethod prep-field :default [field values & [form]]
   (prep-field-default field values form))
@@ -78,13 +78,13 @@
                 field)
         val (get-value values field)]
     (assoc field
-      :value (:value field "true")
-      :checked (= (str val) (str (:value field "true")))
-      :label (r/get-field-label field))))
+           :value (:value field "true")
+           :checked (= (str val) (str (:value field "true")))
+           :label (r/get-field-label field))))
 
 (defmethod prep-field :submit [field values & [form]]
   (assoc field
-    :value (:value field "")))
+         :value (:value field "")))
 
 (defmethod prep-field :html [field values & [form]]
   field)
@@ -128,11 +128,11 @@
                       (into {} (map (juxt :name identity)
                                     fields2)))
         after-fields (reduce
-                       (fn [m spec]
-                         (update-in m [(:after spec)]
-                                    (fnil conj []) (dissoc spec :after)))
-                       {}
-                       (filter :after fields2))
+                      (fn [m spec]
+                        (update-in m [(:after spec)]
+                                   (fnil conj []) (dissoc spec :after)))
+                      {}
+                      (filter :after fields2))
         before-fields (reduce
                        (fn [m spec]
                          (update-in m [(:before spec)]
@@ -140,23 +140,23 @@
                        {}
                        (filter :before fields2))
         [ret leftovers] (reduce
-                          (fn [[ret f2m] spec]
-                            (let [fname (:name spec)
-                                  [spec* f2m*]
-                                  (if (contains? f2m fname)
-                                    [(merge spec (get f2m fname))
-                                     (dissoc f2m fname)]
-                                    [spec f2m])
-                                  ret* (if-let [bspecs (get before-fields fname)]
-                                         (into ret bspecs)
-                                         ret)
-                                  ret* (conj ret* spec*)
-                                  ret* (if-let [aspecs (get after-fields fname)]
-                                         (into ret* aspecs)
-                                         ret*)]
-                              [ret* f2m*]))
-                          [[] fields2-map]
-                          fields1)
+                         (fn [[ret f2m] spec]
+                           (let [fname (:name spec)
+                                 [spec* f2m*]
+                                 (if (contains? f2m fname)
+                                   [(merge spec (get f2m fname))
+                                    (dissoc f2m fname)]
+                                   [spec f2m])
+                                 ret* (if-let [bspecs (get before-fields fname)]
+                                        (into ret bspecs)
+                                        ret)
+                                 ret* (conj ret* spec*)
+                                 ret* (if-let [aspecs (get after-fields fname)]
+                                        (into ret* aspecs)
+                                        ret*)]
+                             [ret* f2m*]))
+                         [[] fields2-map]
+                         fields1)
         new-fields (concat ret (remove (some-fn :before :after)
                                        (filter (comp leftovers :name) fields2)))]
     (if form
@@ -178,14 +178,14 @@
 
 (defn- prep-problems [problems]
   (set
-    (if (map? (first problems))
-      (map name
-           (mapcat (fn [p]
-                     (or (:keys p)
-                         (when (:field-name p)
-                           [(:field-name p)])))
-                   problems))
-      (map name problems))))
+   (if (map? (first problems))
+     (map name
+          (mapcat (fn [p]
+                    (or (:keys p)
+                        (when (:field-name p)
+                          [(:field-name p)])))
+                  problems))
+     (map name problems))))
 
 (defn prep-form
   "Prepares a form for rendering by normalizing and populating fields, adding
@@ -194,19 +194,19 @@
   [spec]
   (let [;; HTML attrs
         form-attrs (select-keys
-                     spec [:action :method :enctype :accept :name :id :class
-                           :onsubmit :onreset :accept-charset :autofill
-                           :novalidate :autocomplete])
+                    spec [:action :method :enctype :accept :name :id :class
+                          :onsubmit :onreset :accept-charset :autofill
+                          :novalidate :autocomplete])
         method (string/upper-case
-                 (name (or (:method spec) :post)))
+                (name (or (:method spec) :post)))
         form-attrs (assoc form-attrs
-                     :method (if (= "GET" method) method "POST")
-                     :renderer (:renderer spec *renderer*))
+                          :method (if (= "GET" method) method "POST")
+                          :renderer (:renderer spec *renderer*))
         ;; Field values
         values (stringify-keys
-                 (if (string? (:values spec))
-                   (fu/decode-form-data (:values spec))
-                   (:values spec)))
+                (if (string? (:values spec))
+                  (fu/decode-form-data (:values spec))
+                  (:values spec)))
         fields (:fields spec)
         ;; Emulate HTTP methods
         [fields values] (if-not (#{"PUT" "DELETE" "PATCH"} method)
@@ -214,11 +214,11 @@
                           [(cons {:type :hidden :name "_method"} fields)
                            (assoc values "_method" method)])
         ;; CSRF protection
-        #+clj [fields values] #+clj (if (and (not= "GET" method) (bound? #'*anti-forgery-token*)
-                                             *anti-forgery-token*)
-                                      [(cons {:type :hidden :name "__anti-forgery-token"} fields)
-                                       (assoc values "__anti-forgery-token" *anti-forgery-token*)]
-                                      [fields values])
+        #?(:clj [fields values]) #?(:clj (if (and (not= "GET" method) (bound? #'*anti-forgery-token*)
+                                                  *anti-forgery-token*)
+                                           [(cons {:type :hidden :name "__anti-forgery-token"} fields)
+                                            (assoc values "__anti-forgery-token" *anti-forgery-token*)]
+                                           [fields values]))
         fields (prep-fields fields values spec)
         ;; Attach :cancel-href to submit button
         fields (if (or (:cancel-label spec) (:cancel-href spec))
@@ -337,9 +337,9 @@
 
   Built-in field types:
 
-	  :text         - Single-line text input
-	  :textarea     - Multi-line text input
-	  :select       - Dropdown. Special keys:
+      :text         - Single-line text input
+      :textarea     - Multi-line text input
+      :select       - Dropdown. Special keys:
                         :options - options to display; see below for format
                         :placeholder - text for a first, disabled option
                         :first-option - option to prepend to the other options
@@ -444,14 +444,14 @@
   "Render an individual form field element as Hiccup data. See render-form
   for field specification format."
   ([field]
-    (r/render-field
-      (prep-field (normalize-field field) {})))
+   (r/render-field
+    (prep-field (normalize-field field) {})))
   ([field value]
-    (let [norm-field (normalize-field field)]
-      (r/render-field
-        (prep-field norm-field {(:name norm-field) value})))))
+   (let [norm-field (normalize-field field)]
+     (r/render-field
+      (prep-field norm-field {(:name norm-field) value})))))
 
-#+clj
-(defmacro with-renderer [renderer & body]
-  `(binding [*renderer* ~renderer]
-     (do ~@body)))
+#?(:clj
+   (defmacro with-renderer [renderer & body]
+     `(binding [*renderer* ~renderer]
+        (do ~@body))))

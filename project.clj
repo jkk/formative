@@ -10,5 +10,5 @@
                  [ring-anti-forgery "0.2.1"]]
   :test-paths ["test"]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]
-                                  [org.clojure/clojurescript "0.0-2138"]
-                                  [com.cemerick/piggieback "0.0.5"]]}})
+                                  [com.cemerick/piggieback "0.2.1"]
+                                  [org.clojure/clojurescript "1.7.228"]]}})

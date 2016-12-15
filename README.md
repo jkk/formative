@@ -456,7 +456,7 @@ See a live demo at [formative-demo.herokuapp.com](http://formative-demo.herokuap
 
 ## Developing
 
-This project uses [Cljx](https://github.com/lynaghk/cljx) to share and emit Clojure and ClojureScript code. To start a REPL, run:
+This project uses Cljc with reader conditionals to share and emit Clojure and ClojureScript code. To start a REPL, run:
 
 ```
 $ lein repl :headless

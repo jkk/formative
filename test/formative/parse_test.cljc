@@ -1,11 +1,11 @@
 (ns formative.parse-test
-  #+cljs (:require-macros [cemerick.cljs.test :refer [is are deftest testing run-tests]]
-                          [formative.macros :refer [with-fallback]])
+  #?(:cljs (:require-macros [cemerick.cljs.test :refer [is are deftest testing run-tests]]
+                            [formative.macros :refer [with-fallback]]))
   (:require [formative.parse :as fp]
             [formative.util :as fu]
-            #+clj [formative.parse :refer [with-fallback]]
-            #+cljs [cemerick.cljs.test :as t]
-            #+clj [clojure.test :refer [is are deftest testing run-tests]]))
+            #?(:clj [formative.parse :refer [with-fallback]])
+            #?(:cljs [cemerick.cljs.test :as t])
+            #?(:clj [clojure.test :refer [is are deftest testing run-tests]])))
 
 (def form1
   {:fields [{:name :f-default}
@@ -20,7 +20,7 @@
             {:name :f-date :datatype :date}
             {:name :f-time :datatype :time}
             {:name :f-instant :datatype :instant}
-            
+
             {:name :f-ints :datatype :ints}
             {:name :f-longs :datatype :longs}
             {:name :f-booleans :datatype :booleans}
@@ -31,7 +31,7 @@
             {:name :f-dates :datatype :dates}
             {:name :f-times :datatype :times}
             {:name :f-instants :datatype :instants}
-            
+
             {:name :f-textarea :type :textarea}
             {:name :f-select1 :type :select :options ["foo" "bar" "baz"]}
             {:name :f-select2 :type :select :datatype :boolean
@@ -54,7 +54,7 @@
             {:name :f-radios2 :type :radios :datatype :boolean
              :options [{:label "Foo" :value true}
                        {:label "Bar" :value false}]}
-            
+
             {:name :f-us-state :type :us-state}
             {:name :f-ca-state :type :ca-state}
             {:name :f-country :type :country}
@@ -66,7 +66,7 @@
             {:name :f-datetime-select :type :datetime-select
              :timezone "America/New_York"}
             {:name :f-currency :type :currency}
-            
+
             {:name :f-heading :type :heading}
             {:name :f-labeled-html :type :labeled-html}
             {:name :f-html :type :html}
@@ -129,9 +129,9 @@
    :f-boolean true
    :f-float 123.45
    :f-double 123.45
-   :f-decimal #+clj 123.45M #+cljs "123.45"
-   :f-bigint #+clj 13918723981723918723987129387198273198273918273N
-             #+cljs "13918723981723918723987129387198273198273918273"
+   :f-decimal #?(:clj 123.45M :cljs "123.45")
+   :f-bigint #?(:clj 13918723981723918723987129387198273198273918273N
+                :cljs "13918723981723918723987129387198273198273918273")
    :f-date (fu/to-date (fu/utc-date 2012 12 25))
    :f-time (fu/to-time (fu/parse-time "23:06"))
    :f-instant (fu/to-date (fu/utc-date 2012 12 25 23 6))
@@ -140,11 +140,11 @@
    :f-booleans [true true false]
    :f-floats [123.45 678.90]
    :f-doubles [123.45 678.90]
-   :f-decimals #+clj [123.45M 678.90M] #+cljs ["123.45" "678.90"]
-   :f-bigints #+clj [13918723981723918723987129387198273198273918273N
-                     29038402938402938402983409283049203948209384209N]
-              #+cljs ["13918723981723918723987129387198273198273918273"
-                      "29038402938402938402983409283049203948209384209"]
+   :f-decimals #?(:clj [123.45M 678.90M] :cljs ["123.45" "678.90"])
+   :f-bigints #?(:clj [13918723981723918723987129387198273198273918273N
+                       29038402938402938402983409283049203948209384209N]
+                 :cljs ["13918723981723918723987129387198273198273918273"
+                        "29038402938402938402983409283049203948209384209"])
    :f-dates [(fu/to-date (fu/utc-date 2012 1 1))
              (fu/to-date (fu/utc-date 2012 2 3))
              (fu/to-date (fu/utc-date 2012 10 4))]
@@ -172,53 +172,53 @@
    :f-year-select 2012
    :f-month-select 12
    :f-time-select (fu/to-time (fu/parse-time "12:00"))
-   :f-datetime-select (fu/to-date (fu/utc-date 2012 12 25 #+clj 23 #+cljs 18 0))
-   :f-currency #+clj 123.45M #+cljs "123.45"
+   :f-datetime-select (fu/to-date (fu/utc-date 2012 12 25 #?(:clj 23 :cljs 18) 0))
+   :f-currency #?(:clj 123.45M :cljs "123.45")
    :foo {:bar {:baz 1}}
    :foo2 {:bar {:baz 1}}})
 
 (deftest parse-test
   (testing "Known-good params"
-           (let [values (fp/parse-params form1 good-params)]
-             (is (= values good-values))))
+    (let [values (fp/parse-params form1 good-params)]
+      (is (= values good-values))))
   (testing "Unparsed Ring params"
-           (is (= (fp/parse-params form1 {"f-date-select[year]" "2012"
-                                          "f-date-select[month]" "12"
-                                          "f-date-select[day]" "25"
-                                          "f-checkboxes2[]" ["" "true" "false"]})
-                  {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
-                   :f-checkboxes2 [true false]})))
+    (is (= (fp/parse-params form1 {"f-date-select[year]" "2012"
+                                   "f-date-select[month]" "12"
+                                   "f-date-select[day]" "25"
+                                   "f-checkboxes2[]" ["" "true" "false"]})
+           {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
+            :f-checkboxes2 [true false]})))
   (testing "Unparsed form data"
-           (is (= (fp/parse-params form1 (str "f-date-select[year]=2012"
-                                              "&f-date-select[month]=12"
-                                              "&f-date-select[day]=25"
-                                              "&f-checkboxes2[]="
-                                              "&f-checkboxes2[]=true"
-                                              "&f-checkboxes2[]=false"))
-                  {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
-                   :f-checkboxes2 [true false]})))
+    (is (= (fp/parse-params form1 (str "f-date-select[year]=2012"
+                                       "&f-date-select[month]=12"
+                                       "&f-date-select[day]=25"
+                                       "&f-checkboxes2[]="
+                                       "&f-checkboxes2[]=true"
+                                       "&f-checkboxes2[]=false"))
+           {:f-date-select (fu/to-date (fu/utc-date 2012 12 25))
+            :f-checkboxes2 [true false]})))
   (testing "Failed parsing"
-           (let [values (fp/parse-params form1 {:f-int "xxx"}
-                                         :validate false)]
-             (is (instance? formative.parse.ParseError (:f-int values))))
-           (let [ex (try
-                      (fp/parse-params form1 {:f-int "xxx"})
-                      (catch #+clj Exception #+cljs js/Error ex
-                        ex))]
-             (is (= [{:keys [:f-int] :msg "must be a number"}]
-                    (:problems (ex-data ex)))))
-           (let [ex (try
-                      (fp/parse-params (assoc form1
-                                              :validations
-                                              [[:required [:f-us-state
-                                                           :f-ca-state
-                                                           :f-country]]])
-                                       {:f-int "123"})
-                      (catch #+clj Exception #+cljs js/Error ex
-                        ex))]
-             (is (= [{:keys [:f-us-state :f-ca-state :f-country]
-                      :msg "must not be blank"}]
-                    (:problems (ex-data ex)))))))
+    (let [values (fp/parse-params form1 {:f-int "xxx"}
+                                  :validate false)]
+      (is (instance? formative.parse.ParseError (:f-int values))))
+    (let [ex (try
+               (fp/parse-params form1 {:f-int "xxx"})
+               (catch #?(:clj Exception :cljs js/Error) ex
+                   ex))]
+      (is (= [{:keys [:f-int] :msg "must be a number"}]
+             (:problems (ex-data ex)))))
+    (let [ex (try
+               (fp/parse-params (assoc form1
+                                       :validations
+                                       [[:required [:f-us-state
+                                                    :f-ca-state
+                                                    :f-country]]])
+                                {:f-int "123"})
+               (catch #?(:clj Exception :cljs js/Error) ex
+                   ex))]
+      (is (= [{:keys [:f-us-state :f-ca-state :f-country]
+               :msg "must not be blank"}]
+             (:problems (ex-data ex)))))))
 
 (def form2
   {:fields [{:name :a :datatype :int :datatype-error "foobar"}]
@@ -226,31 +226,31 @@
 
 (deftest validate-types-test
   (testing ":validate-types true (default)"
-           (let [ex (try
-                      (fp/parse-params form2 {:a "x"})
-                      (catch #+clj Exception #+cljs js/Error ex
-                        ex))]
-             (is (= '({:keys (:a), :msg "foobar"}
-                       {:keys (:a), :msg "nope"})
-                    (:problems (ex-data ex))))))
+    (let [ex (try
+               (fp/parse-params form2 {:a "x"})
+               (catch #?(:clj Exception :cljs js/Error) ex
+                   ex))]
+      (is (= '({:keys (:a), :msg "foobar"}
+               {:keys (:a), :msg "nope"})
+             (:problems (ex-data ex))))))
   (testing ":validate-types false"
-           (let [ex (try
-                      (fp/parse-params (assoc form2 :validate-types false)
-                                       {:a "x"})
-                      (catch #+clj Exception #+cljs js/Error ex
-                        ex))]
-             (is (= '({:keys (:a), :msg "nope"})
-                    (:problems (ex-data ex))))))
+    (let [ex (try
+               (fp/parse-params (assoc form2 :validate-types false)
+                                {:a "x"})
+               (catch #?(:clj Exception :cljs js/Error) ex
+                   ex))]
+      (is (= '({:keys (:a), :msg "nope"})
+             (:problems (ex-data ex))))))
   (testing ":validate-types false, without :validations"
-           (is (= (fp/parse-params (-> form2
-                                     (dissoc :validations)
-                                     (assoc :validate-types false))
-                                   {:a "x"})
-                  {:a (fp/->ParseError "x")}))))
+    (is (= (fp/parse-params (-> form2
+                                (dissoc :validations)
+                                (assoc :validate-types false))
+                            {:a "x"})
+           {:a (fp/->ParseError "x")}))))
 
 (deftest with-fallback-test
   (= [{:msg "hi"}]
      (with-fallback identity
        (throw (ex-info "Boo" {:problems [{:msg "hi"}]})))))
 
-;(run-tests)
+;;(run-tests)

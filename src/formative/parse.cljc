@@ -4,7 +4,7 @@
             [formative.core :as f]
             [formative.validate :as fv]
             [formative.util :as fu]
-            #+cljs [cljs.reader :as reader]))
+            #?(:cljs [cljs.reader :as reader])))
 
 (defrecord ParseError [bad-value])
 
@@ -26,8 +26,8 @@
   (when-not (string/blank? x)
     (try
       (fu/parse-int x)
-      (catch #+clj Exception #+cljs js/Error _
-        (->ParseError x)))))
+      (catch #?(:clj Exception :cljs js/Error) _
+          (->ParseError x)))))
 
 (defmethod parse-input :int [spec v]
   (parse-long spec v))
@@ -42,19 +42,19 @@
   (map #(parse-long spec %) (fu/seqify-value v)))
 
 (defmethod parse-input :boolean [_ v]
-  #+clj (Boolean/valueOf v)
-  #+cljs (contains? #{"true" "on"} v))
+  #?(:clj (Boolean/valueOf v)
+     :cljs (contains? #{"true" "on"} v)))
 
 (defmethod parse-input :booleans [_ v]
-  (map #+clj #(Boolean/valueOf %) #+cljs #(contains? #{"true" "on"} %)
+  (map #?(:clj #(Boolean/valueOf %) :cljs #(contains? #{"true" "on"} %))
        (fu/seqify-value v)))
 
 (defn- parse-double [spec x]
   (when-not (string/blank? x)
     (try
-      #+clj (Double/valueOf x) #+cljs (js/parseFloat x)
-      (catch #+clj Exception #+cljs js/Error _
-        (->ParseError x)))))
+      #?(:clj (Double/valueOf x) :cljs (js/parseFloat x))
+      (catch #?(:clj Exception :cljs js/Error) _
+          (->ParseError x)))))
 
 (defmethod parse-input :float [spec v]
   (parse-double spec v))
@@ -71,9 +71,9 @@
 (defn- parse-bigdec [spec x]
   (when-not (string/blank? x)
     (try
-      #+clj (BigDecimal. x) #+cljs x
-      (catch #+clj Exception #+cljs js/Error _
-        (->ParseError x)))))
+      #?(:clj (BigDecimal. x) :cljs x)
+      (catch #?(:clj Exception :cljs js/Error) _
+          (->ParseError x)))))
 
 (defmethod parse-input :decimal [spec v]
   (parse-bigdec spec v))
@@ -84,9 +84,9 @@
 (defn- parse-bigint [spec x]
   (when-not (string/blank? x)
     (try
-      #+clj (bigint (BigInteger. x)) #+cljs x
-      (catch #+clj Exception #+cljs js/Error _
-        (->ParseError x)))))
+      #?(:clj (bigint (BigInteger. x)) :cljs x)
+      (catch #?(:clj Exception :cljs js/Error) _
+          (->ParseError x)))))
 
 (defmethod parse-input :bigint [spec v]
   (parse-bigint spec v))
@@ -98,8 +98,8 @@
   (when-not (string/blank? x)
     (try
       (fu/to-date (fu/parse-date x (:date-format spec)))
-      (catch #+clj Exception #+cljs js/Error e
-        (->ParseError x)))))
+      (catch #?(:clj Exception :cljs js/Error) e
+          (->ParseError x)))))
 
 (defmethod parse-input :date [spec v]
   (parse-date spec v))
@@ -118,8 +118,8 @@
                 ["year" "month" "day"])
     (try
       (fu/to-date (fu/normalize-date v))
-      (catch #+clj Exception #+cljs js/Error e
-        (->ParseError v)))))
+      (catch #?(:clj Exception :cljs js/Error) e
+          (->ParseError v)))))
 
 (defmethod parse-input :year-select [spec v]
   (parse-long spec v))
@@ -131,8 +131,8 @@
   (when-not (string/blank? x)
     (try
       (fu/to-time (fu/normalize-time x))
-      (catch #+clj Exception #+cljs js/Error e
-        (->ParseError x)))))
+      (catch #?(:clj Exception :cljs js/Error) e
+          (->ParseError x)))))
 
 (defmethod parse-input :time [spec v]
   (parse-time spec v))
@@ -147,23 +147,23 @@
                   ["h" "m"])
       (try
         (fu/to-time (fu/normalize-time v))
-        (catch #+clj Exception #+cljs js/Error e
-          (->ParseError v))))))
+        (catch #?(:clj Exception :cljs js/Error) e
+            (->ParseError v))))))
 
 (defn- parse-instant [spec x]
   (when-not (string/blank? x)
     (try
-      #+clj (clojure.instant/read-instant-date x)
-      #+cljs (let [[years months days hours minutes seconds ms offset]
-                   (reader/parse-and-validate-timestamp x)
-                   offset (if (or (js/isNaN offset)
-                                  (not (number? offset)))
-                            0 offset)]
-               (js/Date.
-                 (- (.UTC js/Date years (dec months) days hours minutes seconds ms)
-                    (* offset 60 1000))))
-      (catch #+clj Exception #+cljs js/Error e
-        (->ParseError x)))))
+      #?(:clj (clojure.instant/read-instant-date x)
+         :cljs (let [[years months days hours minutes seconds ms offset]
+                     (reader/parse-and-validate-timestamp x)
+                     offset (if (or (js/isNaN offset)
+                                    (not (number? offset)))
+                              0 offset)]
+                 (js/Date.
+                  (- (.UTC js/Date years (dec months) days hours minutes seconds ms)
+                     (* offset 60 1000)))))
+      (catch #?(:clj Exception :cljs js/Error) e
+          (->ParseError x)))))
 
 (defmethod parse-input :instant [spec v]
   (parse-instant spec v))
@@ -181,16 +181,16 @@
           (try
             (when-let [time (fu/normalize-time v)]
               (fu/to-date
-                (fu/from-timezone
-                  (fu/with-time date
-                    (fu/hour time)
-                    (fu/minute time)
-                    (fu/sec time))
-                  (:timezone spec))))
-            (catch #+clj Exception #+cljs js/Error e
-              (->ParseError v)))))
-      (catch #+clj Exception #+cljs js/Error e
-        (->ParseError v)))))
+               (fu/from-timezone
+                (fu/with-time date
+                  (fu/hour time)
+                  (fu/minute time)
+                  (fu/sec time))
+                (:timezone spec))))
+            (catch #?(:clj Exception :cljs js/Error) e
+                (->ParseError v)))))
+      (catch #?(:clj Exception :cljs js/Error) e
+          (->ParseError v)))))
 
 (defmethod parse-input :currency [spec v]
   (parse-bigdec spec v))
@@ -241,35 +241,35 @@
 
 (defn- parse-nested-params [fields np & [absent-nil?]]
   (reduce
-    (fn [vals spec]
-      (let [sname (fu/expand-name (:name spec))
-            kname (mapv keyword sname)]
-        (if (or (contains-in? np sname)
-                (contains-in? np kname))
-          (let [raw-val (fix-input
-                          (get-param np sname) spec)
-                val (parse-input spec raw-val)]
-            (if (= val ::absent)
-              (if absent-nil? (assoc-in vals kname nil) vals)
-              (if (and (map? val) (:flatten spec))
-                (let [ktip (name (peek kname))
-                      kbase (pop kname)]
-                  (reduce-kv 
-                    (fn [vals k v]
-                      (assoc-in vals (conj kbase (keyword (str ktip "-" (name k)))) v))
-                    vals val))
-                (assoc-in vals kname val))))
-          (if absent-nil?
-            (assoc-in vals kname nil)
-            vals))))
-    {}
-    fields))
+   (fn [vals spec]
+     (let [sname (fu/expand-name (:name spec))
+           kname (mapv keyword sname)]
+       (if (or (contains-in? np sname)
+               (contains-in? np kname))
+         (let [raw-val (fix-input
+                        (get-param np sname) spec)
+               val (parse-input spec raw-val)]
+           (if (= val ::absent)
+             (if absent-nil? (assoc-in vals kname nil) vals)
+             (if (and (map? val) (:flatten spec))
+               (let [ktip (name (peek kname))
+                     kbase (pop kname)]
+                 (reduce-kv
+                  (fn [vals k v]
+                    (assoc-in vals (conj kbase (keyword (str ktip "-" (name k)))) v))
+                  vals val))
+               (assoc-in vals kname val))))
+         (if absent-nil?
+           (assoc-in vals kname nil)
+           vals))))
+   {}
+   fields))
 
 (defmethod parse-input :compound [spec v]
   (try
     (parse-nested-params (:fields spec) v true)
-    (catch #+clj Exception #+cljs js/Error e
-      (->ParseError v))))
+    (catch #?(:clj Exception :cljs js/Error) e
+        (->ParseError v))))
 
 (defn- normalize-params [params]
   (when (seq params)
@@ -322,14 +322,14 @@
 
 ;;;;
 
-#+clj
-(defmacro with-fallback
-  "Attempts to run body; if an ExceptionInfo with a :problems key is caught,
+#?(:clj
+   (defmacro with-fallback
+     "Attempts to run body; if an ExceptionInfo with a :problems key is caught,
   calls fallback-fn with the problems as the argument."
-  [fallback-fn & body]
-  `(try
-     ~@body
-     (catch clojure.lang.ExceptionInfo e#
-       (if-let [problems# (:problems (ex-data e#))]
-         (~fallback-fn problems#)
-         (throw e#)))))
+     [fallback-fn & body]
+     `(try
+        ~@body
+        (catch clojure.lang.ExceptionInfo e#
+          (if-let [problems# (:problems (ex-data e#))]
+            (~fallback-fn problems#)
+            (throw e#))))))

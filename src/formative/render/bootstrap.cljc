@@ -21,29 +21,29 @@
      (if (= :heading (:type field))
        [:legend (render-field field)]
        (list
-         [:div {:class (if (#{:checkbox :submit} (:type field))
-                         "empty-shell"
-                         "label-shell")}
-          (when (and (not (#{:checkbox} (:type field))) (:label field))
-            [:label.control-label {:for field-id}
-             (:label field)])]
-         [:div {:class (str "input-shell" (when-not (#{:submit :html} (:type field))
-                                            " controls"))}
-          (when (:prefix field)
-            [:span.prefix (:prefix field)])
-          (if (= :checkbox (:type field))
-            [:label.checkbox {:for field-id} " "
-             (render-field field) " "
-             [:span.cb-label (:label field)]]
-            (render-field field))
-          (when (:suffix field)
-            [:span.suffix (:suffix field)])
-          (when (and (= :submit (:type field))
-                     (:cancel-href field))
-            [:span.cancel-link " " [:a.btn {:href (:cancel-href field)}
-                                    (:cancel-label field)]])
-          (when (:note field)
-            [:div.note.help-inline (:note field)])]))]))
+        [:div {:class (if (#{:checkbox :submit} (:type field))
+                        "empty-shell"
+                        "label-shell")}
+         (when (and (not (#{:checkbox} (:type field))) (:label field))
+           [:label.control-label {:for field-id}
+            (:label field)])]
+        [:div {:class (str "input-shell" (when-not (#{:submit :html} (:type field))
+                                           " controls"))}
+         (when (:prefix field)
+           [:span.prefix (:prefix field)])
+         (if (= :checkbox (:type field))
+           [:label.checkbox {:for field-id} " "
+            (render-field field) " "
+            [:span.cb-label (:label field)]]
+           (render-field field))
+         (when (:suffix field)
+           [:span.suffix (:suffix field)])
+         (when (and (= :submit (:type field))
+                    (:cancel-href field))
+           [:span.cancel-link " " [:a.btn {:href (:cancel-href field)}
+                                   (:cancel-label field)]])
+         (when (:note field)
+           [:div.note.help-inline (:note field)])]))]))
 
 (defn- group-fieldsets [fields]
   (loop [ret []

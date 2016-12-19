@@ -115,7 +115,7 @@
                                       :checked :disabled :href :style :src :size
                                       :readonly :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder :autofill
-                                      :multiple :title])
+                                      :multiple :title :accept])
         attrs (if (and (= :submit (:type attrs))
                        (empty? (:value attrs)))
                 (dissoc attrs :value)

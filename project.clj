@@ -7,7 +7,7 @@
                  [jkkramer/verily "0.6.0"]
                  [clj-time "0.5.1"]
                  [prismatic/dommy "0.1.1"]
-                 [ring-anti-forgery "1.0.1"]]
+                 [ring/ring-anti-forgery "1.0.1"]]
   :test-paths ["test"]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]
                                   [com.cemerick/piggieback "0.2.1"]

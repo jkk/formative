@@ -2,8 +2,7 @@
   (:require [clojure.string :as string]
             #?@(:clj [[clj-time.core :as ct]
                       [clj-time.coerce :as cc]
-                      [clj-time.format :as cf]])
-            #?(:cljs [goog.string :as gstring]))
+                      [clj-time.format :as cf]]))
   (:import #?@(:clj [org.joda.time.DateTime
                      org.joda.time.LocalDate
                      org.joda.time.LocalTime])))
@@ -122,6 +121,11 @@
             (inc (.getUTCMonth date))
             (.getUTCDate date)]))
 
+(defn- format-%d-%02d-%02d [y m d]
+  (str y "-"
+       (if (< m 10) (str "0" m) m) "-"
+       (if (< d 10) (str "0" d) d)))
+
 (defn format-date [dt & [format]]
   (let [format (or format default-date-format)]
     #?(:clj (cf/unparse (cf/with-zone (cf/formatter format) (.getZone ^DateTime dt))
@@ -130,7 +134,7 @@
                (throw (ex-info (str "Only " default-date-format " format supported")
                                {:format format}))
                (let [[y m d] (get-year-month-day dt)]
-                 (cljs.core/format "%d-%02d-%02d" y m d))))))
+                 (format-%d-%02d-%02d y m d))))))
 
 (defn epoch []
   #?(:clj (ct/epoch)
@@ -226,10 +230,24 @@
    (minute date)
    (sec date)])
 
+(defn- format-%02d:%02d
+  "Dirty work around the breakage introduced by the removal of cljs.core/format fn.
+   If gstring/format did not defy Dead Code Elimination it would do the same as
+   (gstring/format \"%02d:%02d\" h m)"
+  [h m]
+  (str
+   (if (< h 10)
+     (str "0" h)
+     h)
+   ":"
+   (if (< m 10)
+     (str "0" m)
+     m)))
+
 (defn format-time [t]
   #?(:clj (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone ^DateTime t))
                       t)
-     :cljs (gstring/format "%02d:%02d" (hour t) (minute t))))
+     :cljs (format-%02d:%02d (hour t) (minute t))))
 
 (defn to-time [date]
   #?(:clj (java.sql.Time. (cc/to-long date))

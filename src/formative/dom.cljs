@@ -2,7 +2,9 @@
   (:require [formative.util :as fu]
             [formative.parse :as fp]
             [formative.render :as fr]
-            [dommy.core :as d]
+            [dommy.core :as d
+             #_ (:include-macros true)]
+            [dommy.utils :as du]
             [clojure.string :as string])
   (:require-macros [formative.macros :refer [with-fallback]]
                    [dommy.macros :refer [sel sel1 node]]))
@@ -11,7 +13,7 @@
   "Returns a form data string for the given form element, suitable for Ajax
   GET/POST, or passing to formative.parse/parse-params."
   [form-el]
-  (->> (for [el (d/->Array (.-elements form-el))
+  (->> (for [el (du/->Array (.-elements form-el))
              :let [name (.-name el)]
              :when (not (string/blank? name))]
          (let [node-name (.-nodeName el)
@@ -22,15 +24,15 @@
                   (#{"checkbox" "radio"} type)) (when (.-checked el)
                                                   (fu/encode-uri-kv name value))
              (and (= "SELECT" node-name)
-                  (= "select-multiple" type)) (->> (for [opt (d/->Array (.-options el))
+                  (= "select-multiple" type)) (->> (for [opt (du/->Array (.-options el))
                                                          :when (.-selected opt)]
                                                      (fu/encode-uri-kv name (.-value opt)))
-                                                (string/join "&"))
+                                                   (string/join "&"))
              (and (= "INPUT" node-name)
                   (= "file" type)) nil
              :else (fu/encode-uri-kv name value))))
-    (remove nil?)
-    (string/join "&")))
+       (remove nil?)
+       (string/join "&")))
 
 (defn get-form-el
   "Given a form container element or a form element, returns the form element"
@@ -45,7 +47,7 @@
   (let [form-el (get-form-el container-or-form-el)]
     (when-let [parent-el (.-parentNode form-el)]
       (when-let [problems-el (sel1 parent-el ".form-problems")]
-        (d/remove! problems-el)))
+        (.remove problems-el)))
     (doseq [el (sel form-el ".problem.error")]
       (d/remove-class! el "problem" "error"))))
 
@@ -83,8 +85,8 @@
                                      [problem]))]
             fname fnames]
       (let [field-container-id (fu/get-field-container-id
-                                 {:id (fu/get-field-id {:name fname})
-                                  :name fname})]
+                                {:id (fu/get-field-id {:name fname})
+                                 :name fname})]
         (when-let [el (sel1 (str "#" field-container-id))]
           (d/add-class! el "problem error"))))))
 
@@ -105,4 +107,4 @@
                  (with-fallback failure
                    (clear-problems form-el)
                    (success
-                     (fp/parse-params form-spec (serialize form-el))))))))
+                    (fp/parse-params form-spec (serialize form-el))))))))

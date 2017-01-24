@@ -13,7 +13,7 @@
   "Returns a form data string for the given form element, suitable for Ajax
   GET/POST, or passing to formative.parse/parse-params."
   [form-el]
-  (->> (for [el (du/->Array (.-elements form-el))
+  (->> (for [el (.call js/Array.prototype.slice (.-elements form-el))
              :let [name (.-name el)]
              :when (not (string/blank? name))]
          (let [node-name (.-nodeName el)

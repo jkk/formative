@@ -39,16 +39,16 @@
   [container-or-form-el]
   (if (= "FORM" (.-nodeName container-or-form-el))
     container-or-form-el
-    (sel1 container-or-form-el "form")))
+    (.querySelector container-or-form-el "form")))
 
 (defn clear-problems
   "Clears form problems from the DOM"
   [container-or-form-el]
   (let [form-el (get-form-el container-or-form-el)]
     (when-let [parent-el (.-parentNode form-el)]
-      (when-let [problems-el (sel1 parent-el ".form-problems")]
+      (when-let [problems-el (.querySelector parent-el ".form-problems")]
         (.remove problems-el)))
-    (doseq [el (sel form-el ".problem.error")]
+    (doseq [el (.call js/Array.prototype.slice (.querySelectorAll form-el ".problem.error"))]
       (d/remove-class! el "problem" "error"))))
 
 (defn get-scroll-top

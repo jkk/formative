@@ -74,10 +74,11 @@
 (defn show-problems
   "Shows form problems in the DOM"
   [form-spec container-or-form-el problems]
-  (let [form-el (get-form-el container-or-form-el)]
+  (let [form-el (get-form-el container-or-form-el)
+        form-el-parent (.-parentNode form-el)]
     (clear-problems form-el)
     (let [problems-el (node (fr/render-problems problems (:fields form-spec)))]
-      (d/insert-before! problems-el form-el)
+      (.insertBefore form-el-parent problems-el form-el)
       (scroll-to-el problems-el))
     (doseq [problem problems
             :let [fnames (map name (if (map? problem)

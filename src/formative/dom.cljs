@@ -2,8 +2,7 @@
   (:require [formative.util :as fu]
             [formative.parse :as fp]
             [formative.render :as fr]
-            [dommy.core :as d
-             #_ (:include-macros true)]
+            [dommy.core :as d]
             [dommy.utils :as du]
             [clojure.string :as string])
   (:require-macros [formative.macros :refer [with-fallback]]
@@ -23,11 +22,13 @@
              (and (= "INPUT" node-name)
                   (#{"checkbox" "radio"} type)) (when (.-checked el)
                                                   (fu/encode-uri-kv name value))
-             (and (= "SELECT" node-name)
-                  (= "select-multiple" type)) (->> (for [opt (du/->Array (.-options el))
-                                                         :when (.-selected opt)]
-                                                     (fu/encode-uri-kv name (.-value opt)))
-                                                   (string/join "&"))
+
+             (and (= "SELECT" node-name) (= "select-multiple" type))
+             (->> (for [opt (.call js/Array.prototype.slice (.-options el))
+                        :when (.-selected opt)]
+                    (fu/encode-uri-kv name (.-value opt)))
+                  (string/join "&"))
+
              (and (= "INPUT" node-name)
                   (= "file" type)) nil
              :else (fu/encode-uri-kv name value))))

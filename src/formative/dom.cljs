@@ -6,7 +6,7 @@
             [dommy.utils :as du]
             [clojure.string :as string])
   (:require-macros [formative.macros :refer [with-fallback]]
-                   [dommy.macros :refer [sel sel1 node]]))
+                   [dommy.macros :refer [node]]))
 
 (defn serialize
   "Returns a form data string for the given form element, suitable for Ajax
@@ -89,7 +89,7 @@
       (let [field-container-id (fu/get-field-container-id
                                 {:id (fu/get-field-id {:name fname})
                                  :name fname})]
-        (when-let [el (sel1 (str "#" field-container-id))]
+        (when-let [el (.getElementById js/document field-container-id)]
           (d/add-class! el "problem error"))))))
 
 (defn handle-submit

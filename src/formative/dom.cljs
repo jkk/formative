@@ -1,12 +1,14 @@
 (ns formative.dom
-  (:require [formative.util :as fu]
+  (:require [clojure.string :as string]
+            [dommy.core :as d]
             [formative.parse :as fp]
             [formative.render :as fr]
-            [dommy.core :as d]
-            [dommy.utils :as du]
-            [clojure.string :as string])
-  (:require-macros [formative.macros :refer [with-fallback]]
-                   [dommy.macros :refer [node]]))
+            [formative.util :as fu]
+            [goog.events :as ge])
+  (:require-macros
+   [dommy.macros :refer [node]]
+   [formative.macros :refer [with-fallback]])
+  (:import goog.events.EventType))
 
 (defn serialize
   "Returns a form data string for the given form element, suitable for Ajax
@@ -103,9 +105,10 @@
   (let [form-el (get-form-el container-or-form-el)
         failure (or failure
                     #(show-problems form-spec form-el %))]
-    (d/listen! form-el :submit
-               (fn [event]
-                 (.preventDefault event)
+    (ge/listen form-el
+               (.-SUBMIT EventType)
+               (fn [e]
+                 (.preventDefault e)
                  (with-fallback failure
                    (clear-problems form-el)
                    (success

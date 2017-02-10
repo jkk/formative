@@ -1,9 +1,9 @@
 (ns formative.dom
   (:require [clojure.string :as string]
-            [dommy.core :as d]
             [formative.parse :as fp]
             [formative.render :as fr]
             [formative.util :as fu]
+            [goog.dom.classlist :as gclass]
             [goog.events :as ge])
   (:require-macros
    [dommy.macros :refer [node]]
@@ -52,7 +52,10 @@
       (when-let [problems-el (.querySelector parent-el ".form-problems")]
         (.remove problems-el)))
     (doseq [el (.call js/Array.prototype.slice (.querySelectorAll form-el ".problem.error"))]
-      (d/remove-class! el "problem" "error"))))
+      ;;For some reason removeAll causes the event to stop firing,
+      ;;plus removeAll call remove for each class anyways.
+      (gclass/remove el "problem")
+      (gclass/remove el "error"))))
 
 (defn get-scroll-top
   "Returns the top window scroll position"
@@ -92,7 +95,8 @@
                                 {:id (fu/get-field-id {:name fname})
                                  :name fname})]
         (when-let [el (.getElementById js/document field-container-id)]
-          (d/add-class! el "problem error"))))))
+          (gclass/add el "problem")
+          (gclass/add el "error"))))))
 
 (defn handle-submit
   "Attaches an event handler to a form's \"submit\" browser event, validates

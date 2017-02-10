@@ -1,12 +1,12 @@
 (ns formative.dom
   (:require [clojure.string :as string]
+            [crate.core :as c]
             [formative.parse :as fp]
             [formative.render :as fr]
             [formative.util :as fu]
             [goog.dom.classlist :as gclass]
             [goog.events :as ge])
   (:require-macros
-   [dommy.macros :refer [node]]
    [formative.macros :refer [with-fallback]])
   (:import goog.events.EventType))
 
@@ -83,7 +83,7 @@
   (let [form-el (get-form-el container-or-form-el)
         form-el-parent (.-parentNode form-el)]
     (clear-problems form-el)
-    (let [problems-el (node (fr/render-problems problems (:fields form-spec)))]
+    (let [problems-el (c/html (fr/render-problems problems (:fields form-spec)))]
       (.insertBefore form-el-parent problems-el form-el)
       (scroll-to-el problems-el))
     (doseq [problem problems

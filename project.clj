@@ -6,7 +6,6 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [jkkramer/verily "0.6.0"]
                  [clj-time "0.5.1"]
-
                  [ring-anti-forgery "0.2.1"]
                  [crate "0.2.4"]]
   :test-paths ["test"]

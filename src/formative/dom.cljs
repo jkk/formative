@@ -10,11 +10,14 @@
    [formative.macros :refer [with-fallback]])
   (:import goog.events.EventType))
 
+(defn ->Array [elements]
+  (.call js/Array.prototype.slice elements))
+
 (defn serialize
   "Returns a form data string for the given form element, suitable for Ajax
   GET/POST, or passing to formative.parse/parse-params."
   [form-el]
-  (->> (for [el (.call js/Array.prototype.slice (.-elements form-el))
+  (->> (for [el (->Array (.-elements form-el))
              :let [name (.-name el)]
              :when (not (string/blank? name))]
          (let [node-name (.-nodeName el)
@@ -26,7 +29,7 @@
                                                   (fu/encode-uri-kv name value))
 
              (and (= "SELECT" node-name) (= "select-multiple" type))
-             (->> (for [opt (.call js/Array.prototype.slice (.-options el))
+             (->> (for [opt (->Array (.-options el))
                         :when (.-selected opt)]
                     (fu/encode-uri-kv name (.-value opt)))
                   (string/join "&"))
@@ -51,7 +54,7 @@
     (when-let [parent-el (.-parentNode form-el)]
       (when-let [problems-el (.querySelector parent-el ".form-problems")]
         (.remove problems-el)))
-    (doseq [el (.call js/Array.prototype.slice (.querySelectorAll form-el ".problem.error"))]
+    (doseq [el (->Array (.querySelectorAll form-el ".problem.error"))]
       ;;For some reason removeAll causes the event to stop firing,
       ;;plus removeAll call remove for each class anyways.
       (gclass/remove el "problem")

@@ -121,7 +121,7 @@
             (inc (.getUTCMonth date))
             (.getUTCDate date)]))
 
-(defn- format-%d-%02d-%02d [y m d]
+(defn- format-iso-8601-date [y m d]
   (str y "-"
        (if (< m 10) (str "0" m) m) "-"
        (if (< d 10) (str "0" d) d)))
@@ -134,7 +134,7 @@
                (throw (ex-info (str "Only " default-date-format " format supported")
                                {:format format}))
                (let [[y m d] (get-year-month-day dt)]
-                 (format-%d-%02d-%02d y m d))))))
+                 (format-iso-8601-date y m d))))))
 
 (defn epoch []
   #?(:clj (ct/epoch)
@@ -230,7 +230,7 @@
    (minute date)
    (sec date)])
 
-(defn- format-%02d:%02d
+(defn- format-hours-minutes
   "Dirty work around the breakage introduced by the removal of cljs.core/format fn.
    If gstring/format did not defy Dead Code Elimination it would do the same as
    (gstring/format \"%02d:%02d\" h m)"
@@ -247,7 +247,7 @@
 (defn format-time [t]
   #?(:clj (cf/unparse (cf/with-zone (cf/formatter "H:mm") (.getZone ^DateTime t))
                       t)
-     :cljs (format-%02d:%02d (hour t) (minute t))))
+     :cljs (format-hours-minutes (hour t) (minute t))))
 
 (defn to-time [date]
   #?(:clj (java.sql.Time. (cc/to-long date))

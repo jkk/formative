@@ -1,9 +1,7 @@
 (ns formative.render
   (:require [formative.data :as data]
             [formative.util :as fu]
-            [clojure.string :as string]
-            #?(:cljs [goog.string :as gstring]
-               :cljs goog.string.format)))
+            [clojure.string :as string]))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any
@@ -115,7 +113,7 @@
                                       :checked :disabled :href :style :src :size
                                       :readonly :tabindex :onchange :onclick
                                       :onfocus :onblur :placeholder :autofill
-                                      :multiple :title])
+                                      :multiple :title :accept])
         attrs (if (and (= :submit (:type attrs))
                        (empty? (:value attrs)))
                 (dissoc attrs :value)
@@ -137,8 +135,12 @@
     [:textarea attrs (fu/escape-html (render-input-val field))]))
 
 (defn ^:private build-opt-tag [v text val]
-  (let [v (str v)]
-    [:option {:value v :selected (= val v)} text]))
+  (let [v (str v)
+        attrs {:value v}
+        attrs (if (= val v)
+                (assoc attrs :selected "true")
+                attrs)]
+    [:option attrs text]))
 
 (defmethod render-field :select [field]
   (let [attrs (get-input-attrs field [:name :id :class :autofocus
@@ -370,7 +372,8 @@
       [h])))
 
 (defn- format-minutes [m]
-  (#?(:clj format :cljs gstring/format) "%02d" m))
+  #?(:clj (format "%02d" m)
+     :cljs (if (< m 10) (str "0" m) (str m))))
 
 (defn- render-time-select-multi [fname h m s step ampm? seconds?]
   (let [[h ampm] (get-hour+ampm h ampm?)]

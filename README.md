@@ -87,9 +87,9 @@ You can also render individual fields using `formative.core/render-field`. Unlik
                 "Vanilla")
 ;; Returns:
 [:select {:name "flavor"}
- ([:option {:value "Chocolate", :selected false} "Chocolate"]
+ ([:option {:value "Chocolate"} "Chocolate"]
   [:option {:value "Vanilla", :selected true} "Vanilla"]
-  [:option {:value "Strawberry", :selected false} "Strawberry"])]
+  [:option {:value "Strawberry"} "Strawberry"])]
 ```
 
 Notice that the "Vanilla" option is selected in our generated element.

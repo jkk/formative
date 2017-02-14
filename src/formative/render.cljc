@@ -1,9 +1,7 @@
 (ns formative.render
   (:require [formative.data :as data]
             [formative.util :as fu]
-            [clojure.string :as string]
-            #?(:cljs [goog.string :as gstring]
-               :cljs goog.string.format)))
+            [clojure.string :as string]))
 
 (defmulti render-form
   "Renders a form, dispatching on :renderer in form-attrs. Can return any
@@ -374,7 +372,8 @@
       [h])))
 
 (defn- format-minutes [m]
-  (#?(:clj format :cljs gstring/format) "%02d" m))
+  #?(:clj (format "%02d" m)
+     :cljs (if (< m 10) (str "0" m) (str m))))
 
 (defn- render-time-select-multi [fname h m s step ampm? seconds?]
   (let [[h ampm] (get-hour+ampm h ampm?)]

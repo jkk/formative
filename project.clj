@@ -4,10 +4,10 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [jkkramer/verily "0.6.0"]
-                 [clj-time "0.5.1"]
-                 [prismatic/dommy "0.1.1"]
-                 [ring/ring-anti-forgery "1.0.1"]]
+                 [jkkramer/verily "0.6.1"]
+                 [clj-time "0.12.2"]
+                 [ring/ring-anti-forgery "1.0.1"]
+                 [crate "0.2.4"]]
   :test-paths ["test"]
   :profiles {:dev {:dependencies [[com.cemerick/clojurescript.test "0.0.4"]
                                   [com.cemerick/piggieback "0.2.1"]

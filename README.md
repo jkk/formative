@@ -1,6 +1,6 @@
 # Formative
 
-![CircleCI] (https://circleci.com/gh/jkk/formative/tree/master.png?circle-token=89665c8e9ec20d87fcb09a3cf731039dcdf398e8)
+![CircleCI](https://circleci.com/gh/jkk/formative/tree/master.png?circle-token=89665c8e9ec20d87fcb09a3cf731039dcdf398e8)
 
 Web forms for __Clojure__ and __ClojureScript__:
 
@@ -19,7 +19,6 @@ Leiningen coordinate:
 ```
 
 ## Usage
-
 
 The important namespaces are `formative.core` and `formative.parse`.
 

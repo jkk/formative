@@ -99,6 +99,8 @@ All of the built-in form renderers make use of `render-field`, but not all rende
 
 `formative.parse/parse-params` will turn a form specification and form data into a map of parsed form data. It will parse each field according to its `:type` or `:datatype` keys.
 
+Note: You must have `ring.middleware.nested-params/wrap-nested-params` in your middleware for the checkbox parsing to function correctly.
+
 ```clj
 ;; From Ring param map
 (fp/parse-params example-form

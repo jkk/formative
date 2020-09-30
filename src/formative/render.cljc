@@ -197,7 +197,7 @@
                        [:span.cb-input-shell
                         (render-field {:name fname :id id :checked (contains? vals (str oval))
                                        :type :checkbox :value (str oval)})] " "
-                       [:span.cb-label [:nobr olabel]]]]))]
+                       [:span.cb-label [:span {:style {:white-space "nowrap"}} olabel]]]]))]
     [:div.checkboxes
      ;; FIXME: this prevents checkbox values from being absent in the submitted
      ;; request, but at the cost of including an empty value which must be
@@ -229,7 +229,7 @@
                                                   :checked (= val (str oval))
                                                   :value oval})]
                           " "
-                          [:span.radio-label [:nobr olabel]]]]))]
+                          [:span.radio-label [:span {:style {:white-space "nowrap"}} olabel]]]]))]
     [:div.radios
      (for [[oval olabel subopts] opts]
        (if (empty? subopts)
